@@ -1,115 +1,162 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * Generated with the TypeScript template
- * https://github.com/react-native-community/react-native-template-typescript
- *
- * @format
- */
-
+import 'react-native-gesture-handler';
 import React from 'react';
+import {View, Text, Button, StyleProp, ViewStyle} from 'react-native';
+import {NavigationContainer} from '@react-navigation/native';
+import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
-
+  createNativeStackNavigator,
+  NativeStackNavigationProp,
+} from '@react-navigation/native-stack';
 import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+  createDrawerNavigator,
+  DrawerContentScrollView,
+  DrawerItem,
+  DrawerToggleButton,
+} from '@react-navigation/drawer';
+import Octicons from 'react-native-vector-icons/Octicons';
+import FontAwesome5 from 'react-native-vector-icons/FontAwesome5';
+import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
 
-const Section: React.FC<{
-  title: string;
-}> = ({children, title}) => {
-  const isDarkMode = useColorScheme() === 'dark';
+const Drawer = createDrawerNavigator();
+const Tab = createBottomTabNavigator();
+const TaskStack = createNativeStackNavigator<TaskStackParams>();
+
+const centeredStyle: StyleProp<ViewStyle> = {
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+};
+
+const SummaryScreen = () => (
+  <View style={centeredStyle}>
+    <Text>SUMMARY</Text>
+  </View>
+);
+
+const TaskListScreen = ({
+  navigation,
+}: {
+  navigation: NativeStackNavigationProp<TaskStackParams, 'taskList'>;
+}) => (
+  <View style={centeredStyle}>
+    <Text>TASKS</Text>
+    <Button onPress={() => navigation.navigate('addTask')} title="Add task" />
+  </View>
+);
+
+const TaskDetailScreen = ({taskId}: {taskId: string}) => (
+  <View style={centeredStyle}>
+    <Text>Viewing task {taskId}</Text>
+  </View>
+);
+
+const AddTaskScreen = () => (
+  <View style={centeredStyle}>
+    <Text>ADD TASK</Text>
+  </View>
+);
+
+type TaskStackParams = {
+  taskList: undefined;
+  addTask: undefined;
+};
+const TasksScreen = () => {
   return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
+    <TaskStack.Navigator>
+      <TaskStack.Screen
+        name="taskList"
+        component={TaskListScreen}
+        options={{
+          title: 'Tasks',
+          headerLeft: props => (
+            <Text style={{marginLeft: -4, marginRight: 24}}>
+              <DrawerToggleButton {...props} />
+            </Text>
+          ),
+          headerBackVisible: false,
+        }}
+      />
+      <TaskStack.Screen
+        name="addTask"
+        component={AddTaskScreen}
+        options={{title: 'Add Task'}}
+      />
+    </TaskStack.Navigator>
   );
 };
+
+const CustomDrawerContent = (props: any) => (
+  <DrawerContentScrollView {...props}>
+    <DrawerItem
+      label="Tasks"
+      icon={({color, size}) => (
+        <FontAwesome5 name="tasks" color={color} size={size} />
+      )}
+      onPress={() => props.navigation.navigate('taskList')}
+    />
+    <DrawerItem 
+    label="Add task"
+    icon={({color, size}) => <MaterialIcons name="add-task" {...{color, size }} />}
+    onPress={() => props.navigation.navigate('addTask')}/>
+    <DrawerItem
+      label="Metrics"
+      icon={({color, size}) => (
+        <Octicons name="graph" color={color} size={size} />
+      )}
+      onPress={() => props.navigation.navigate('metrics')}
+    />
+  </DrawerContentScrollView>
+);
+
+const Root = () => (
+  <Tab.Navigator>
+    <Tab.Screen
+      name="tasks"
+      component={TasksScreen}
+      options={{
+        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarIcon: ({color, size}) => (
+          <FontAwesome5 name="tasks" color={color} size={size} />
+        ),
+      }}
+    />
+    <Tab.Screen
+      name="metrics"
+      component={SummaryScreen}
+      options={{
+        tabBarShowLabel: false,
+        title: "Metrics",
+        tabBarIcon: ({color, size}) => (
+          <Octicons name="graph" color={color} size={size} />
+        ),
+        headerLeft: props => (
+            <DrawerToggleButton {...props} />
+        )
+      }}
+    />
+  </Tab.Navigator>
+);
+
+const SettingsScreen = () => (
+  <View style={centeredStyle}>
+    <Text>SETTINGS</Text>
+  </View>
+);
 
 const App = () => {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}>
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <NavigationContainer>
+      <Drawer.Navigator
+        drawerContent={props => <CustomDrawerContent {...props} />}>
+        <Drawer.Screen
+          name="drawer"
+          component={Root}
+          options={{headerShown: false}}
+        />
+      </Drawer.Navigator>
+    </NavigationContainer>
   );
 };
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
 
 export default App;
