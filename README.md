@@ -2,11 +2,26 @@
 
 Android app about managing personal tasks.
 
-Goals:
-- Keep track of things to do in a format that encourages actually completing tasks in a timely manner
-- Present metrics of work done
+The goal is to get personal tasks done in a timely manner. We approach this from two directions:
+
+1. Task list: keep track of things to do in a format that encourages actually doing them. Default ordering that emphasizes the most important (or most useful) tasks. Track both recurring tasks and one-off tasks within the same interface.
+2. Metrics: track task completion & effort spent over time. This encourages actually using the app and also works a reward mechanism. (Recurring personal tasks - chores - can be frustrating because they're never actually "done". Keeping a record of work completed at least ensures that it is not forgotten.)
 
 ## Schemas
+
+State shape:
+
+```
+{
+  tasks: {
+    byId: { [id]: Task },
+    allIds: id[]
+  },
+  completions: {
+    byId: { [id]: Completion }
+  }
+}
+```
 
 ### Tags
 
@@ -19,9 +34,12 @@ Tag {
 Tags are created while creating Tasks, but they should be stored separately since we will need to be able to fetch all tags for filtering + autocomplete.
 
 Suggestions for tags:
-- `home` - housework, both recurring tasks like chores and 
-- `outdoors`
-- `health`
+
+- `home` - housework, both recurring tasks like chores and one-off tasks like "fix wobbly chair leg"
+- `outdoors` - tasks which take place outside. useful for filtering since completion depends on weather and time of day
+- `health` - exercise, taking vitamins, etc
+- `logistics` - paying bills, shopping for household items, etc
+- people or pets (parents, dog)
 
 ### Tasks
 
@@ -43,17 +61,18 @@ Task {
   (maybe) deadlineWarning: Recurrence
   scheduled: timestamp
   points: integer
-  lastCompletedAt: date
   tags: Tag[]
   priority: positive or negative integer (0 is neutral)
 }
 ```
 
 Constraints:
+
 - `points` must be a positive integer
 - `recurrence` is required if `isRecurring` is true
 - `scheduled` and `deadline` are mutually exclusive, if one is set the other must be null
 - if `isRecurring` is true then one of `scheduled` or `deadline` must be set, else both are optional
+
 
 #### Recurring tasks
 
@@ -62,6 +81,10 @@ Recurrences are defined by a frequency (representing days/weeks/months) and a nu
 For our use case it should be sufficient to reset the interval whenever the task is (fully) completed, meaning we mutate `scheduled` on the task record when that happens.
 
 Generally recurring tasks will have scheduled dates, but theoretically they could have deadlines (eg, pay a bill that can't be automated), so we should also support that case.
+
+#### Recurrence schema
+
+This will be used for date math on the current date / scheduled date. Thus if we represent it in the db as `frequency` + `interval`, we will have to convert it to a duration we can pass to a date-time library, eg `{ weeks: 2 }`. We may want to just save it as a Duration in the first place, especially if using redux.
 
 #### Deadlines and scheduled times
 
@@ -87,17 +110,43 @@ When creating a completion, inputs for `points` and `date` should default to the
 
 ### Settings
 
-- timezone: necessary for chunking metrics by day/week
+- ~~timezone: necessary for chunking metrics by day/week~~
 - theme
 - default deadline warning
 
+#### On timezone
+
+Setting a configurable timezone means we need to either: 
+1. do all date math in that timezone explicitly
+2. set the system time to that timezone when the app starts up
+
+it may in fact be smarter to just not make the timezone configurable.
+
 ## Filtering & sorting
+
+We need a datastore that is really flexible about querying, since we should be able to build clauses dynamically based on filters.
+
+Eg:
+
+```ts
+const getSortedAndFilteredTasks = (state: State, ...filters: ((task: Task) => boolean)[]) => state.tasks.filter(compose(...filters))
+```
+
+where `filters` would be something like:
+
+```ts
+const isActive = task.scheduled < new Date() || sub(task.deadline, deadlineWarning) < new Date()
+
+const isNotCompleted = task => (!task.isRecurring && !task.lastCompletedAt) || (task.isRecurring && isActive(task))
+```
 
 ### Filter options
 
 By default the task list should filter out completed tasks.
 
 One-offs are completed if there exists any completion record for them. A recurring task is considered completed (temporarily) when `scheduled` is in the future, or when the current date is before `deadline` minus `deadlineWarning`.
+
+Other filter options:
 
 - include tags
 - exclude tags
@@ -115,6 +164,12 @@ One-offs are completed if there exists any completion record for them. A recurri
 
 The urgency of a task is a function of its priority and the time between the current time and the scheduled time or deadline.
 
+Note that some tasks will not (and should not) have scheduled times or deadlines. These tasks should probably be handled as though they are of a lower priority than scheduled/deadline tasks.
+
+How do we weigh time past scheduled date or time until deadline against priority?
+
+Task size should factor into the time until deadline weight - larger tasks become more urgent near their deadline than smaller tasks because it is assumed that they will take longer to finish.
+
 #### Utility
 
 The "utility" of a task is a function of its urgency and the inverse of its point value (smaller tasks lead to higher utility).
@@ -127,3 +182,26 @@ The "utility" of a task is a function of its urgency and the inverse of its poin
 - Alphabetical
 
 ## Metrics
+
+### Point totals
+
+1. A line graph of time on the x axis and points completed on the y axis
+2. A histogram of times completed (like activity on github)
+
+Point totals can apply to one or more tasks. The default metrics view should show point totals for all tasks; the detail page for an individual task should link to point totals for that task.
+
+Can filter and bucket by task properties. Grouping would work for any exclusive category (eg, recurring vs one-off since a task cannot be both, or priority - not tags since tasks can have multiple).
+
+### Point averages
+
+Average points completed per day over each week. Intervals can be customized, eg points per week over the last month/year, etc.
+
+Can represent with a line graph or histogram just like with point totals, and can be filtered/bucketed along the same lines.
+
+### Task demographics
+
+Pie charts of all tasks broken down along various axes.
+
+### Completion intervals
+
+We have the data to compare the average completion interval (time between completions) against the recurrence interval for a task. Not sure how to represent this though.
