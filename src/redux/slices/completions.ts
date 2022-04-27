@@ -1,34 +1,25 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { omit, without } from 'ramda'
-import { TaskID, CompletionID, Completion } from '../../types'
+import { createSlice, createEntityAdapter } from '@reduxjs/toolkit'
+import { Task } from '../../types'
+import { State } from '../store'
 
-export type CompletionState = {
-  byId: Readonly<{ [id: CompletionID]: Completion }>
-  ids: CompletionID[]
-}
+const completionsAdapter = createEntityAdapter<Task>()
 
-const initialState: CompletionState = { byId: {}, ids: [] }
+const initialState = completionsAdapter.getInitialState()
+export type TaskState = typeof initialState
 
 const completions = createSlice({
   name: 'completions',
   initialState,
   reducers: {
-    newCompletion(state, { payload }: PayloadAction<Completion>) {
-      state.byId[payload.id] = payload
-      state.ids.push(payload.id)
-    },
-    deleteCompletion(state, { payload }: PayloadAction<TaskID>) {
-      state.byId = omit([payload], state.byId)
-      state.ids = without([payload], state.ids)
-    },
-    updateCompletion(
-      state,
-      { payload }: PayloadAction<Partial<Completion> & { id: TaskID }>,
-    ) {
-      state.byId[payload.id] = { ...state.byId[payload.id], ...payload }
-    }
+    add: completionsAdapter.addOne,
+    remove: completionsAdapter.removeOne,
+    update: completionsAdapter.updateOne,
   },
 })
 
-const { actions, reducer } = completions
-export { actions, reducer }
+const selectors = completionsAdapter.getSelectors(
+  (state: State) => state.completions
+)
+
+const { reducer, actions } = completions
+export { reducer, actions, selectors }

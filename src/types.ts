@@ -11,32 +11,33 @@ type Recurrence = {
   interval: number
 }
 
-export type TaskID = string
 type Tag = string
 
-export type Task = {
-  id: TaskID
+export type TaskSettings = {
   name: string
-  description: string
   icon: string // emoji
-  createdAt: Date
-  isRecurring: boolean
-  recurrence: Recurrence
-  deadline: Date
-  deadlineWarning?: Recurrence
-  scheduled: Date
   points: number
-  tags: Tag[]
   priority: number
+  isRecurring: boolean
+  recurrence?: Recurrence
+  description: string
+  scheduled?: Date
+  deadline?: Date
+  deadlineWarning?: Recurrence
+  tags: Tag[]
 }
 
-export type CompletionID = string
+export type Task = TaskSettings & {
+  id: string
+  createdAt: Date
+  completions: Completion[]
+}
 
 export type Completion = {
-  id: CompletionID
+  id: string
   name: string
   createdAt: Date
   date: Date
   points: number
-  taskId: TaskID
+  taskId: string
 }

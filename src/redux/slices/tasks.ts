@@ -1,5 +1,6 @@
 import { createSlice, createEntityAdapter } from '@reduxjs/toolkit'
 import { Task } from '../../types'
+import { State } from '../store'
 
 const tasksAdapter = createEntityAdapter<Task>()
 
@@ -16,6 +17,7 @@ const tasks = createSlice({
   }
 })
 
-const { actions, reducer } = tasks
-export { actions, reducer }
+const selectors = tasksAdapter.getSelectors((state: State) => state.tasks)
 
+const { reducer, actions } = tasks
+export { reducer, actions, selectors }
