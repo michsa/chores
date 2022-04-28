@@ -1,12 +1,16 @@
+export type RootStackParamList = {
+  taskList: undefined;
+  addTask: undefined;
+};
 
-enum Frequency {
+export enum Frequency {
   DAY,
   WEEK,
   MONTH,
   YEAR,
 }
 
-type Recurrence = {
+export type Recurrence = {
   frequency: Frequency
   interval: number
 }

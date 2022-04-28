@@ -4,8 +4,9 @@ import { Provider } from 'react-redux'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
 import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import { PersistGate } from 'redux-persist/integration/react'
 
-import store from './src/redux/store'
+import { store, persistor } from './src/redux/store'
 import EditTask from './src/components/EditTask'
 import TaskList from './src/components/TaskList'
 
@@ -19,6 +20,7 @@ type TaskStackParams = {
 const App = () => {
   return (
     <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
       <NavigationContainer>
         <TaskStack.Navigator>
           <TaskStack.Screen
@@ -44,6 +46,7 @@ const App = () => {
           />
         </TaskStack.Navigator>
       </NavigationContainer>
+      </PersistGate>
     </Provider>
   )
 }

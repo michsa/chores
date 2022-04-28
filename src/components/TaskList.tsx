@@ -8,7 +8,7 @@ const TaskList = () => {
   return (
     <View>
       {tasks.length ? (
-        tasks.map(task => <Text>{task.name}</Text>)
+        tasks.map(task => <Text key={task.id}>{JSON.stringify(task, null, 2)}</Text>)
       ) : (
         <Text>No tasks :(</Text>
       )}

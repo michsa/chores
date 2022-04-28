@@ -10,7 +10,9 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "^1.17.1",
+    "@react-native-async-storage/async-storage": "^1.17.3",
+    "@react-native-community/datetimepicker": "^6.1.2",
+    "@react-native-picker/picker": "^2.4.1",
     "@react-navigation/bottom-tabs": "^6.2.0",
     "@react-navigation/drawer": "^6.3.1",
     "@react-navigation/native": "^6.0.8",
@@ -21,7 +23,6 @@
     "@types/react-redux": "^7.1.23",
     "@types/redux": "^3.6.0",
     "@types/redux-persist": "^4.3.1",
-    "nanoid": "^3.3.3",
     "ramda": "^0.28.0",
     "react": "17.0.2",
     "react-native": "0.67.4",
