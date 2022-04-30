@@ -1,8 +1,9 @@
 import React from 'react'
-import { View, StyleProp, ViewStyle } from 'react-native'
+import { View, ViewStyle } from 'react-native'
 import { Picker } from '@react-native-picker/picker'
 import { Frequency, Recurrence } from '../types'
 import { useForm } from '../hooks'
+import { inputStyle } from '../styles'
 import { frequencies } from '../utils'
 import NumericTextInput from './NumericTextInput'
 
@@ -24,17 +25,12 @@ const EditRecurrence = ({
       style={{ ...style, flexDirection: 'row', justifyContent: 'flex-start' }}>
       <NumericTextInput
         style={{
+          ...inputStyle,
           flexBasis: 50,
           flexShrink: 0,
           flexGrow: 1,
-          borderBottomWidth: 1,
-          borderBottomColor: 'lightgrey',
           paddingBottom: 2,
-          fontSize: 16,
-          // paddingTop: 0,
           marginTop: 0,
-          // borderWidth: 1,
-          borderColor: '#F0F'
         }}
         value={form.interval}
         minValue={1}
@@ -42,17 +38,13 @@ const EditRecurrence = ({
       />
       <View
         style={{
+          ...inputStyle,
           flexBasis: 150,
           flexShrink: 0,
           flexGrow: 3,
           padding: 0,
           margin: 0,
-          height: 46,
-          borderBottomWidth: 1,
-          borderBottomColor: 'lightgrey',
           marginLeft: 8,
-          // borderWidth: 1,
-          borderColor: '#0F0'
         }}>
         <Picker
           selectedValue={form.frequency}

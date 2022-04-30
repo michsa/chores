@@ -3,19 +3,16 @@ import React from 'react'
 import { Provider } from 'react-redux'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons'
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
 import { PersistGate } from 'redux-persist/integration/react'
 
 import { store, persistor } from './src/redux/store'
 import EditTask from './src/components/EditTask'
 import TaskList from './src/components/TaskList'
+import ViewTask from './src/components/ViewTask'
+import {TaskStackParams } from './src/types'
 
 const TaskStack = createStackNavigator<TaskStackParams>()
-
-type TaskStackParams = {
-  taskList: undefined
-  addTask: undefined
-}
 
 const App = () => {
   return (
@@ -29,11 +26,10 @@ const App = () => {
             options={({ navigation }) => ({
               title: 'Tasks',
               headerRight: () => (
-                <MaterialIcons
-                  name="add-task"
+                <Icon
+                  name="pencil-plus"
                   size={24}
-                  color="green"
-                  style={{ paddingRight: 24, paddingLeft: 24 }}
+                  style={{ paddingHorizontal: 16 }}
                   onPress={() => navigation.navigate('addTask')}
                 />
               ),
@@ -43,6 +39,16 @@ const App = () => {
             name="addTask"
             component={EditTask}
             options={{ title: 'Add Task', presentation: 'modal' }}
+          />
+          <TaskStack.Screen
+            name="editTask"
+            component={EditTask}
+            options={{ title: 'Edit Task' }}
+          />
+          <TaskStack.Screen
+            name="viewTask"
+            component={ViewTask}
+            options={{ title: 'View Task' }}
           />
         </TaskStack.Navigator>
       </NavigationContainer>

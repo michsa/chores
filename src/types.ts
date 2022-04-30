@@ -1,7 +1,18 @@
-export type RootStackParamList = {
-  taskList: undefined;
-  addTask: undefined;
-};
+import { StackScreenProps } from '@react-navigation/stack'
+
+export type TaskStackParams = {
+  taskList: undefined
+  addTask: undefined
+  editTask: { id: string }
+  viewTask: { id: string }
+}
+
+export type NavigationProps = {
+  taskList: StackScreenProps<TaskStackParams, 'taskList'>
+  addTask: StackScreenProps<TaskStackParams, 'addTask'>
+  editTask: StackScreenProps<TaskStackParams, 'editTask'>
+  viewTask: StackScreenProps<TaskStackParams, 'viewTask'>
+}
 
 export enum Frequency {
   DAY,
@@ -19,29 +30,28 @@ type Tag = string
 
 export type TaskSettings = {
   name: string
-  icon: string // emoji
   points: number
   priority: number
   isRecurring: boolean
   recurrence?: Recurrence
   description: string
-  scheduled?: Date
-  deadline?: Date
+  scheduled?: number
+  deadline?: number
   deadlineWarning?: Recurrence
   tags: Tag[]
 }
 
 export type Task = TaskSettings & {
   id: string
-  createdAt: Date
+  createdAt: number
   completions: Completion[]
 }
 
 export type Completion = {
   id: string
   name: string
-  createdAt: Date
-  date: Date
+  createdAt: number
+  date: number
   points: number
   taskId: string
 }
