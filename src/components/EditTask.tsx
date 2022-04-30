@@ -7,6 +7,7 @@ import {
   Button,
   Pressable,
   ScrollView,
+  ToastAndroid,
 } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { Picker } from '@react-native-picker/picker'
@@ -17,43 +18,67 @@ import { upsertTask } from '../redux/actions'
 import { getTaskById } from '../redux/selectors'
 import { elementStyle, dividerStyle, fieldStyle, inputStyle } from '../styles'
 import { Task, TaskSettings, Frequency, NavigationProps } from '../types'
-import { priorities } from '../utils'
+import { priorityOptions } from '../utils'
 import EditRecurrence from './EditRecurrence'
 import NumericTextInput from './NumericTextInput'
 
-const useTaskIfExists = (id?: string): TaskSettings | Task => {
-  const emptyTask: TaskSettings = {
-    name: '',
-    points: 1,
-    priority: 0,
-    isRecurring: false,
-    recurrence: { frequency: Frequency.WEEK, interval: 1 },
-    description: '',
-    tags: [],
-  }
+const defaultRecurrence = { frequency: Frequency.WEEK, interval: 1 }
+
+const defaultSetings: TaskSettings = {
+  name: '',
+  points: 1,
+  priority: 0,
+  isRecurring: false,
+  recurrence: defaultRecurrence,
+  deadlineWarning: defaultRecurrence,
+  description: '',
+  tags: [],
+}
+
+const useTaskIfExists = (id?: string): TaskSettings => {
   const task = id ? useSelector(getTaskById(id)) : undefined
-  return task ?? emptyTask
+  return task?.settings ?? defaultSetings
 }
 
 const validate = (form: Partial<TaskSettings>): TaskSettings => {
   if (!form.name) throw Error('Task must have a name')
+  if (!form.points) throw Error('Task must have points')
 
   return form as TaskSettings
 }
 
+const cleanup = (form: TaskSettings) => {
+  if (form.deadlineWarning && !form.deadline) {
+    delete form.deadlineWarning
+  }
+  if (!form.scheduled && !form.deadline) {
+    form.isRecurring = false
+  }
+  if (form.recurrence && !form.isRecurring) {
+    delete form.recurrence
+  }
+  return form
+}
+
 const EditTask = ({
   navigation,
-  route,
+  route: { params },
 }: NavigationProps['addTask'] | NavigationProps['editTask']) => {
   const dispatch = useDispatch()
-  const task = useTaskIfExists(route.params?.id)
-  const { form, setField } = useForm<TaskSettings>(task)
+  const settings = useTaskIfExists(params?.id)
+  const { form, setField } = useForm<TaskSettings>(settings)
 
   const onSubmit = () => {
     console.log('onSubmit', form)
-    const formToSubmit = validate(form)
-    dispatch(upsertTask(formToSubmit))
-    navigation.goBack()
+    try {
+      const formToSubmit = validate(form)
+      dispatch(upsertTask(cleanup(formToSubmit), params?.id))
+      navigation.goBack()
+    } catch (e: unknown) {
+      console.log(typeof e)
+      const error = (e as Error).toString()
+      ToastAndroid.show(error, ToastAndroid.LONG)
+    }
   }
 
   useLayoutEffect(() => {
@@ -87,7 +112,7 @@ const EditTask = ({
           fontSize: 16,
         }}
         onPress={() => setDatePicker(field)}>
-        {form[field]?.toString()}
+        {!!form[field] && new Date(form[field] as number).toDateString()}
       </Text>
       <Button title="clear" onPress={() => setField(field)(undefined)} />
     </View>
@@ -98,7 +123,7 @@ const EditTask = ({
       <View style={fieldStyle}>
         <Text>Name</Text>
         <TextInput
-          style={{ ...inputStyle, fontSize: 18 }}
+          style={{ ...inputStyle, fontSize: 20 }}
           value={form.name}
           onChangeText={setField('name')}
         />
@@ -120,8 +145,8 @@ const EditTask = ({
           <View style={inputStyle}>
             <Picker
               selectedValue={form.priority}
-              onValueChange={(value: number) => setField('priority')(value)}>
-              {Object.entries(priorities).map(([label, value]) => (
+              onValueChange={setField('priority')}>
+              {priorityOptions.map(({ label, value }) => (
                 <Picker.Item key={value} {...{ label, value }} />
               ))}
             </Picker>

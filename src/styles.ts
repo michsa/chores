@@ -7,11 +7,13 @@ export const elementStyle = {
 export const fieldStyle = {
   ...elementStyle,
   backgroundColor: '#FFF',
-  padding: 8,
+  paddingHorizontal: 16,
+  paddingVertical: 8,
+  borderRadius: 8
 }
 
 export const dividerStyle = {
-  flexBasis: 12,
+  flexBasis: 8,
 }
 
 export const inputHeight = 46
@@ -27,4 +29,5 @@ export const propertyStyle = {
   borderBottomColor: 'lightgrey',
   paddingVertical: 4,
   fontSize: 16,
+  color: 'black'
 }

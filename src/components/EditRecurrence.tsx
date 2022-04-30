@@ -1,14 +1,11 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { View, ViewStyle } from 'react-native'
 import { Picker } from '@react-native-picker/picker'
 import { Frequency, Recurrence } from '../types'
 import { useForm } from '../hooks'
 import { inputStyle } from '../styles'
-import { frequencies } from '../utils'
+import { frequencyOptions, maybePlural } from '../utils'
 import NumericTextInput from './NumericTextInput'
-
-const maybePlural = (text: string, qty: number) =>
-  qty === 1 ? text : `${text}s`
 
 const EditRecurrence = ({
   value = { frequency: Frequency.WEEK, interval: 1 },
@@ -20,6 +17,10 @@ const EditRecurrence = ({
   onChange: (r: Recurrence) => void
 }) => {
   const { form, setField } = useForm<Recurrence>(value)
+
+  useEffect(() => {
+    onChange(form)
+  }, [form])
   return (
     <View
       style={{ ...style, flexDirection: 'row', justifyContent: 'flex-start' }}>
@@ -48,14 +49,11 @@ const EditRecurrence = ({
         }}>
         <Picker
           selectedValue={form.frequency}
-          onValueChange={(value: Frequency) => {
-            setField('frequency')(value)
-            onChange(form)
-          }}>
-          {Object.entries(frequencies).map(([key, value]) => (
+          onValueChange={setField('frequency')}>
+          {frequencyOptions.map(({ label, value }) => (
             <Picker.Item
               key={value}
-              label={maybePlural(key, form.interval)}
+              label={maybePlural(label, form.interval)}
               value={value}
             />
           ))}

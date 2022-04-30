@@ -7,6 +7,7 @@ import { deleteTask } from '../redux/actions'
 import { getTaskById } from '../redux/selectors'
 import { dividerStyle, fieldStyle, propertyStyle } from '../styles'
 import { NavigationProps } from '../types'
+import { priorityLabel, printRecurrence } from '../utils'
 
 const ViewTask = ({
   navigation,
@@ -47,39 +48,58 @@ const ViewTask = ({
     <ScrollView>
       <View style={fieldStyle}>
         <Text>Name</Text>
-        <Text style={{ ...propertyStyle, fontSize: 18 }}>{task.name}</Text>
+        <Text style={{ ...propertyStyle, fontSize: 20 }}>
+          {task.settings.name}
+        </Text>
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <View style={{ ...fieldStyle, flex: 2, marginRight: 0 }}>
           <Text>Points</Text>
-          <Text style={propertyStyle}>{task.points}</Text>
+          <Text style={propertyStyle}>{task.settings.points}</Text>
         </View>
         <View style={dividerStyle} />
         <View style={{ ...fieldStyle, flex: 3, marginLeft: 0 }}>
           <Text>Priority</Text>
-          <Text style={propertyStyle}>{task.priority}</Text>
+          <Text style={propertyStyle}>
+            {priorityLabel(task.settings.priority)}
+          </Text>
         </View>
       </View>
       <View style={fieldStyle}>
         <Text>Tags</Text>
-        <Text style={propertyStyle}>{task.tags.join(' ')}</Text>
+        <Text style={propertyStyle}>{task.settings.tags.join(' ')}</Text>
       </View>
-      {!!task.scheduled && (
+      {!!task.settings.scheduled && (
         <View style={fieldStyle}>
           <Text>Scheduled</Text>
-          <Text style={propertyStyle}>{task.scheduled}</Text>
+          <Text style={propertyStyle}>
+            {new Date(task.settings.scheduled).toDateString()}
+          </Text>
         </View>
       )}
-      {!!task.deadline && (
-        <View style={fieldStyle}>
-          <Text>Deadline</Text>
-          <Text style={propertyStyle}>{task.deadline}</Text>
+      {!!task.settings.deadline && (
+        <View style={{ flexDirection: 'row' }}>
+          <View style={{ ...fieldStyle, flex: 3, marginRight: 0 }}>
+            <Text>Deadline</Text>
+            <Text style={propertyStyle}>
+              {new Date(task.settings.deadline).toDateString()}
+            </Text>
+          </View>
+          <View style={dividerStyle} />
+          {!!task.settings.deadlineWarning && (
+            <View style={{ ...fieldStyle, flex: 2, marginLeft: 0 }}>
+              <Text>Notify</Text>
+              <Text style={propertyStyle}>
+                {printRecurrence(task.settings.deadlineWarning)} before
+              </Text>
+            </View>
+          )}
         </View>
       )}
 
       <View style={fieldStyle}>
         <Text>Notes</Text>
-        <Text style={propertyStyle}>{task.description}</Text>
+        <Text style={propertyStyle}>{task.settings.description}</Text>
       </View>
     </ScrollView>
   )

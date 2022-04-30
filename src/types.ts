@@ -28,10 +28,12 @@ export type Recurrence = {
 
 type Tag = string
 
+export type Priority = -2 | -1 | 0 | 1 | 2
+
 export type TaskSettings = {
   name: string
   points: number
-  priority: number
+  priority: Priority,
   isRecurring: boolean
   recurrence?: Recurrence
   description: string
@@ -41,8 +43,9 @@ export type TaskSettings = {
   tags: Tag[]
 }
 
-export type Task = TaskSettings & {
+export type Task = {
   id: string
+  settings: TaskSettings
   createdAt: number
   completions: Completion[]
 }

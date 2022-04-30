@@ -14,7 +14,7 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
         <Pressable
           onPress={() => navigation.navigate('viewTask', { id: item.id })}>
           <View style={{ ...fieldStyle, flexDirection: 'row' }}>
-            <Text>{item.name}</Text>
+            <Text>{item.settings.name}</Text>
             <Text>{JSON.stringify(item, null, 2)}</Text>
           </View>
         </Pressable>
