@@ -4,10 +4,10 @@ import { StatusBar } from 'react-native'
 import { Provider } from 'react-redux'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
-import Icon from 'react-native-vector-icons/Feather'
 import { PersistGate } from 'redux-persist/integration/react'
 import { ThemeProvider as EThemeProvider } from '@emotion/react'
 
+import { HeaderIcon } from './src/components'
 import { store, persistor } from './src/redux/store'
 import EditTask from './src/pages/EditTask'
 import TaskList from './src/pages/TaskList'
@@ -40,6 +40,9 @@ const App = () => {
                 cardStyle: {
                   backgroundColor: theme.colors.background,
                 },
+                headerRightContainerStyle: {
+                  marginRight: theme.spacing.m,
+                },
               }}>
               <TaskStack.Screen
                 name="taskList"
@@ -47,11 +50,9 @@ const App = () => {
                 options={({ navigation }) => ({
                   title: 'Tasks',
                   headerRight: () => (
-                    <Icon
+                    <HeaderIcon
                       name="plus-square"
                       size={26}
-                      color="teal"
-                      style={{ padding: 8, marginRight: 12 }}
                       onPress={() => navigation.navigate('addTask')}
                     />
                   ),

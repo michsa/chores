@@ -8,25 +8,21 @@ import {
   ToastAndroid,
 } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
-// import { Picker } from '@react-native-picker/picker'
+import { useTheme } from '@emotion/react'
 
 import { useDispatch, useForm, useSelector } from '../hooks'
 import { upsertTask } from '../redux/actions'
 import { getTaskById } from '../redux/selectors'
-import {
-  elementStyle,
-  dividerStyle,
-  fieldStyle,
-  inputStyle,
-  selectInputStyle,
-} from '../styles'
 import { TaskSettings, Frequency, NavigationProps } from '../types'
 import { priorityOptions } from '../utils'
 import {
   Text,
   Card,
+  Section,
+  Divider,
   TextInput,
   Icon,
+  HeaderIcon,
   Picker,
   FakeInputText,
 } from '../components'
@@ -75,6 +71,7 @@ const EditTask = ({
   navigation,
   route: { params },
 }: NavigationProps['addTask'] | NavigationProps['editTask']) => {
+  const theme = useTheme()
   const dispatch = useDispatch()
   const settings = useTaskIfExists(params?.id)
   const { form, setField } = useForm<TaskSettings>(settings)
@@ -95,13 +92,7 @@ const EditTask = ({
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <Icon
-          name="save"
-          size={24}
-          color="accent"
-          style={{ padding: 8, marginRight: 12 }}
-          onPress={onSubmit}
-        />
+        <HeaderIcon name="save" color="accent" onPress={onSubmit} />
       ),
     })
   }, [navigation, form])
@@ -129,7 +120,7 @@ const EditTask = ({
       <Card>
         <TextInput
           placeholder="Name"
-          style={{ fontSize: 20 }}
+          style={{ fontSize: theme.fontSizes.large }}
           value={form.name}
           onChangeText={setField('name')}
         />
@@ -143,7 +134,7 @@ const EditTask = ({
             alignItems: 'center',
           }}>
           <Icon name="star" />
-          <View style={dividerStyle} />
+          <Divider />
           <NumericTextInput
             placeholder="Points"
             style={{ flex: 1 }}
@@ -153,7 +144,7 @@ const EditTask = ({
             onChangeText={setField('points')}
           />
         </Card>
-        <View style={dividerStyle} />
+        <Divider />
         <Card
           style={{
             flex: 3,
@@ -162,7 +153,7 @@ const EditTask = ({
             alignItems: 'center',
           }}>
           <Icon name="flag" />
-          <View style={dividerStyle} />
+          <Divider />
           <Picker
             selectedValue={form.priority}
             onValueChange={setField('priority')}
@@ -172,35 +163,30 @@ const EditTask = ({
       </View>
       <Card style={{ flexDirection: 'row', alignItems: 'center' }}>
         <Icon name="tag" />
-        <View style={dividerStyle} />
+        <Divider />
         <TextInput
           placeholder="Tags"
-          style={{ flex: 1, paddingLeft: 8 }}
+          style={{ flex: 1 }}
           value={form.tags.join(' ')}
           onChangeText={text => setField('tags')(text.split(' '))}
         />
       </Card>
       {!form.scheduled && !form.deadline && (
-        <View
-          style={{
-            ...elementStyle,
-            flexDirection: 'row',
-            padding: 8,
-          }}>
-          <View style={{ flex: 1, marginRight: 0 }}>
+        <Section style={{ flexDirection: 'row', padding: theme.spacing.s }}>
+          <View style={{ flex: 1 }}>
             <Button
               title="Set scheduled time"
               onPress={() => setDatePicker('scheduled')}
             />
           </View>
-          <View style={dividerStyle} />
-          <View style={{ flex: 1, marginLeft: 0 }}>
+          <Divider />
+          <View style={{ flex: 1 }}>
             <Button
               title="Set deadline"
               onPress={() => setDatePicker('deadline')}
             />
           </View>
-        </View>
+        </Section>
       )}
       {!!datePicker && (
         <DateTimePicker
@@ -215,66 +201,63 @@ const EditTask = ({
       )}
       {!!form.scheduled && (
         <Card style={{ flexDirection: 'row', alignItems: 'center' }}>
-          <Icon name="calendar" size={20} />
-          <View style={dividerStyle} />
+          <Icon name="calendar" />
+          <Divider />
           <DateField field="scheduled" />
         </Card>
       )}
       {!!form.deadline && (
         <Card>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Icon name="alert-circle" size={20} />
-            <View style={dividerStyle} />
+            <Icon name="alert-circle" />
+            <Divider />
             <DateField field="deadline" />
           </View>
+          <Divider />
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              marginTop: 8,
-              marginLeft: 4,
-              marginRight: 8,
             }}>
             <Text>Notify</Text>
-            <View style={dividerStyle} />
+            <Divider />
             <EditRecurrence
               style={{ flex: 1 }}
               value={form.deadlineWarning}
               onChange={setField('deadlineWarning')}
             />
-            <View style={dividerStyle} />
+            <Divider />
             <Text>before</Text>
+            <Divider />
           </View>
         </Card>
       )}
       {!!(form.scheduled || form.deadline) && (
-        <Card>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              height: inputStyle.height,
-            }}>
-            <Text>Repeat</Text>
-            {form.isRecurring && (
-              <>
-                <Text style={{ marginRight: 8 }}> after</Text>
-                <EditRecurrence
-                  style={{ flex: 1 }}
-                  value={form.recurrence}
-                  onChange={setField('recurrence')}
-                />
-              </>
-            )}
-            <Pressable
-              style={{ flex: 1, paddingLeft: 24 }}
-              onPress={() => setField('isRecurring')(!form.isRecurring)}>
-              <Switch
-                value={form.isRecurring}
-                onValueChange={setField('isRecurring')}
+        <Card
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            height: theme.sizes.inputHeight,
+          }}>
+          <Text>Repeat</Text>
+          {form.isRecurring && (
+            <>
+              <Text style={{ marginRight: theme.spacing.s }}> after</Text>
+              <EditRecurrence
+                style={{ flex: 1 }}
+                value={form.recurrence}
+                onChange={setField('recurrence')}
               />
-            </Pressable>
-          </View>
+            </>
+          )}
+          <Pressable
+            style={{ flex: 1, paddingLeft: theme.spacing.xl }}
+            onPress={() => setField('isRecurring')(!form.isRecurring)}>
+            <Switch
+              value={form.isRecurring}
+              onValueChange={setField('isRecurring')}
+            />
+          </Pressable>
         </Card>
       )}
 
@@ -282,9 +265,9 @@ const EditTask = ({
         <Text>Notes</Text>
         <TextInput
           style={{
-            minHeight: inputStyle.height,
+            minHeight: theme.sizes.inputHeight,
             height: 'auto',
-            paddingHorizontal: 0
+            paddingHorizontal: 0,
           }}
           autoCorrect={false}
           value={form.description}

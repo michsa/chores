@@ -1,11 +1,10 @@
 import React, { useLayoutEffect } from 'react'
 import { View, ScrollView } from 'react-native'
 
-import { Text, PropertyText, Card, Icon } from '../components'
+import { Text, PropertyText, Card, Divider, HeaderIcon } from '../components'
 import { useDispatch, useSelector } from '../hooks'
 import { deleteTask } from '../redux/actions'
 import { getTaskById } from '../redux/selectors'
-import { dividerStyle, fieldStyle, propertyStyle } from '../styles'
 import { NavigationProps } from '../types'
 import { priorityLabel, printRecurrence } from '../utils'
 
@@ -21,23 +20,18 @@ const ViewTask = ({
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <View style={{ flexDirection: 'row', marginRight: 12 }}>
-          <Icon
+        <View style={{ flexDirection: 'row' }}>
+          <HeaderIcon
             name="trash-2"
             color="danger"
-            size={24}
-            style={{ padding: 8 }}
             onPress={() => {
               dispatch(deleteTask(id))
               navigation.navigate('taskList')
             }}
           />
-          <View style={dividerStyle} />
-          <Icon
+          <Divider />
+          <HeaderIcon
             name="edit"
-            size={24}
-            color="accent"
-            style={{ padding: 8 }}
             onPress={() => navigation.navigate('editTask', { id })}
           />
         </View>
@@ -59,12 +53,10 @@ const ViewTask = ({
           <Text>Points</Text>
           <PropertyText>{task.settings.points}</PropertyText>
         </Card>
-        <View style={dividerStyle} />
+        <Divider />
         <Card style={{ flex: 3, marginLeft: 0 }}>
           <Text>Priority</Text>
-          <PropertyText>
-            {priorityLabel(task.settings.priority)}
-          </PropertyText>
+          <PropertyText>{priorityLabel(task.settings.priority)}</PropertyText>
         </Card>
       </View>
       <Card>
@@ -87,7 +79,7 @@ const ViewTask = ({
               {new Date(task.settings.deadline).toDateString()}
             </PropertyText>
           </Card>
-          <View style={dividerStyle} />
+          <Divider />
           {!!task.settings.deadlineWarning && (
             <Card style={{ flex: 2, marginLeft: 0 }}>
               <Text>Notify</Text>

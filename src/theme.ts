@@ -33,6 +33,11 @@ const spacing = {
   s: 8,
   m: 12,
   l: 16,
+  xl: 24
+}
+
+const sizes = {
+  inputHeight: 46
 }
 
 type ThemeColor =
@@ -78,6 +83,7 @@ const darkColors: ColorScheme = {
 const baseTheme = {
   palette,
   spacing,
+  sizes,
   fontSizes
 }
 
