@@ -23,13 +23,11 @@ const EditRecurrence = ({
   }, [form])
   return (
     <View
-      style={{ ...style, flexDirection: 'row', justifyContent: 'flex-start' }}>
+      style={{ ...style, minWidth: 200, flexDirection: 'row', justifyContent: 'space-around', flex: 1 }}>
       <NumericTextInput
         style={{
           ...inputStyle,
-          flexBasis: 50,
-          flexShrink: 0,
-          flexGrow: 1,
+          flex: 1,
           paddingBottom: 2,
         }}
         value={form.interval}
@@ -39,9 +37,7 @@ const EditRecurrence = ({
       <View
         style={{
           ...inputStyle,
-          flexBasis: 150,
-          flexShrink: 0,
-          flexGrow: 3,
+          flex: 3,
           padding: 0,
           margin: 0,
           marginLeft: 8,

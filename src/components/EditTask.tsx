@@ -237,44 +237,41 @@ const EditTask = ({
       )}
       {!!(form.scheduled || form.deadline) && (
         <View style={fieldStyle}>
-          <Pressable onPress={() => setField('isRecurring')(!form.isRecurring)}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingVertical: 4,
-              }}>
-              <Text>Repeat</Text>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              height: inputStyle.height,
+            }}>
+            <Text style={{ flex: 0 }}>Repeat</Text>
+            {form.isRecurring && (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  flex: 1,
+                }}>
+                <Text
+                  style={{ marginHorizontal: 4 }}>
+                  after
+                </Text>
+                <EditRecurrence
+                  style={{ flex: 1 }}
+                  value={form.recurrence}
+                  onChange={setField('recurrence')}
+                />
+              </View>
+            )}
+            <Pressable
+              style={{ flex: form.isRecurring ? 0 : 1 }}
+              onPress={() => setField('isRecurring')(!form.isRecurring)}>
               <Switch
                 value={form.isRecurring}
                 onValueChange={setField('isRecurring')}
               />
-            </View>
-          </Pressable>
-          {form.isRecurring && (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginLeft: 4,
-                marginRight: 8,
-              }}>
-              <Text
-                style={{
-                  marginRight: 16,
-                  flex: 0,
-                }}>
-                after
-              </Text>
-              <EditRecurrence
-                style={{ flex: 3 }}
-                value={form.recurrence}
-                onChange={setField('recurrence')}
-              />
-            </View>
-          )}
+            </Pressable>
+          </View>
         </View>
       )}
 
