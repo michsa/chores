@@ -16,7 +16,7 @@ import Icon from 'react-native-vector-icons/Feather'
 import { useDispatch, useForm, useSelector } from '../hooks'
 import { upsertTask } from '../redux/actions'
 import { getTaskById } from '../redux/selectors'
-import { elementStyle, dividerStyle, fieldStyle, inputStyle } from '../styles'
+import { elementStyle, dividerStyle, fieldStyle, inputStyle, selectInputStyle } from '../styles'
 import { Task, TaskSettings, Frequency, NavigationProps } from '../types'
 import { priorityOptions } from '../utils'
 import EditRecurrence from './EditRecurrence'
@@ -104,35 +104,49 @@ const EditTask = ({
         style={{
           ...inputStyle,
           flex: 1,
-          paddingLeft: 4,
+          paddingLeft: 8,
           paddingBottom: 8,
           paddingTop: 16,
           color: 'black',
-          marginRight: 16,
           fontSize: 16,
+          marginLeft: 12,
         }}
         onPress={() => setDatePicker(field)}>
         {!!form[field] && new Date(form[field] as number).toDateString()}
       </Text>
-      <Button title="clear" onPress={() => setField(field)(undefined)} />
+      <Icon
+        name="x"
+        color="teal"
+        style={{ paddingHorizontal: 24 }}
+        size={24}
+        onPress={() => setField(field)(undefined)}
+      />
     </View>
   )
 
   return (
     <ScrollView>
       <View style={fieldStyle}>
-        <Text>Name</Text>
         <TextInput
+          placeholder="Name"
           style={{ ...inputStyle, fontSize: 20 }}
           value={form.name}
           onChangeText={setField('name')}
         />
       </View>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <View style={{ ...fieldStyle, flex: 2, marginRight: 0 }}>
-          <Text>Points</Text>
+        <View
+          style={{
+            ...fieldStyle,
+            flex: 2,
+            marginRight: 0,
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          <Icon name="star" size={20} />
           <NumericTextInput
-            style={inputStyle}
+            placeholder="Points"
+            style={{ ...inputStyle, flex: 1, marginLeft: 12 }}
             minValue={1}
             maxValue={999}
             value={form.points}
@@ -140,10 +154,19 @@ const EditTask = ({
           />
         </View>
         <View style={dividerStyle} />
-        <View style={{ ...fieldStyle, flex: 3, marginLeft: 0 }}>
-          <Text>Priority</Text>
-          <View style={inputStyle}>
+        <View
+          style={{
+            ...fieldStyle,
+            flex: 3,
+            marginLeft: 0,
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          <Icon name="flag" size={20} style={{ marginRight: 8 }} />
+          <View
+            style={{ ...selectInputStyle, flex: 1 }}>
             <Picker
+              style={{ marginLeft: -8 }}
               selectedValue={form.priority}
               onValueChange={setField('priority')}>
               {priorityOptions.map(({ label, value }) => (
@@ -153,10 +176,13 @@ const EditTask = ({
           </View>
         </View>
       </View>
-      <View style={fieldStyle}>
-        <Text>Tags</Text>
+      <View
+        style={{ ...fieldStyle, flexDirection: 'row', alignItems: 'center' }}>
+        <Icon name="tag" size={20} />
+
         <TextInput
-          style={inputStyle}
+          placeholder="Tags"
+          style={{ ...inputStyle, flex: 1, marginLeft: 12, paddingLeft: 8 }}
           value={form.tags.join(' ')}
           onChangeText={text => setField('tags')(text.split(' '))}
         />
@@ -195,15 +221,18 @@ const EditTask = ({
         />
       )}
       {!!form.scheduled && (
-        <View style={fieldStyle}>
-          <Text>Scheduled</Text>
+        <View
+          style={{ ...fieldStyle, flexDirection: 'row', alignItems: 'center' }}>
+          <Icon name="calendar" size={20} />
           <DateField field="scheduled" />
         </View>
       )}
       {!!form.deadline && (
         <View style={fieldStyle}>
-          <Text>Deadline</Text>
-          <DateField field="deadline" />
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Icon name="alert-circle" size={20} />
+            <DateField field="deadline" />
+          </View>
           <View
             style={{
               flexDirection: 'row',
@@ -252,10 +281,7 @@ const EditTask = ({
                   justifyContent: 'center',
                   flex: 1,
                 }}>
-                <Text
-                  style={{ marginHorizontal: 4 }}>
-                  after
-                </Text>
+                <Text style={{ marginHorizontal: 4 }}>after</Text>
                 <EditRecurrence
                   style={{ flex: 1 }}
                   value={form.recurrence}
