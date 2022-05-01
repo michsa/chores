@@ -1,7 +1,7 @@
 import React, { useLayoutEffect } from 'react'
-import { View, Text, ScrollView } from 'react-native'
-import Icon from 'react-native-vector-icons/Feather'
+import { View, ScrollView } from 'react-native'
 
+import { Text, PropertyText, Card, Icon } from '../components'
 import { useDispatch, useSelector } from '../hooks'
 import { deleteTask } from '../redux/actions'
 import { getTaskById } from '../redux/selectors'
@@ -24,7 +24,7 @@ const ViewTask = ({
         <View style={{ flexDirection: 'row', marginRight: 12 }}>
           <Icon
             name="trash-2"
-            color="indianred"
+            color="danger"
             size={24}
             style={{ padding: 8 }}
             onPress={() => {
@@ -36,7 +36,7 @@ const ViewTask = ({
           <Icon
             name="edit"
             size={24}
-            color="teal"
+            color="accent"
             style={{ padding: 8 }}
             onPress={() => navigation.navigate('editTask', { id })}
           />
@@ -48,61 +48,61 @@ const ViewTask = ({
   if (!task) return null
   return (
     <ScrollView>
-      <View style={fieldStyle}>
+      <Card>
         <Text>Name</Text>
-        <Text style={{ ...propertyStyle, fontSize: 20 }}>
+        <PropertyText style={{ fontSize: 20 }}>
           {task.settings.name}
-        </Text>
-      </View>
+        </PropertyText>
+      </Card>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <View style={{ ...fieldStyle, flex: 2, marginRight: 0 }}>
+        <Card style={{ flex: 2, marginRight: 0 }}>
           <Text>Points</Text>
-          <Text style={propertyStyle}>{task.settings.points}</Text>
-        </View>
+          <PropertyText>{task.settings.points}</PropertyText>
+        </Card>
         <View style={dividerStyle} />
-        <View style={{ ...fieldStyle, flex: 3, marginLeft: 0 }}>
+        <Card style={{ flex: 3, marginLeft: 0 }}>
           <Text>Priority</Text>
-          <Text style={propertyStyle}>
+          <PropertyText>
             {priorityLabel(task.settings.priority)}
-          </Text>
-        </View>
+          </PropertyText>
+        </Card>
       </View>
-      <View style={fieldStyle}>
+      <Card>
         <Text>Tags</Text>
-        <Text style={propertyStyle}>{task.settings.tags.join(' ')}</Text>
-      </View>
+        <PropertyText>{task.settings.tags.join(' ')}</PropertyText>
+      </Card>
       {!!task.settings.scheduled && (
-        <View style={fieldStyle}>
+        <Card>
           <Text>Scheduled</Text>
-          <Text style={propertyStyle}>
+          <PropertyText>
             {new Date(task.settings.scheduled).toDateString()}
-          </Text>
-        </View>
+          </PropertyText>
+        </Card>
       )}
       {!!task.settings.deadline && (
         <View style={{ flexDirection: 'row' }}>
-          <View style={{ ...fieldStyle, flex: 3, marginRight: 0 }}>
+          <Card style={{ flex: 3, marginRight: 0 }}>
             <Text>Deadline</Text>
-            <Text style={propertyStyle}>
+            <PropertyText>
               {new Date(task.settings.deadline).toDateString()}
-            </Text>
-          </View>
+            </PropertyText>
+          </Card>
           <View style={dividerStyle} />
           {!!task.settings.deadlineWarning && (
-            <View style={{ ...fieldStyle, flex: 2, marginLeft: 0 }}>
+            <Card style={{ flex: 2, marginLeft: 0 }}>
               <Text>Notify</Text>
-              <Text style={propertyStyle}>
+              <PropertyText>
                 {printRecurrence(task.settings.deadlineWarning)} before
-              </Text>
-            </View>
+              </PropertyText>
+            </Card>
           )}
         </View>
       )}
 
-      <View style={fieldStyle}>
+      <Card>
         <Text>Notes</Text>
-        <Text style={propertyStyle}>{task.settings.description}</Text>
-      </View>
+        <PropertyText>{task.settings.description}</PropertyText>
+      </Card>
     </ScrollView>
   )
 }

@@ -1,6 +1,7 @@
-import { clamp } from 'ramda'
+import { clamp } from 'lodash'
 import React from 'react'
-import { TextInput, TextInputProps } from 'react-native'
+import { TextInputProps } from 'react-native'
+import { TextInput } from '../components'
 
 const NumericTextInput = ({
   value,
@@ -21,7 +22,7 @@ const NumericTextInput = ({
     onChangeText={(text: string) => {
       const numericTextValue = text.replace(/[^0-9]/g, '') || '0'
       const newNumValue = parseInt(numericTextValue, 10)
-      onChangeText(clamp(minValue ?? 0, maxValue ?? Infinity, newNumValue))
+      onChangeText(clamp(newNumValue, minValue ?? 0, maxValue ?? Infinity))
     }}
     {...props}
   />

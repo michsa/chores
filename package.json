@@ -10,6 +10,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
   },
   "dependencies": {
+    "@emotion/native": "^11.0.0",
+    "@emotion/react": "^11.9.0",
     "@react-native-async-storage/async-storage": "^1.17.3",
     "@react-native-community/datetimepicker": "^6.1.2",
     "@react-native-picker/picker": "^2.4.1",
@@ -18,12 +20,12 @@
     "@react-navigation/native": "^6.0.8",
     "@react-navigation/stack": "^6.2.1",
     "@reduxjs/toolkit": "^1.8.0",
-    "@types/ramda": "^0.28.5",
+    "@types/lodash": "^4.14.182",
     "@types/react-native-vector-icons": "^6.4.10",
     "@types/react-redux": "^7.1.23",
     "@types/redux": "^3.6.0",
     "@types/redux-persist": "^4.3.1",
-    "ramda": "^0.28.0",
+    "lodash": "^4.17.21",
     "react": "17.0.2",
     "react-native": "0.67.4",
     "react-native-gesture-handler": "^2.3.2",

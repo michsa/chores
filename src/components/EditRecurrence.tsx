@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { View, ViewStyle } from 'react-native'
-import { Picker } from '@react-native-picker/picker'
+// import { Picker } from '@react-native-picker/picker'
+import { Picker } from '../components'
 import { Frequency, Recurrence } from '../types'
 import { useForm } from '../hooks'
 import { inputStyle, selectInputStyle } from '../styles'
@@ -28,27 +29,22 @@ const EditRecurrence = ({
         minWidth: 200,
         flexDirection: 'row',
         justifyContent: 'space-around',
-        flex: 1,
       }}>
       <NumericTextInput
-        style={{ ...inputStyle, flex: 1 }}
+        style={{ flex: 1 }}
         value={form.interval}
         minValue={1}
         onChangeText={setField('interval')}
       />
-      <View style={{ ...selectInputStyle, flex: 3, marginLeft: 8 }}>
-        <Picker
-          selectedValue={form.frequency}
-          onValueChange={setField('frequency')}>
-          {frequencyOptions.map(({ label, value }) => (
-            <Picker.Item
-              key={value}
-              label={maybePlural(label, form.interval)}
-              value={value}
-            />
-          ))}
-        </Picker>
-      </View>
+      <Picker
+        containerStyle={{ flex: 3, marginLeft: 8 }}
+        selectedValue={form.frequency}
+        onValueChange={setField('frequency')}
+        options={frequencyOptions.map(option => ({
+          ...option,
+          label: maybePlural(option.label, form.interval),
+        }))}
+      />
     </View>
   )
 }

@@ -1,8 +1,6 @@
 import React, { useState, useLayoutEffect } from 'react'
 import {
   View,
-  Text,
-  TextInput,
   Switch,
   Button,
   Pressable,
@@ -10,17 +8,30 @@ import {
   ToastAndroid,
 } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
-import { Picker } from '@react-native-picker/picker'
-import Icon from 'react-native-vector-icons/Feather'
+// import { Picker } from '@react-native-picker/picker'
 
 import { useDispatch, useForm, useSelector } from '../hooks'
 import { upsertTask } from '../redux/actions'
 import { getTaskById } from '../redux/selectors'
-import { elementStyle, dividerStyle, fieldStyle, inputStyle, selectInputStyle } from '../styles'
-import { Task, TaskSettings, Frequency, NavigationProps } from '../types'
+import {
+  elementStyle,
+  dividerStyle,
+  fieldStyle,
+  inputStyle,
+  selectInputStyle,
+} from '../styles'
+import { TaskSettings, Frequency, NavigationProps } from '../types'
 import { priorityOptions } from '../utils'
-import EditRecurrence from './EditRecurrence'
-import NumericTextInput from './NumericTextInput'
+import {
+  Text,
+  Card,
+  TextInput,
+  Icon,
+  Picker,
+  FakeInputText,
+} from '../components'
+import EditRecurrence from '../components/EditRecurrence'
+import NumericTextInput from '../components/NumericTextInput'
 
 const defaultRecurrence = { frequency: Frequency.WEEK, interval: 1 }
 
@@ -87,7 +98,7 @@ const EditTask = ({
         <Icon
           name="save"
           size={24}
-          color="teal"
+          color="accent"
           style={{ padding: 8, marginRight: 12 }}
           onPress={onSubmit}
         />
@@ -100,23 +111,12 @@ const EditTask = ({
 
   const DateField = ({ field }: { field: DateField }) => (
     <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <Text
-        style={{
-          ...inputStyle,
-          flex: 1,
-          paddingLeft: 8,
-          paddingBottom: 8,
-          paddingTop: 16,
-          color: 'black',
-          fontSize: 16,
-          marginLeft: 12,
-        }}
-        onPress={() => setDatePicker(field)}>
+      <FakeInputText style={{ flex: 1 }} onPress={() => setDatePicker(field)}>
         {!!form[field] && new Date(form[field] as number).toDateString()}
-      </Text>
+      </FakeInputText>
       <Icon
         name="x"
-        color="teal"
+        color="accent"
         style={{ paddingHorizontal: 24 }}
         size={24}
         onPress={() => setField(field)(undefined)}
@@ -126,67 +126,60 @@ const EditTask = ({
 
   return (
     <ScrollView>
-      <View style={fieldStyle}>
+      <Card>
         <TextInput
           placeholder="Name"
-          style={{ ...inputStyle, fontSize: 20 }}
+          style={{ fontSize: 20 }}
           value={form.name}
           onChangeText={setField('name')}
         />
-      </View>
+      </Card>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <View
+        <Card
           style={{
-            ...fieldStyle,
             flex: 2,
             marginRight: 0,
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          <Icon name="star" size={20} />
+          <Icon name="star" />
+          <View style={dividerStyle} />
           <NumericTextInput
             placeholder="Points"
-            style={{ ...inputStyle, flex: 1, marginLeft: 12 }}
+            style={{ flex: 1 }}
             minValue={1}
             maxValue={999}
             value={form.points}
             onChangeText={setField('points')}
           />
-        </View>
+        </Card>
         <View style={dividerStyle} />
-        <View
+        <Card
           style={{
-            ...fieldStyle,
             flex: 3,
             marginLeft: 0,
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          <Icon name="flag" size={20} style={{ marginRight: 8 }} />
-          <View
-            style={{ ...selectInputStyle, flex: 1 }}>
-            <Picker
-              style={{ marginLeft: -8 }}
-              selectedValue={form.priority}
-              onValueChange={setField('priority')}>
-              {priorityOptions.map(({ label, value }) => (
-                <Picker.Item key={value} {...{ label, value }} />
-              ))}
-            </Picker>
-          </View>
-        </View>
+          <Icon name="flag" />
+          <View style={dividerStyle} />
+          <Picker
+            selectedValue={form.priority}
+            onValueChange={setField('priority')}
+            options={priorityOptions}
+          />
+        </Card>
       </View>
-      <View
-        style={{ ...fieldStyle, flexDirection: 'row', alignItems: 'center' }}>
-        <Icon name="tag" size={20} />
-
+      <Card style={{ flexDirection: 'row', alignItems: 'center' }}>
+        <Icon name="tag" />
+        <View style={dividerStyle} />
         <TextInput
           placeholder="Tags"
-          style={{ ...inputStyle, flex: 1, marginLeft: 12, paddingLeft: 8 }}
+          style={{ flex: 1, paddingLeft: 8 }}
           value={form.tags.join(' ')}
           onChangeText={text => setField('tags')(text.split(' '))}
         />
-      </View>
+      </Card>
       {!form.scheduled && !form.deadline && (
         <View
           style={{
@@ -221,76 +214,60 @@ const EditTask = ({
         />
       )}
       {!!form.scheduled && (
-        <View
-          style={{ ...fieldStyle, flexDirection: 'row', alignItems: 'center' }}>
+        <Card style={{ flexDirection: 'row', alignItems: 'center' }}>
           <Icon name="calendar" size={20} />
+          <View style={dividerStyle} />
           <DateField field="scheduled" />
-        </View>
+        </Card>
       )}
       {!!form.deadline && (
-        <View style={fieldStyle}>
+        <Card>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Icon name="alert-circle" size={20} />
+            <View style={dividerStyle} />
             <DateField field="deadline" />
           </View>
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              justifyContent: 'center',
               marginTop: 8,
               marginLeft: 4,
               marginRight: 8,
             }}>
-            <Text
-              style={{
-                marginRight: 16,
-                flex: 0,
-              }}>
-              Notify
-            </Text>
+            <Text>Notify</Text>
+            <View style={dividerStyle} />
             <EditRecurrence
-              style={{ flex: 3 }}
+              style={{ flex: 1 }}
               value={form.deadlineWarning}
               onChange={setField('deadlineWarning')}
             />
-            <Text
-              style={{
-                marginLeft: 16,
-                flex: 0,
-              }}>
-              before
-            </Text>
+            <View style={dividerStyle} />
+            <Text>before</Text>
           </View>
-        </View>
+        </Card>
       )}
       {!!(form.scheduled || form.deadline) && (
-        <View style={fieldStyle}>
+        <Card>
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
               height: inputStyle.height,
             }}>
-            <Text style={{ flex: 0 }}>Repeat</Text>
+            <Text>Repeat</Text>
             {form.isRecurring && (
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flex: 1,
-                }}>
-                <Text style={{ marginHorizontal: 4 }}>after</Text>
+              <>
+                <Text style={{ marginRight: 8 }}> after</Text>
                 <EditRecurrence
                   style={{ flex: 1 }}
                   value={form.recurrence}
                   onChange={setField('recurrence')}
                 />
-              </View>
+              </>
             )}
             <Pressable
-              style={{ flex: form.isRecurring ? 0 : 1 }}
+              style={{ flex: 1, paddingLeft: 24 }}
               onPress={() => setField('isRecurring')(!form.isRecurring)}>
               <Switch
                 value={form.isRecurring}
@@ -298,23 +275,23 @@ const EditTask = ({
               />
             </Pressable>
           </View>
-        </View>
+        </Card>
       )}
 
-      <View style={fieldStyle}>
+      <Card>
         <Text>Notes</Text>
         <TextInput
           style={{
-            ...inputStyle,
             minHeight: inputStyle.height,
             height: 'auto',
+            paddingHorizontal: 0
           }}
           autoCorrect={false}
           value={form.description}
           onChangeText={setField('description')}
           multiline
         />
-      </View>
+      </Card>
     </ScrollView>
   )
 }

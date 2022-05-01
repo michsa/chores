@@ -14,6 +14,7 @@ export const fieldStyle = {
 
 export const dividerStyle = {
   flexBasis: 8,
+  minWidth: 8,
 }
 
 export const inputStyle = {

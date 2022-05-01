@@ -20,7 +20,7 @@ export const frequencyOptions = [
 export const frequencyLabel = (f: Frequency) =>
   frequencyOptions.find(o => o.value === f)?.label
 
-export const priorityOptions = [
+export const priorityOptions: { label: string; value: Priority }[] = [
   { label: 'Highest', value: 2 },
   { label: 'High', value: 1 },
   { label: 'Standard', value: 0 },
