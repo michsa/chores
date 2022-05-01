@@ -9,7 +9,7 @@ export const fieldStyle = {
   backgroundColor: '#FFF',
   paddingHorizontal: 16,
   paddingVertical: 8,
-  borderRadius: 8
+  borderRadius: 8,
 }
 
 export const dividerStyle = {
@@ -22,6 +22,7 @@ export const inputStyle = {
   borderBottomColor: 'lightgrey',
   paddingBottom: 4,
   fontSize: 16,
+  marginTop: -8,
   height: inputHeight,
 }
 
@@ -29,5 +30,5 @@ export const propertyStyle = {
   borderBottomColor: 'lightgrey',
   paddingVertical: 4,
   fontSize: 16,
-  color: 'black'
+  color: 'black',
 }

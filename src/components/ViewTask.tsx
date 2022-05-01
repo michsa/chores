@@ -1,6 +1,6 @@
 import React, { useLayoutEffect } from 'react'
 import { View, Text, ScrollView } from 'react-native'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import Icon from 'react-native-vector-icons/Feather'
 
 import { useDispatch, useSelector } from '../hooks'
 import { deleteTask } from '../redux/actions'
@@ -21,21 +21,23 @@ const ViewTask = ({
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <View style={{ flexDirection: 'row' }}>
+        <View style={{ flexDirection: 'row', marginRight: 12 }}>
           <Icon
-            name="trash-can-outline"
-            color="red"
+            name="trash-2"
+            color="indianred"
             size={24}
-            style={{ paddingHorizontal: 16 }}
+            style={{ padding: 8 }}
             onPress={() => {
               dispatch(deleteTask(id))
               navigation.navigate('taskList')
             }}
           />
+          <View style={dividerStyle} />
           <Icon
-            name="pencil"
+            name="edit"
             size={24}
-            style={{ paddingHorizontal: 16 }}
+            color="teal"
+            style={{ padding: 8 }}
             onPress={() => navigation.navigate('editTask', { id })}
           />
         </View>

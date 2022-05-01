@@ -3,7 +3,7 @@ import React from 'react'
 import { Provider } from 'react-redux'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons'
+import Icon from 'react-native-vector-icons/Feather'
 import { PersistGate } from 'redux-persist/integration/react'
 
 import { store, persistor } from './src/redux/store'
@@ -27,9 +27,10 @@ const App = () => {
               title: 'Tasks',
               headerRight: () => (
                 <Icon
-                  name="pencil-plus"
-                  size={24}
-                  style={{ paddingHorizontal: 16 }}
+                  name="plus-square"
+                  size={26}
+                  color="teal"
+                  style={{ padding: 8, marginRight: 12 }}
                   onPress={() => navigation.navigate('addTask')}
                 />
               ),
@@ -43,7 +44,7 @@ const App = () => {
           <TaskStack.Screen
             name="editTask"
             component={EditTask}
-            options={{ title: 'Edit Task' }}
+            options={{ title: 'Edit Task', presentation: 'modal' }}
           />
           <TaskStack.Screen
             name="viewTask"

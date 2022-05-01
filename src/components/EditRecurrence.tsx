@@ -31,7 +31,6 @@ const EditRecurrence = ({
           flexShrink: 0,
           flexGrow: 1,
           paddingBottom: 2,
-          marginTop: 0,
         }}
         value={form.interval}
         minValue={1}

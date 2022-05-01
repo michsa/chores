@@ -85,10 +85,10 @@ const EditTask = ({
     navigation.setOptions({
       headerRight: () => (
         <Icon
-          name="check-circle"
+          name="save"
           size={24}
-          color="mediumseagreen"
-          style={{ paddingHorizontal: 16 }}
+          color="teal"
+          style={{ padding: 8, marginRight: 12 }}
           onPress={onSubmit}
         />
       ),
@@ -216,8 +216,6 @@ const EditTask = ({
             <Text
               style={{
                 marginRight: 16,
-                height: 46,
-                lineHeight: 56,
                 flex: 0,
               }}>
               Notify
@@ -230,8 +228,6 @@ const EditTask = ({
             <Text
               style={{
                 marginLeft: 16,
-                height: 46,
-                lineHeight: 56,
                 flex: 0,
               }}>
               before
@@ -247,6 +243,7 @@ const EditTask = ({
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                paddingVertical: 4,
               }}>
               <Text>Repeat</Text>
               <Switch
@@ -267,11 +264,9 @@ const EditTask = ({
               <Text
                 style={{
                   marginRight: 16,
-                  height: 46,
-                  lineHeight: 56,
                   flex: 0,
                 }}>
-                After
+                after
               </Text>
               <EditRecurrence
                 style={{ flex: 3 }}
