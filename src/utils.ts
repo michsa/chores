@@ -34,4 +34,5 @@ export const priorityLabel = (p: Priority) =>
 export const printRecurrence = (r: Recurrence) =>
   `${r.interval} ${maybePlural(frequencyLabel(r.frequency)!, r.interval)}`
 
-export const shortPriorityLabel = (p: Priority) => `${p < 0 ? '−' : p > 0 ? '+' : ''}${Math.abs(p)}`
+export const shortPriorityLabel = (p: Priority) =>
+  `${p < 0 ? '−' : p > 0 ? '+' : ''}${Math.abs(p)}`

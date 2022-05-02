@@ -23,11 +23,6 @@ const palette = {
   danger: 'indianred',
 }
 
-const fontSizes = {
-  small: 14,
-  regular: 16,
-  large: 20,
-}
 const spacing = {
   xs: 4,
   s: 8,
@@ -38,6 +33,20 @@ const spacing = {
 
 const sizes = {
   inputHeight: 46
+}
+
+const fontSizes = {
+  small: 14,
+  regular: 16,
+  large: 20,
+}
+
+const iconSizes = {
+  small: 16,
+  regular: 20,
+  large: 24,
+  header: 24,
+  xlarge: 26
 }
 
 type ThemeColor =
@@ -84,7 +93,8 @@ const baseTheme = {
   palette,
   spacing,
   sizes,
-  fontSizes
+  fontSizes,
+  iconSizes
 }
 
 export const darkTheme = {

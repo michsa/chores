@@ -34,4 +34,3 @@ export const Picker = <T extends number | string>({
     </PickerContainer>
   )
 }
-export default Picker

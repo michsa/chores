@@ -1,7 +1,7 @@
 import React, { useLayoutEffect } from 'react'
 import { View, ScrollView } from 'react-native'
 
-import { Text, PropertyText, Card, Divider, HeaderIcon } from '../components'
+import { Text, PropertyText, Card, Spacer, HeaderIcon } from '../components'
 import { useDispatch, useSelector } from '../hooks'
 import { deleteTask } from '../redux/actions'
 import { getTaskById } from '../redux/selectors'
@@ -29,7 +29,7 @@ const ViewTask = ({
               navigation.navigate('taskList')
             }}
           />
-          <Divider />
+          <Spacer />
           <HeaderIcon
             name="edit"
             onPress={() => navigation.navigate('editTask', { id })}
@@ -53,7 +53,7 @@ const ViewTask = ({
           <Text>Points</Text>
           <PropertyText>{task.settings.points}</PropertyText>
         </Card>
-        <Divider />
+        <Spacer />
         <Card style={{ flex: 3, marginLeft: 0 }}>
           <Text>Priority</Text>
           <PropertyText>{priorityLabel(task.settings.priority)}</PropertyText>
@@ -79,7 +79,7 @@ const ViewTask = ({
               {new Date(task.settings.deadline).toDateString()}
             </PropertyText>
           </Card>
-          <Divider />
+          <Spacer />
           {!!task.settings.deadlineWarning && (
             <Card style={{ flex: 2, marginLeft: 0 }}>
               <Text>Notify</Text>

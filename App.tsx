@@ -18,7 +18,7 @@ import { TaskStackParams } from './src/types'
 
 const TaskStack = createStackNavigator<TaskStackParams>()
 
-const theme = darkTheme
+const theme = lightTheme
 
 const App = () => {
   return (
@@ -52,7 +52,7 @@ const App = () => {
                   headerRight: () => (
                     <HeaderIcon
                       name="plus-square"
-                      size={26}
+                      size="xlarge"
                       onPress={() => navigation.navigate('addTask')}
                     />
                   ),
