@@ -26,21 +26,25 @@ export type Recurrence = {
   interval: number
 }
 
-type Tag = string
-
 export type Priority = -2 | -1 | 0 | 1 | 2
+
+export type Tag = { id: string; name: string }
 
 export type TaskSettings = {
   name: string
   points: number
-  priority: Priority,
+  priority: Priority
   isRecurring: boolean
   recurrence?: Recurrence
   description: string
   scheduled?: number
   deadline?: number
   deadlineWarning?: Recurrence
-  tags: Tag[]
+  tags: string[]
+}
+
+export type TaskSettingsInput = Omit<TaskSettings, 'tags'> & {
+  tagNames: string[]
 }
 
 export type Task = {

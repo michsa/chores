@@ -1,32 +1,19 @@
 # Chores
 
-Android app about managing personal tasks.
+Android app about managing personal tasks, using react-native. This app primarily targets Android 9 since that's the version my phone uses, but it would be nice to polish & test it for newer versions and maybe even iOS.
 
 The goal is to get personal tasks done in a timely manner. We approach this from two directions:
 
-1. Task list: keep track of things to do in a format that encourages actually doing them. Default ordering that emphasizes the most important (or most useful) tasks. Track both recurring tasks and one-off tasks within the same interface.
+1. Task list: keep track of things to do in a format that encourages actually doing them. Default ordering that emphasizes the most important (or most useful) tasks. Track both recurring tasks and one-off tasks within the same interface. Filtering controls to facilitate finding existing tasks in order to complete them.
 2. Metrics: track task completion & effort spent over time. This encourages actually using the app and also works a reward mechanism. (Recurring personal tasks - chores - can be frustrating because they're never actually "done". Keeping a record of work completed at least ensures that it is not forgotten.)
 
 ## Schemas
-
-State shape:
-
-```
-{
-  tasks: {
-    byId: { [id]: Task },
-    allIds: id[]
-  },
-  completions: {
-    byId: { [id]: Completion }
-  }
-}
-```
 
 ### Tags
 
 ```
 Tag {
+  id: string
   name: string
 }
 ```
@@ -41,11 +28,22 @@ Suggestions for tags:
 - `logistics` - paying bills, shopping for household items, etc
 - people or pets (parents, dog)
 
+### Categories
+
+```
+Category {
+  id: string
+  name: string
+}
+```
+
+Categories are one-to-many with completions (a completion can have a single category). These allow us to bucket completions for analytics purposes. A competion category can be anything, but the primary use case is to represent the person who completed it: eg, if a housekeeper has cleaned the bathroom, we can mark the "clean bathroom" task as completed with the `housekeeper` category, so that we can filter those completions out when we view analytics for work done ourselves.
+
 ### Tasks
 
 ```
 Recurrence {
-  frequency: enum (day, week, month)
+  frequency: enum (day, week, month, year)
   interval: integer
 }
 
@@ -53,12 +51,11 @@ Task {
   id
   name: string
   description: string
-  icon: emoji
   createdAt: date
   isRecurring: boolean
   recurrence: Recurrence
   deadline: timestamp
-  (maybe) deadlineWarning: Recurrence
+  deadlineWarning: Recurrence
   scheduled: timestamp
   points: integer
   tags: Tag[]
@@ -72,13 +69,13 @@ Constraints:
 - `recurrence` is required if `isRecurring` is true
 - `scheduled` and `deadline` are mutually exclusive, if one is set the other must be null
 - if `isRecurring` is true then one of `scheduled` or `deadline` must be set, else both are optional
-
+- `deadlineWarning` is required if `deadline` is set
 
 #### Recurring tasks
 
 Recurrences are defined by a frequency (representing days/weeks/months) and a numeric interval represeting how many of those days/weeks/months should elapse before it's time to do the task again.
 
-For our use case it should be sufficient to reset the interval whenever the task is (fully) completed, meaning we mutate `scheduled` on the task record when that happens.
+For our use case it should be sufficient to reset the interval whenever the task is completed, meaning we mutate `scheduled` or `deadline` on the task record when that happens.
 
 Generally recurring tasks will have scheduled dates, but theoretically they could have deadlines (eg, pay a bill that can't be automated), so we should also support that case.
 
@@ -90,7 +87,7 @@ This will be used for date math on the current date / scheduled date. Thus if we
 
 Taking a page from org-mode, tasks can (optionally) have a scheduled time or a deadline.
 
-A scheduled date is simply the date at which it becomes time to perform the task (or at least start thinking about it). The urgency of the task increases with time elapsed since the scheduled date. By default we don't need to worry about tasks before their scheduled date.
+A scheduled date is simply the date at which it becomes time to perform the task (or at least start thinking about it). The urgency of the task increases with time elapsed since the scheduled date. This design assumes that we don't need to worry about tasks before their scheduled date.
 
 A deadline indicates that the task should be completed _before_ the date in question - thus we should surface tasks with deadlines well before the deadline. As the deadline for a task approaches, the task grows more urgent (as a function of its point value) and therefore should be displayed more prominently (ie higher up) in the task list when using "smart" sorting.
 
@@ -98,15 +95,21 @@ A deadline indicates that the task should be completed _before_ the date in ques
 
 ```
 Completion: {
-  taskId
-  date
-  points
+  taskId: string
+  date: date
+  points: number
+  isPartial: boolean
+  category: string
 }
 ```
 
-Completions are many-to-one with Tasks. The `points` value of a completion can be less than or equal to the point value of the parent task (ie, it's possible to partially complete a task).
+Completions are many-to-one with Tasks. The `points` value of a completion can be different from the point value of the parent task.
 
 When creating a completion, inputs for `points` and `date` should default to the point value of the task and the current date respectively, but should be configurable in the UI.
+
+#### Partial completions
+
+A completion typically but not necessarily indicates that we should mark the task as "completed", meaning we reset its scheduled time or deadline if it is recurring
 
 ### Settings
 
@@ -135,7 +138,7 @@ const getSortedAndFilteredTasks = (state: State, ...filters: ((task: Task) => bo
 where `filters` would be something like:
 
 ```ts
-const isActive = task.scheduled < new Date() || sub(task.deadline, deadlineWarning) < new Date()
+const isActive = task => task.scheduled < new Date() || sub(task.deadline, deadlineWarning) < new Date()
 
 const isNotCompleted = task => (!task.isRecurring && !task.lastCompletedAt) || (task.isRecurring && isActive(task))
 ```
@@ -144,7 +147,7 @@ const isNotCompleted = task => (!task.isRecurring && !task.lastCompletedAt) || (
 
 By default the task list should filter out completed tasks.
 
-One-offs are completed if there exists any completion record for them. A recurring task is considered completed (temporarily) when `scheduled` is in the future, or when the current date is before `deadline` minus `deadlineWarning`.
+One-offs are completed if there exists any completion record for them with `isPartial = false`. A recurring task is considered completed (temporarily) when `scheduled` is in the future, or when the current date is before `deadline` minus `deadlineWarning`.
 
 Other filter options:
 

@@ -1,5 +1,7 @@
 import { Frequency, Priority, Recurrence } from './types'
 
+export const exists = <T>(x: T | undefined): x is T => !!x
+
 export const maybePlural = (text: string, qty: number) =>
   qty === 1 ? text : `${text}s`
 

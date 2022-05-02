@@ -7,7 +7,12 @@ import {
 import type { State, Dispatch } from './redux/store'
 
 export const useDispatch = () => baseUseDispatch<Dispatch>()
-export const useSelector: TypedUseSelectorHook<State> = baseUseSelector
+export const useStateSelector: TypedUseSelectorHook<State> = baseUseSelector
+
+export const useSelector = <A extends any[], R>(
+  selector: (state: State, ...rest: A) => R,
+  ...rest: A
+) => useStateSelector(state => selector(state, ...rest))
 
 export const useForm = <T extends { [k: string]: unknown }>(defaults: T) => {
   const [form, setForm] = useState<T>(defaults)

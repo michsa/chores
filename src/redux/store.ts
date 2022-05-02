@@ -8,18 +8,21 @@ import {
   PURGE,
   REGISTER,
 } from 'redux-persist'
-import { configureStore, combineReducers } from '@reduxjs/toolkit'
+import { configureStore, combineReducers, ThunkAction, AnyAction } from '@reduxjs/toolkit'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 import { reducer as tasks } from './slices/tasks'
 import { reducer as completions } from './slices/completions'
+import { reducer as tags } from './slices/tags'
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
 }
 
-const reducer = combineReducers({ tasks, completions })
+const reducer = combineReducers({ tasks, completions, tags })
+export type State = ReturnType<typeof reducer>
+
 const persistedReducer = persistReducer(persistConfig, reducer)
 
 const store = configureStore({
@@ -34,7 +37,12 @@ const store = configureStore({
 
 const persistor = persistStore(store)
 
-export type State = ReturnType<typeof store.getState>
 export type Dispatch = typeof store.dispatch
+export type Thunk<ReturnType = void> = ThunkAction<
+  ReturnType,
+  State,
+  unknown,
+  AnyAction
+>
 
 export { store, persistor }

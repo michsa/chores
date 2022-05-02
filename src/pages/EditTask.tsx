@@ -11,14 +11,13 @@ import DateTimePicker from '@react-native-community/datetimepicker'
 import { useTheme } from '@emotion/react'
 
 import { useDispatch, useForm, useSelector } from '../hooks'
-import { upsertTask } from '../redux/actions'
-import { getTaskById } from '../redux/selectors'
-import { TaskSettings, Frequency, NavigationProps } from '../types'
+import { upsertTask } from '../redux/thunks'
+import { getTaskWithTags } from '../redux/selectors'
+import { TaskSettingsInput, Frequency, NavigationProps } from '../types'
 import { priorityOptions } from '../utils'
 import {
   Text,
   Card,
-  Section,
   Spacer,
   TextInput,
   Icon,
@@ -33,7 +32,7 @@ import NumericTextInput from '../components/NumericTextInput'
 
 const defaultRecurrence = { frequency: Frequency.WEEK, interval: 1 }
 
-const defaultSetings: TaskSettings = {
+const defaultSetings: TaskSettingsInput = {
   name: '',
   points: 1,
   priority: 0,
@@ -41,22 +40,24 @@ const defaultSetings: TaskSettings = {
   recurrence: defaultRecurrence,
   deadlineWarning: defaultRecurrence,
   description: '',
-  tags: [],
+  tagNames: [],
 }
 
-const useTaskIfExists = (id?: string): TaskSettings => {
-  const task = id ? useSelector(getTaskById(id)) : undefined
-  return task?.settings ?? defaultSetings
+const useTaskIfExists = (id?: string): TaskSettingsInput => {
+  const task = id ? useSelector(getTaskWithTags, id) : undefined
+  return task
+    ? { ...task.settings, tagNames: task.tags.map(tag => tag?.name) }
+    : defaultSetings
 }
 
-const validate = (form: Partial<TaskSettings>): TaskSettings => {
+const validate = (form: Partial<TaskSettingsInput>): TaskSettingsInput => {
   if (!form.name) throw Error('Task must have a name')
   if (!form.points) throw Error('Task must have points')
 
-  return form as TaskSettings
+  return form as TaskSettingsInput
 }
 
-const cleanup = (form: TaskSettings) => {
+const cleanup = (form: TaskSettingsInput) => {
   if (form.deadlineWarning && !form.deadline) {
     delete form.deadlineWarning
   }
@@ -76,14 +77,14 @@ const EditTask = ({
   const theme = useTheme()
   const dispatch = useDispatch()
   const settings = useTaskIfExists(params?.id)
-  const { form, setField } = useForm<TaskSettings>(settings)
+  const { form, setField } = useForm<TaskSettingsInput>(settings)
 
   const onSubmit = () => {
     console.log('onSubmit', form)
     try {
       const formToSubmit = validate(form)
-      const { payload: task } = upsertTask(dispatch)(cleanup(formToSubmit), params?.id)
-      navigation.navigate('viewTask', { id: task.id })
+      const id = dispatch(upsertTask(cleanup(formToSubmit), params?.id))
+      navigation.navigate('viewTask', { id })
     } catch (e: unknown) {
       console.log(typeof e)
       const error = (e as Error).toString()
@@ -154,8 +155,8 @@ const EditTask = ({
           <TextInput
             placeholder="Tags"
             style={{ flex: 1 }}
-            value={form.tags.join(' ')}
-            onChangeText={text => setField('tags')(text.split(' '))}
+            value={form.tagNames.join(' ')}
+            onChangeText={text => setField('tagNames')(text.split(' '))}
           />
         </Row>
         {!form.scheduled && !form.deadline && (
@@ -210,7 +211,10 @@ const EditTask = ({
           </SpacedList>
         )}
         {!!(form.scheduled || form.deadline) && (
-          <Row spacing="xs" as={Card} style={{ height: theme.sizes.inputHeight }}>
+          <Row
+            spacing="xs"
+            as={Card}
+            style={{ height: theme.sizes.inputHeight }}>
             <Text>Repeat</Text>
             {form.isRecurring && (
               <>

@@ -6,15 +6,15 @@ import styled from '@emotion/native'
 import {
   Text,
   Card,
-  Spacer,
   HeaderIcon,
   Row,
   SpacedList,
   Icon,
+  PrimaryText,
 } from '../components'
 import { useDispatch, useSelector } from '../hooks'
-import { deleteTask } from '../redux/actions'
-import { getTaskById } from '../redux/selectors'
+import { deleteTask } from '../redux/thunks'
+import { getTaskWithTags } from '../redux/selectors'
 import { NavigationProps } from '../types'
 import { priorityLabel, printRecurrence } from '../utils'
 
@@ -30,7 +30,7 @@ const ViewTask = ({
 }: NavigationProps['viewTask']) => {
   const theme = useTheme()
   const dispatch = useDispatch()
-  const task = useSelector(getTaskById(id))
+  const task = useSelector(getTaskWithTags, id)
 
   const [modal, setModal] = useState(false)
 
@@ -124,7 +124,7 @@ const ViewTask = ({
 
         <Row as={ViewCard}>
           <Icon name="tag" />
-          <Text variant="primary">{task.settings.tags.join(' ')}</Text>
+          <Row as={PrimaryText}>{task.tags.map(t => t.name).join(', ')}</Row>
         </Row>
 
         <Card>
