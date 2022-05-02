@@ -1,12 +1,26 @@
 import React, { useLayoutEffect } from 'react'
 import { View, ScrollView } from 'react-native'
+import { useTheme } from '@emotion/react'
+import styled from '@emotion/native'
 
-import { Text, PropertyText, Card, Spacer, HeaderIcon } from '../components'
+import {
+  Text,
+  Card,
+  Spacer,
+  HeaderIcon,
+  Row,
+  SpacedList,
+  Icon,
+} from '../components'
 import { useDispatch, useSelector } from '../hooks'
 import { deleteTask } from '../redux/actions'
 import { getTaskById } from '../redux/selectors'
 import { NavigationProps } from '../types'
 import { priorityLabel, printRecurrence } from '../utils'
+
+const ViewCard = styled(Card)(({ theme }) => ({
+  paddingVertical: theme.spacing.m,
+}))
 
 const ViewTask = ({
   navigation,
@@ -14,13 +28,14 @@ const ViewTask = ({
     params: { id },
   },
 }: NavigationProps['viewTask']) => {
+  const theme = useTheme()
   const dispatch = useDispatch()
   const task = useSelector(getTaskById(id))
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <View style={{ flexDirection: 'row' }}>
+        <Row spacing="l">
           <HeaderIcon
             name="trash-2"
             color="danger"
@@ -29,12 +44,13 @@ const ViewTask = ({
               navigation.navigate('taskList')
             }}
           />
-          <Spacer />
           <HeaderIcon
             name="edit"
+            color="text"
             onPress={() => navigation.navigate('editTask', { id })}
           />
-        </View>
+          <HeaderIcon name="check-circle" onPress={() => {}} />
+        </Row>
       ),
     })
   }, [navigation, task])
@@ -42,59 +58,62 @@ const ViewTask = ({
   if (!task) return null
   return (
     <ScrollView>
-      <Card>
-        <Text>Name</Text>
-        <PropertyText style={{ fontSize: 20 }}>
-          {task.settings.name}
-        </PropertyText>
-      </Card>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <Card style={{ flex: 2, marginRight: 0 }}>
-          <Text>Points</Text>
-          <PropertyText>{task.settings.points}</PropertyText>
-        </Card>
-        <Spacer />
-        <Card style={{ flex: 3, marginLeft: 0 }}>
-          <Text>Priority</Text>
-          <PropertyText>{priorityLabel(task.settings.priority)}</PropertyText>
-        </Card>
-      </View>
-      <Card>
-        <Text>Tags</Text>
-        <PropertyText>{task.settings.tags.join(' ')}</PropertyText>
-      </Card>
-      {!!task.settings.scheduled && (
-        <Card>
-          <Text>Scheduled</Text>
-          <PropertyText>
-            {new Date(task.settings.scheduled).toDateString()}
-          </PropertyText>
-        </Card>
-      )}
-      {!!task.settings.deadline && (
-        <View style={{ flexDirection: 'row' }}>
-          <Card style={{ flex: 3, marginRight: 0 }}>
-            <Text>Deadline</Text>
-            <PropertyText>
-              {new Date(task.settings.deadline).toDateString()}
-            </PropertyText>
-          </Card>
-          <Spacer />
-          {!!task.settings.deadlineWarning && (
-            <Card style={{ flex: 2, marginLeft: 0 }}>
-              <Text>Notify</Text>
-              <PropertyText>
-                {printRecurrence(task.settings.deadlineWarning)} before
-              </PropertyText>
-            </Card>
-          )}
-        </View>
-      )}
+      <SpacedList style={{ margin: theme.spacing.s }}>
+        <ViewCard>
+          <Text variant="primary" style={{ fontSize: theme.fontSizes.large }}>
+            {task.settings.name}
+          </Text>
+        </ViewCard>
+        <Row>
+          <Row as={ViewCard} style={{ flex: 2 }}>
+            <Icon name="star" />
+            <Text variant="primary">{task.settings.points}</Text>
+          </Row>
+          <Row as={ViewCard} style={{ flex: 3 }}>
+            <Icon name="flag" />
+            <Text variant="primary">
+              {priorityLabel(task.settings.priority)}
+            </Text>
+          </Row>
+        </Row>
 
-      <Card>
-        <Text>Notes</Text>
-        <PropertyText>{task.settings.description}</PropertyText>
-      </Card>
+        <Row as={ViewCard}>
+          <Icon name="tag" />
+          <Text variant="primary">{task.settings.tags.join(' ')}</Text>
+        </Row>
+
+        {!!task.settings.scheduled && (
+          <Row as={ViewCard}>
+            <Icon name="calendar" />
+            <Text variant="primary">
+              {new Date(task.settings.scheduled).toDateString()}
+            </Text>
+          </Row>
+        )}
+        {!!task.settings.deadline && (
+          <Row
+            as={ViewCard}
+            style={{ flex: 3, justifyContent: 'space-between' }}>
+            <Row>
+              <Icon name="alert-circle" />
+              <Text variant="primary">
+                {new Date(task.settings.deadline).toDateString()}
+              </Text>
+            </Row>
+            <Spacer />
+            {!!task.settings.deadlineWarning && (
+              <Text>
+                Notify {printRecurrence(task.settings.deadlineWarning)} before
+              </Text>
+            )}
+          </Row>
+        )}
+
+        <Card>
+          <Text>Notes</Text>
+          <Text variant="property">{task.settings.description}</Text>
+        </Card>
+      </SpacedList>
     </ScrollView>
   )
 }
