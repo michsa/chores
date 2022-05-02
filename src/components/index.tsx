@@ -42,3 +42,23 @@ export const Spacer = styled.View<{ size?: keyof Theme['spacing'] }>(
     minHeight: theme.spacing[size],
   })
 )
+
+type DividerProps = {
+  direction?: 'h' | 'v'
+  size?: keyof Theme['spacing']
+  color?: keyof Theme['colors']
+}
+export const Divider = styled(Spacer)<DividerProps>(
+  ({ direction = 'h', size = 's', color = 'underline', theme }) => ({
+    alignSelf: 'stretch',
+    ...(direction === 'h' && {
+      borderBottomWidth: 1,
+      marginBottom: theme.spacing[size],
+    }),
+    ...(direction === 'v' && {
+      borderRightWidth: 1,
+      marginRight: theme.spacing[size],
+    }),
+    borderColor: theme.colors[color],
+  })
+)

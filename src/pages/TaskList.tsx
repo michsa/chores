@@ -39,14 +39,8 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
                 {item.settings.name}
               </Text>
               <Spacer />
-              <Row>
+              <Row spacing="m">
                 <DetailSection icon="star" text={item.settings.points} />
-                {!!item.settings.priority && (
-                  <DetailSection
-                    icon="flag"
-                    text={priorityLabel(item.settings.priority)}
-                  />
-                )}
                 {!!item.settings.scheduled && (
                   <DetailSection
                     icon="calendar"
@@ -57,6 +51,12 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
                   <DetailSection
                     icon="alert-circle"
                     text={new Date(item.settings.deadline).toDateString()}
+                  />
+                )}
+                {!!item.settings.priority && (
+                  <DetailSection
+                    icon="flag"
+                    text={priorityLabel(item.settings.priority)}
                   />
                 )}
               </Row>
