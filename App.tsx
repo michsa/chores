@@ -18,7 +18,7 @@ import { TaskStackParams } from './src/types'
 
 const TaskStack = createStackNavigator<TaskStackParams>()
 
-const theme = lightTheme
+const theme = darkTheme
 
 const App = () => {
   return (

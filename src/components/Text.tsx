@@ -5,11 +5,12 @@ import { variants } from './utils'
 
 const BaseText = styled.Text(({ theme }) => ({
   color: theme.colors.text,
+  fontSize: theme.fontSizes.small,
 }))
 
 export const PrimaryText = styled.Text(({ theme }) => ({
   color: theme.colors.primaryText,
-  fontSize: 16,
+  fontSize: theme.fontSizes.regular,
 }))
 
 export const PropertyText = styled(PrimaryText)(({ theme }) => ({

@@ -1,5 +1,5 @@
-import React, { useLayoutEffect } from 'react'
-import { View, ScrollView } from 'react-native'
+import React, { useLayoutEffect, useState } from 'react'
+import { View, ScrollView, Modal } from 'react-native'
 import { useTheme } from '@emotion/react'
 import styled from '@emotion/native'
 
@@ -32,6 +32,8 @@ const ViewTask = ({
   const dispatch = useDispatch()
   const task = useSelector(getTaskById(id))
 
+  const [modal, setModal] = useState(false)
+
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
@@ -49,7 +51,7 @@ const ViewTask = ({
             color="text"
             onPress={() => navigation.navigate('editTask', { id })}
           />
-          <HeaderIcon name="check-circle" onPress={() => {}} />
+          <HeaderIcon name="check-circle" onPress={() => setModal(true)} />
         </Row>
       ),
     })
@@ -58,6 +60,14 @@ const ViewTask = ({
   if (!task) return null
   return (
     <ScrollView>
+      <Modal transparent visible={modal} onRequestClose={() => setModal(false)}>
+        <View
+          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <Card style={{ width: 200, height: 200 }}>
+            <Text>Complete task</Text>
+          </Card>
+        </View>
+      </Modal>
       <SpacedList style={{ margin: theme.spacing.s }}>
         <ViewCard>
           <Text variant="primary" style={{ fontSize: theme.fontSizes.large }}>
@@ -77,37 +87,45 @@ const ViewTask = ({
           </Row>
         </Row>
 
+        {(!!task.settings.scheduled || !!task.settings.deadline) && (
+          <Row as={ViewCard} style={{ justifyContent: 'space-between' }}>
+            {!!task.settings.scheduled && (
+              <Row>
+                <Icon name="calendar" />
+                <Text variant="primary">
+                  {new Date(task.settings.scheduled).toDateString()}
+                </Text>
+              </Row>
+            )}
+            {!!task.settings.deadline && (
+              <Row spacing="l">
+                <Icon name="alert-circle" />
+                <SpacedList>
+                  <Text variant="primary">
+                    {new Date(task.settings.deadline).toDateString()}
+                  </Text>
+                  {!!task.settings.deadlineWarning && (
+                    <Text>
+                      Notify {printRecurrence(task.settings.deadlineWarning)}{' '}
+                      before
+                    </Text>
+                  )}
+                </SpacedList>
+              </Row>
+            )}
+            {!!task.settings.isRecurring && (
+              <Row>
+                <Icon size="small" name="repeat" />
+                <Text>after {printRecurrence(task.settings.recurrence!)}</Text>
+              </Row>
+            )}
+          </Row>
+        )}
+
         <Row as={ViewCard}>
           <Icon name="tag" />
           <Text variant="primary">{task.settings.tags.join(' ')}</Text>
         </Row>
-
-        {!!task.settings.scheduled && (
-          <Row as={ViewCard}>
-            <Icon name="calendar" />
-            <Text variant="primary">
-              {new Date(task.settings.scheduled).toDateString()}
-            </Text>
-          </Row>
-        )}
-        {!!task.settings.deadline && (
-          <Row
-            as={ViewCard}
-            style={{ flex: 3, justifyContent: 'space-between' }}>
-            <Row>
-              <Icon name="alert-circle" />
-              <Text variant="primary">
-                {new Date(task.settings.deadline).toDateString()}
-              </Text>
-            </Row>
-            <Spacer />
-            {!!task.settings.deadlineWarning && (
-              <Text>
-                Notify {printRecurrence(task.settings.deadlineWarning)} before
-              </Text>
-            )}
-          </Row>
-        )}
 
         <Card>
           <Text>Notes</Text>
