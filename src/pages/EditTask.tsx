@@ -82,8 +82,8 @@ const EditTask = ({
     console.log('onSubmit', form)
     try {
       const formToSubmit = validate(form)
-      dispatch(upsertTask(cleanup(formToSubmit), params?.id))
-      navigation.goBack()
+      const { payload: task } = upsertTask(dispatch)(cleanup(formToSubmit), params?.id)
+      navigation.navigate('viewTask', { id: task.id })
     } catch (e: unknown) {
       console.log(typeof e)
       const error = (e as Error).toString()
