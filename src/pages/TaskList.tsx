@@ -1,16 +1,15 @@
 import React from 'react'
-import { Pressable, FlatList, View, ViewProps } from 'react-native'
+import { Pressable, FlatList, View } from 'react-native'
 import { useTheme } from '@emotion/react'
 
 import { Card, Text, Icon, Spacer, Row } from '../components'
 import { useSelector } from '../hooks'
-import { getOrderedTasks, getTags } from '../redux/selectors'
+import { getOrderedTasks } from '../redux/selectors'
 import { NavigationProps } from '../types'
 import { priorityLabel } from '../utils'
 
 const TaskList = ({ navigation }: NavigationProps['taskList']) => {
   const tasks = useSelector(getOrderedTasks)
-  const tags = useSelector(getTags)
   const theme = useTheme()
 
   const DetailSection = ({ icon, text }: { icon: string; text: any }) => (
@@ -25,7 +24,6 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
       style={{ margin: theme.spacing.s }}
       data={tasks}
       ItemSeparatorComponent={Spacer}
-      ListHeaderComponent={<Text>{JSON.stringify(tags, null, 2)}</Text>}
       renderItem={({ item }) => (
         <Pressable
           onPress={() => navigation.navigate('viewTask', { id: item.id })}>

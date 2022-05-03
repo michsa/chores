@@ -3,8 +3,8 @@ import { StackScreenProps } from '@react-navigation/stack'
 export type TaskStackParams = {
   taskList: undefined
   addTask: undefined
-  editTask: { id: string }
-  viewTask: { id: string }
+  editTask: { id: TaskID }
+  viewTask: { id: TaskID }
 }
 
 export type NavigationProps = {
@@ -28,8 +28,10 @@ export type Recurrence = {
 
 export type Priority = -2 | -1 | 0 | 1 | 2
 
-export type Tag = { id: string; name: string }
+export type TagID = string
+export type Tag = { id: TagID; name: string }
 
+export type TaskID = string
 export type TaskSettings = {
   name: string
   points: number
@@ -40,25 +42,26 @@ export type TaskSettings = {
   scheduled?: number
   deadline?: number
   deadlineWarning?: Recurrence
-  tags: string[]
 }
-
-export type TaskSettingsInput = Omit<TaskSettings, 'tags'> & {
-  tagNames: string[]
-}
+export type TaskSettingsInput = TaskSettings & { tagNames: string[] }
 
 export type Task = {
-  id: string
+  id: TaskID
   settings: TaskSettings
   createdAt: number
-  completions: Completion[]
+  tagIds: TagID[]
+  completionIds: CompletionID[]
 }
 
+export type TaskWithTags = Task & { tags: Tag[] }
+export type TaskWithCompletions = Task & { completions: Completion[] }
+
+export type CompletionID = string
 export type Completion = {
-  id: string
+  id: CompletionID
   name: string
   createdAt: number
   date: number
   points: number
-  taskId: string
+  taskId: TaskID
 }

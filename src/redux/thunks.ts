@@ -1,23 +1,45 @@
+import { ThunkDispatch, AnyAction } from '@reduxjs/toolkit'
 import { find } from 'lodash'
 import { actions as tasks } from './slices/tasks'
 import { actions as tags } from './slices/tags'
-import { TaskSettings, TaskSettingsInput, Tag } from '../types'
-import { Dispatch, State, Thunk } from './store'
+import {
+  TaskSettings,
+  TaskSettingsInput,
+  Tag,
+  Task,
+  TaskID,
+  TagID,
+} from '../types'
+import { Thunk } from './store'
 
-export const deleteTask = tasks.remove
+export const deleteTask =
+  (id: TaskID): Thunk =>
+  dispatch => {
+    // delete all the completions for the task
+    // possibly remove task from tags index
+    dispatch(tasks.remove(id))
+  }
+
+const updateTask =
+  (id: TaskID, changes: Partial<Task>): Thunk<TaskID> =>
+  dispatch => {
+    dispatch(tasks.update({ id, changes }))
+    return id
+  }
 
 const createTask =
-  (settings: TaskSettings): Thunk =>
+  (settings: TaskSettings, tagIds: TagID[]): Thunk<TaskID> =>
   dispatch => {
     const createdAt = Date.now()
-    return dispatch(
-      tasks.add({
-        id: `t${createdAt}`,
-        settings,
-        createdAt,
-        completions: [],
-      })
-    )
+    const newTask = {
+      id: `task-${createdAt}`,
+      settings,
+      tagIds,
+      createdAt,
+      completionIds: [],
+    }
+    dispatch(tasks.add(newTask))
+    return newTask.id
   }
 
 const upsertTagsByName =
@@ -26,24 +48,20 @@ const upsertTagsByName =
     const existingTags = names.map(name =>
       find(getState().tags.entities, { name })
     )
-
     const tagsToSave = existingTags.map(
-      (t, i) =>
-        t ?? { id: `tag-${new Date().valueOf()}-${names[i]}`, name: names[i] }
+      (t, i) => t ?? { id: `tag-${names[i]}-${Date.now()}`, name: names[i] }
     )
-
     dispatch(tags.upsertMany(tagsToSave))
     return tagsToSave
   }
 
 export const upsertTask =
-  ({ tagNames, ...settingsInput }: TaskSettingsInput, id?: string): Thunk =>
+  ({ tagNames, ...settings }: TaskSettingsInput, id?: TaskID): Thunk<TaskID> =>
   dispatch => {
     const taskTags = dispatch(upsertTagsByName(tagNames))
-    console.log({ taskTags })
-    const settings = { ...settingsInput, tags: taskTags.map(t => t.id) }
-    dispatch(
-      id ? tasks.update({ id, changes: { settings } }) : createTask(settings)
+    const tagIds = taskTags.map(t => t.id)
+    const task = dispatch(
+      id ? updateTask(id, { settings, tagIds }) : createTask(settings, tagIds)
     )
-    return id
+    return task
   }

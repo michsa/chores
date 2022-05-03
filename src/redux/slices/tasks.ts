@@ -14,8 +14,8 @@ const tasks = createSlice({
     add: tasksAdapter.addOne,
     remove: tasksAdapter.removeOne,
     update: tasksAdapter.updateOne,
-    upsert: tasksAdapter.upsertOne
-  }
+    upsert: tasksAdapter.upsertOne,
+  },
 })
 
 const selectors = tasksAdapter.getSelectors((state: State) => state.tasks)

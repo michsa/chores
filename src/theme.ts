@@ -28,11 +28,11 @@ const spacing = {
   s: 8,
   m: 12,
   l: 16,
-  xl: 24
+  xl: 24,
 }
 
 const sizes = {
-  inputHeight: 46
+  inputHeight: 46,
 }
 
 const fontSizes = {
@@ -46,7 +46,7 @@ const iconSizes = {
   regular: 20,
   large: 24,
   header: 24,
-  xlarge: 26
+  xlarge: 26,
 }
 
 type ThemeColor =
@@ -94,19 +94,19 @@ const baseTheme = {
   spacing,
   sizes,
   fontSizes,
-  iconSizes
+  iconSizes,
 }
 
 export const darkTheme = {
   ...baseTheme,
   isDark: true,
-  colors: darkColors
+  colors: darkColors,
 }
 
 export const lightTheme = {
   ...baseTheme,
   isDark: false,
-  colors: lightColors
+  colors: lightColors,
 }
 
 export type Theme = typeof lightTheme & typeof darkTheme

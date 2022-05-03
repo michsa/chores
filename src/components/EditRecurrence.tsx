@@ -1,10 +1,8 @@
 import React, { useEffect } from 'react'
 import { View, ViewStyle } from 'react-native'
-// import { Picker } from '@react-native-picker/picker'
 import { Picker } from '../components'
 import { Frequency, Recurrence } from '../types'
 import { useForm } from '../hooks'
-import { inputStyle, selectInputStyle } from '../styles'
 import { frequencyOptions, maybePlural } from '../utils'
 import NumericTextInput from './NumericTextInput'
 

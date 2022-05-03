@@ -29,20 +29,22 @@ const App = () => {
             backgroundColor={theme.colors.background}
             barStyle={theme.isDark ? 'light-content' : 'dark-content'}
           />
-          <NavigationContainer>
+          <NavigationContainer
+            theme={{
+              dark: theme.isDark,
+              colors: {
+                primary: '#0f0',
+                background: theme.colors.background,
+                card: theme.colors.headerBackground,
+                text: theme.colors.primaryText,
+                border: theme.colors.underline,
+                notification: '#f00',
+              },
+            }}>
             <TaskStack.Navigator
               screenOptions={{
-                headerTintColor: theme.colors.primaryText,
-                headerStyle: {
-                  backgroundColor: theme.colors.headerBackground,
-                  elevation: 0,
-                },
-                cardStyle: {
-                  backgroundColor: theme.colors.background,
-                },
-                headerRightContainerStyle: {
-                  marginRight: theme.spacing.m,
-                },
+                headerStyle: { elevation: 0 },
+                headerRightContainerStyle: { marginRight: theme.spacing.m },
               }}>
               <TaskStack.Screen
                 name="taskList"
@@ -59,20 +61,22 @@ const App = () => {
                 })}
               />
               <TaskStack.Screen
-                name="addTask"
-                component={EditTask}
-                options={{ title: 'Add Task', presentation: 'modal' }}
-              />
-              <TaskStack.Screen
                 name="editTask"
                 component={EditTask}
-                options={{ title: 'Edit Task', presentation: 'modal' }}
+                options={{ title: 'Edit Task' }}
               />
               <TaskStack.Screen
                 name="viewTask"
                 component={ViewTask}
                 options={{ title: 'View Task' }}
               />
+              <TaskStack.Group screenOptions={{ presentation: 'modal' }}>
+                <TaskStack.Screen
+                  name="addTask"
+                  component={EditTask}
+                  options={{ title: 'Add Task' }}
+                />
+              </TaskStack.Group>
             </TaskStack.Navigator>
           </NavigationContainer>
         </EThemeProvider>
