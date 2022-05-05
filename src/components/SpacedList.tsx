@@ -3,19 +3,19 @@ import { ViewProps, View } from 'react-native'
 import { Theme } from '../theme'
 import { Spacer } from '.'
 
-export type SpacedListProps = ViewProps & {
-  as?: ComponentType<ViewProps>
+export type SpacedListProps<P extends ViewProps> = {
+  as?: ComponentType<P> | React.ElementType
   spacing?: keyof Theme['spacing']
   spacer?: ComponentType<{ size?: keyof Theme['spacing'] }>
-}
+} & P
 
-export const SpacedList = ({
+export const SpacedList = <P extends ViewProps>({
   spacing = 's',
   children,
   as = View,
   spacer = Spacer,
   ...props
-}: SpacedListProps) => {
+}: SpacedListProps<P>) => {
   const Component = as
   const SpacerComponent = spacer
   return (
@@ -37,7 +37,10 @@ export const SpacedList = ({
 }
 export default SpacedList
 
-export const Row = ({ style, ...props }: SpacedListProps) => (
+export const Row = <P extends ViewProps>({
+  style,
+  ...props
+}: SpacedListProps<P>) => (
   <SpacedList
     style={[{ flexDirection: 'row', alignItems: 'center' }, style]}
     {...props}

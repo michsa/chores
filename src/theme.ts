@@ -1,26 +1,59 @@
-import { mapValues } from 'lodash'
-
 const palette = {
   white: '#ffffff',
   offWhite: '#f2f2f2',
 
-  // light text
-  grey1: '#757575',
-  grey2: '#8a8a8a',
+  grey1: '#d3d3d3', // light underline
+  grey2: '#9e9e9e', // light placeholder text
+  grey3: '#8a8a8a', // dark secondary text
+  grey4: '#757575', // light secondary text
+  grey5: '#414141', // dark placeholder text (actual inverse of light mode: 616161)
+  grey6: '#2c2c2c', // dark underline
 
-  // underline colors
-  grey3: '#d3d3d3',
-  grey4: '#2c2c2c',
-
-  // placeholder text
-  grey5: '#9e9e9e',
-  grey6: '#414141', // actual inverse of light mode: 616161
-
+  offBlack: '#101010', // '#0d0d0d',
   black: '#000000',
-  offBlack: '#0d0d0d',
 
   accent: 'teal',
   danger: 'indianred',
+}
+
+type ThemeColor =
+  | 'background'
+  | 'foreground'
+  | 'headerBackground'
+  | 'text'
+  | 'primaryText'
+  | 'placeholderText'
+  | 'underline'
+  | 'accent'
+  | 'danger'
+
+type ColorScheme = { [k in ThemeColor]: string }
+
+const highlightColors = {
+  accent: palette.accent,
+  danger: palette.danger,
+}
+
+const lightColors: ColorScheme = {
+  ...highlightColors,
+  background: palette.offWhite,
+  foreground: palette.white,
+  headerBackground: palette.white,
+  text: palette.grey4,
+  primaryText: palette.black,
+  placeholderText: palette.grey2,
+  underline: palette.grey1,
+}
+
+const darkColors: ColorScheme = {
+  ...highlightColors,
+  background: palette.black,
+  foreground: palette.offBlack,
+  headerBackground: palette.black,
+  text: palette.grey3,
+  primaryText: palette.offWhite,
+  placeholderText: palette.grey5,
+  underline: palette.grey5,
 }
 
 const spacing = {
@@ -47,46 +80,6 @@ const iconSizes = {
   large: 24,
   header: 24,
   xlarge: 26,
-}
-
-type ThemeColor =
-  | 'background'
-  | 'foreground'
-  | 'headerBackground'
-  | 'text'
-  | 'primaryText'
-  | 'placeholderText'
-  | 'underline'
-  | 'accent'
-  | 'danger'
-
-type ColorScheme = { [k in ThemeColor]: string }
-
-const highlightColors = {
-  accent: palette.accent,
-  danger: palette.danger,
-}
-
-const lightColors: ColorScheme = {
-  ...highlightColors,
-  background: palette.offWhite,
-  foreground: palette.white,
-  headerBackground: palette.white,
-  text: palette.grey1,
-  primaryText: palette.black,
-  placeholderText: palette.grey5,
-  underline: palette.grey3,
-}
-
-const darkColors: ColorScheme = {
-  ...highlightColors,
-  background: palette.black,
-  foreground: palette.offBlack,
-  headerBackground: palette.black,
-  text: palette.grey2,
-  primaryText: palette.offWhite,
-  placeholderText: palette.grey6,
-  underline: palette.grey6,
 }
 
 const baseTheme = {

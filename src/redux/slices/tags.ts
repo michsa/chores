@@ -2,7 +2,9 @@ import { createSlice, createEntityAdapter } from '@reduxjs/toolkit'
 import { Tag } from '../../types'
 import { State } from '../store'
 
-const tagsAdapter = createEntityAdapter<Tag>()
+const tagsAdapter = createEntityAdapter<Tag>({
+  sortComparer: (a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0),
+})
 
 const initialState = tagsAdapter.getInitialState()
 
