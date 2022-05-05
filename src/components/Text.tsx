@@ -1,4 +1,3 @@
-import React, { ComponentType } from 'react'
 import styled from '@emotion/native'
 import { inputStyle } from '../styles'
 import { variants } from './utils'
@@ -17,6 +16,14 @@ export const PropertyText = styled(PrimaryText)(({ theme }) => ({
   paddingVertical: theme.spacing.s,
 }))
 
+export const Tag = styled.Text<{ color?: string }>(({ theme, color }) => ({
+  backgroundColor: color ?? theme.colors.underline,
+  color: theme.colors.primaryText,
+  paddingHorizontal: theme.spacing.s,
+  paddingVertical: theme.spacing.xs,
+  borderRadius: 4,
+}))
+
 export const FakeInputText = styled.Text([
   inputStyle,
   {
@@ -31,4 +38,5 @@ export const Text = variants({
   property: PropertyText,
   input: FakeInputText,
   default: BaseText,
+  tag: Tag,
 })

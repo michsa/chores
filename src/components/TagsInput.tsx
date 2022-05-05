@@ -1,10 +1,15 @@
-import React, { useEffect, useState, ComponentProps, useRef } from 'react'
-import { View, Pressable, Modal } from 'react-native'
+import React, { useEffect, useState, ComponentProps } from 'react'
+import { View, Pressable, FlatList } from 'react-native'
 import { useTheme } from '@emotion/react'
 
 import { useSelector } from '../hooks'
 import { getTags } from '../redux/selectors'
-import { TextInput, Text, Card } from '.'
+import { TextInput, Tag, Spacer } from '.'
+
+export type TagsInputProps = Omit<ComponentProps<typeof TextInput>, 'value'> & {
+  value: string[]
+  onUpdate: (tags: string[]) => void
+}
 
 const useSelectedTags = (initial: string[]) => {
   const [selectedTags, setSelectedTags] = useState(initial)
@@ -14,78 +19,75 @@ const useSelectedTags = (initial: string[]) => {
   return { selectedTags, selectTag, setSelectedTags }
 }
 
-export type TagsInputProps = Omit<ComponentProps<typeof TextInput>, 'value'> & {
-  value: string[]
-  onUpdate: (tags: string[]) => void
-}
-
 export const TagsInput = ({ value, onUpdate, ...props }: TagsInputProps) => {
   const theme = useTheme()
   const tags = useSelector(getTags)
 
   const { selectedTags, selectTag, setSelectedTags } = useSelectedTags(value)
-  const [dropdown, setDropdown] = useState(false)
+  const [tagList, setTaglist] = useState(false)
 
   useEffect(() => onUpdate(selectedTags), [selectedTags])
 
-  const ref = useRef(null)
-
   return (
-    <View style={{ zIndex: 1, flex: 1 }} {...props}>
+    <View {...props}>
       <TextInput
         placeholder="Tags"
         value={selectedTags.join(' ')}
         onChangeText={text => setSelectedTags(text.split(' '))}
-        onFocus={() => setDropdown(true)}
-        onEndEditing={() => setDropdown(false)}
+        onFocus={() => setTaglist(true)}
+        onEndEditing={() => setTaglist(false)}
       />
-      <Card
+      <FlatList
         style={{
-          zIndex: 1,
-          position: 'absolute',
-          top: '100%',
-          marginTop: theme.spacing.xs,
-          left: 0,
-          right: 0,
-          backgroundColor: theme.colors.underline,
-          borderBottomColor: '#f0f',
-          borderBottomWidth: 5,
-          display: dropdown ? 'flex' : 'none',
-          maxHeight: 200,
-          overflow: 'hidden',
-        }}>
-        <View>
-          {/* <FlatList
-            scrollEnabled={false}
-            // this is the trick to select a tag from the dropdown without blurring the text input
-            keyboardShouldPersistTaps="handled"
-            onScroll={() => console.log('flatList scroll')}
-            // onTouchStart={() => console.log('touch start ')}
-            scrollToOverflowEnabled
-            data={tags.filter(tag => {
-              const input = selectedTags[selectedTags.length - 1] ?? ''
-              const matchesInput = tag.name.startsWith(input)
-              return !selectedTags.includes(tag.name) && matchesInput
-            })}
-            renderItem={({ item: tag }) => (
-              <Pressable onPress={() => selectTag(tag.name)}>
-                <Text variant="property">{tag.name}</Text>
-              </Pressable>
-            )}
-          /> */}
-          {tags
-            .filter(tag => {
-              const input = selectedTags[selectedTags.length - 1] ?? ''
-              const matchesInput = tag.name.startsWith(input)
-              return !selectedTags.includes(tag.name) && matchesInput
-            })
-            .map(tag => (
-              <Pressable onPress={() => selectTag(tag.name)} key={tag.id}>
-                <Text variant="property">{tag.name}</Text>
-              </Pressable>
-            ))}
-        </View>
-      </Card>
+          marginTop: theme.spacing.m,
+          marginBottom: theme.spacing.s,
+          display: tagList ? 'flex' : 'none',
+        }}
+        horizontal
+        // this is the trick to select a tag from the dropdown without blurring the text input
+        keyboardShouldPersistTaps="handled"
+        data={tags.filter(tag => {
+          const input = selectedTags[selectedTags.length - 1] ?? ''
+          const matchesInput = tag.name.startsWith(input)
+          return !selectedTags.includes(tag.name) && matchesInput
+        })}
+        ItemSeparatorComponent={Spacer}
+        renderItem={({ item: tag }) => (
+          <Pressable onPress={() => selectTag(tag.name)}>
+            <Tag
+              style={{
+                backgroundColor: theme.colors.underline,
+                color: theme.colors.primaryText,
+                paddingHorizontal: theme.spacing.s,
+                paddingVertical: theme.spacing.xs,
+                borderRadius: 4,
+              }}>
+              {tag.name}
+            </Tag>
+          </Pressable>
+        )}
+      />
+      {/* <Row style={{ flexWrap: 'wrap' }}>
+        {tags
+          .filter(tag => {
+            const input = selectedTags[selectedTags.length - 1] ?? ''
+            const matchesInput = tag.name.startsWith(input)
+            return !selectedTags.includes(tag.name) && matchesInput
+          })
+          .map(tag => (
+            <Pressable onPress={() => selectTag(tag.name)} key={tag.id}>
+              <Card
+                style={{
+                  backgroundColor: theme.colors.background,
+                  paddingHorizontal: 8,
+                  paddingVertical: 4,
+                  marginVertical: 2,
+                }}>
+                <Text>{tag.name}</Text>
+              </Card>
+            </Pressable>
+          ))}
+      </Row> */}
     </View>
   )
 }

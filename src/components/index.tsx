@@ -1,5 +1,5 @@
-import React from 'react'
-import { TextInputProps } from 'react-native'
+import React, { Ref } from 'react'
+import { TextInputProps, TextInput as RNTextInput } from 'react-native'
 import styled from '@emotion/native'
 import { useTheme } from '@emotion/react'
 import { Theme } from '../theme'
@@ -12,15 +12,18 @@ export * from './SpacedList'
 
 const BaseTextInput = styled.TextInput(inputStyle)
 
-export const TextInput = (props: TextInputProps) => {
-  const theme = useTheme()
-  return (
-    <BaseTextInput
-      placeholderTextColor={theme.colors.placeholderText}
-      {...props}
-    />
-  )
-}
+export const TextInput = React.forwardRef(
+  (props: React.ComponentProps<typeof BaseTextInput>, ref: Ref<RNTextInput>) => {
+    const theme = useTheme()
+    return (
+      <BaseTextInput
+        ref={ref}
+        placeholderTextColor={theme.colors.placeholderText}
+        {...props}
+      />
+    )
+  }
+)
 
 export const Section = styled.View(({ theme }) => ({
   marginHorizontal: theme.spacing.m,
