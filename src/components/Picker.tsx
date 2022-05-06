@@ -24,7 +24,14 @@ export const Picker = <T extends number | string>({
     <PickerContainer style={[{ flex: 1 }, containerStyle]}>
       <BasePicker<T>
         dropdownIconColor={theme.colors.text}
-        style={[{ marginLeft: -8, color: theme.colors.primaryText }, style]}
+        style={[
+          {
+            marginLeft: -theme.spacing.s,
+            marginRight: -theme.spacing.l,
+            color: theme.colors.primaryText,
+          },
+          style,
+        ]}
         onValueChange={onValueChange}
         {...props}>
         {options.map(({ label, value }, i) => (

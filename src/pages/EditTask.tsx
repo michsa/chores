@@ -32,7 +32,7 @@ const defaultSetings: TaskSettingsInput = {
   name: '',
   points: 1,
   priority: 0,
-  isRecurring: false,
+  isRecurring: true,
   recurrence: defaultRecurrence,
   deadlineWarning: defaultRecurrence,
   description: '',
@@ -100,155 +100,140 @@ const EditTask = ({
   type DateField = 'scheduled' | 'deadline'
   const [datePicker, setDatePicker] = useState<DateField | null>(null)
 
-  const DateField = ({ field }: { field: DateField }) => (
-    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-      <FakeInputText style={{ flex: 1 }} onPress={() => setDatePicker(field)}>
-        {!!form[field] && new Date(form[field] as number).toDateString()}
-      </FakeInputText>
+  const DateField = ({
+    field,
+    children,
+  }: {
+    field: DateField
+    children?: React.ReactNode
+  }) => (
+    <Row spacing="m">
+      <Row style={{ flex: 1 }}>
+        <Icon name={field === 'scheduled' ? 'calendar' : 'alert-circle'} />
+        <FakeInputText style={{ flex: 1 }} onPress={() => setDatePicker(field)}>
+          {!!form[field] && new Date(form[field] as number).toDateString()}
+        </FakeInputText>
+      </Row>
       <Icon
-        name="x"
+        name="delete"
         color="accent"
-        style={{ paddingHorizontal: 24 }}
         size="header"
         onPress={() => setField(field)(undefined)}
       />
-    </View>
+    </Row>
   )
 
   return (
-    <>
-      <SpacedList
-        as={KeyboardAwareScrollView}
-        style={{ margin: theme.spacing.s, flex: 1, zIndex: 1 }}
-        // this allows us to select a tag from the dropdown without first collapsing the keyboard
-        keyboardShouldPersistTaps="always">
-        <Card>
-          <TextInput
-            placeholder="Name"
-            style={{ fontSize: theme.fontSizes.large }}
-            value={form.name}
-            onChangeText={setField('name')}
-          />
-        </Card>
-        <Row>
-          <Row as={Card} style={{ flex: 2 }}>
-            <Icon name="star" />
-            <NumericTextInput
-              placeholder="Points"
-              style={{ flex: 1 }}
-              minValue={1}
-              maxValue={999}
-              value={form.points}
-              onChangeText={setField('points')}
-            />
-          </Row>
-          <Row as={Card} style={{ flex: 3 }}>
-            <Icon name="flag" />
-            <Picker
-              selectedValue={form.priority}
-              onValueChange={setField('priority')}
-              options={priorityOptions}
-            />
-          </Row>
-        </Row>
-        <Row as={Card} style={{ zIndex: 1 }}>
-          <Icon name="tag" />
-          <TagsInput
+    <SpacedList
+      as={KeyboardAwareScrollView}
+      style={{ margin: theme.spacing.s, flex: 1, zIndex: 1 }}
+      // this allows us to select a tag from the dropdown without first collapsing the keyboard
+      keyboardShouldPersistTaps="always">
+      <Card>
+        <TextInput
+          placeholder="Name"
+          style={{ fontSize: theme.fontSizes.large }}
+          value={form.name}
+          onChangeText={setField('name')}
+        />
+      </Card>
+      <Row>
+        <Row as={Card} style={{ flex: 2 }}>
+          <Icon name="star" />
+          <NumericTextInput
+            placeholder="Points"
             style={{ flex: 1 }}
-            value={form.tagNames}
-            onUpdate={setField('tagNames')}
+            minValue={1}
+            maxValue={999}
+            value={form.points}
+            onChangeText={setField('points')}
           />
         </Row>
-        {!form.scheduled && !form.deadline && (
-          <Row style={{ padding: theme.spacing.s }}>
-            <View style={{ flex: 1 }}>
-              <Button
-                title="Set scheduled time"
-                onPress={() => setDatePicker('scheduled')}
-              />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Button
-                title="Set deadline"
-                onPress={() => setDatePicker('deadline')}
-              />
-            </View>
-          </Row>
-        )}
-        {!!datePicker && (
-          <DateTimePicker
-            mode="date"
-            minimumDate={new Date()}
-            value={new Date(form.scheduled ?? Date.now())}
-            onChange={(e, date) => {
-              setDatePicker(null)
-              if (e.type === 'set') setField(datePicker)(date?.valueOf())
-            }}
+        <Row as={Card} style={{ flex: 3 }}>
+          <Icon name="flag" />
+          <Picker
+            selectedValue={form.priority}
+            onValueChange={setField('priority')}
+            options={priorityOptions}
           />
-        )}
-        {!!form.scheduled && (
-          <Row as={Card}>
-            <Icon name="calendar" />
-            <DateField field="scheduled" />
-          </Row>
-        )}
-        {!!form.deadline && (
-          <SpacedList as={Card}>
+        </Row>
+      </Row>
+
+      <TagsInput value={form.tagNames} onUpdate={setField('tagNames')} />
+
+      {!form.scheduled && !form.deadline && (
+        <Row style={{ padding: theme.spacing.s }}>
+          <View style={{ flex: 1 }}>
+            <Button
+              title="Set scheduled time"
+              onPress={() => setDatePicker('scheduled')}
+            />
+          </View>
+          <View style={{ flex: 1 }}>
+            <Button
+              title="Set deadline"
+              onPress={() => setDatePicker('deadline')}
+            />
+          </View>
+        </Row>
+      )}
+      {!!(form.scheduled || form.deadline) && (
+        <SpacedList as={Card}>
+          {!!form.scheduled && <DateField field="scheduled" />}
+          {!!form.deadline && <DateField field="deadline" />}
+          {!!form.deadline && (
             <Row>
-              <Icon name="alert-circle" />
-              <DateField field="deadline" />
-            </Row>
-            <Row>
-              <Text>Notify</Text>
+              <Icon size="small" name="calendar" />
+              <Text>Schedule</Text>
               <EditRecurrence
-                style={{ flex: 1 }}
                 value={form.deadlineWarning}
                 onChange={setField('deadlineWarning')}
               />
               <Text>before</Text>
-              <Spacer size="xs" />
             </Row>
-          </SpacedList>
-        )}
-        {!!(form.scheduled || form.deadline) && (
-          <Row
-            spacing="xs"
-            as={Card}
-            style={{ height: theme.sizes.inputHeight }}>
-            <Text>Repeat</Text>
+          )}
+          <Row>
+            <Icon size="small" name="repeat" />
+            <Text>{form.isRecurring ? 'Repeat after' : 'Do not repeat'}</Text>
             {form.isRecurring && (
-              <>
-                <Text style={{ marginRight: theme.spacing.s }}>after</Text>
-                <EditRecurrence
-                  style={{ flex: 1 }}
-                  value={form.recurrence}
-                  onChange={setField('recurrence')}
-                />
-              </>
+              <EditRecurrence
+                value={form.recurrence}
+                onChange={setField('recurrence')}
+              />
             )}
             <Pressable
               style={{ flex: 1, paddingLeft: theme.spacing.xl }}
               onPress={() => setField('isRecurring')(!form.isRecurring)}>
               <Switch
+                style={{ height: theme.sizes.inputHeight - theme.spacing.s }}
                 value={form.isRecurring}
                 onValueChange={setField('isRecurring')}
               />
             </Pressable>
           </Row>
-        )}
+        </SpacedList>
+      )}
 
-        <Card>
-          <Text>Notes</Text>
-          <MultilineTextInput
-            value={form.description}
-            onChangeText={setField('description')}
-          />
-        </Card>
-      </SpacedList>
-      <Card style={{ top: 400, left: 52, position: 'absolute', zIndex: 1 }}>
-        <Text>foo</Text>
+      <Card>
+        <Text>Notes</Text>
+        <MultilineTextInput
+          value={form.description}
+          onChangeText={setField('description')}
+        />
       </Card>
-    </>
+
+      {!!datePicker && (
+        <DateTimePicker
+          mode="date"
+          minimumDate={new Date()}
+          value={new Date(form.scheduled ?? Date.now())}
+          onChange={(e, date) => {
+            setDatePicker(null)
+            if (e.type === 'set') setField(datePicker)(date?.valueOf())
+          }}
+        />
+      )}
+    </SpacedList>
   )
 }
 

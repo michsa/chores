@@ -19,17 +19,17 @@ export const PropertyText = styled(PrimaryText)(({ theme }) => ({
 export const Tag = styled.Text<{ color?: string }>(({ theme, color }) => ({
   backgroundColor: color ?? theme.colors.underline,
   color: theme.colors.primaryText,
-  paddingHorizontal: theme.spacing.s,
+  paddingHorizontal: theme.spacing.m,
   paddingVertical: theme.spacing.xs,
-  borderRadius: 4,
+  borderRadius: theme.spacing.s,
 }))
 
-export const FakeInputText = styled.Text([
+export const FakeInputText = styled.Text(({ theme }) => [
   inputStyle,
   {
-    paddingBottom: 8,
-    paddingTop: 16,
-    fontSize: 16,
+    paddingBottom: theme.spacing.s,
+    paddingTop: theme.spacing.l,
+    fontSize: theme.spacing.l,
   },
 ])
 

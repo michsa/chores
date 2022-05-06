@@ -20,15 +20,12 @@ export const SpacedList = <P extends ViewProps>({
   const SpacerComponent = spacer
   return (
     <Component {...props}>
-      {React.Children.map(
-        children,
+      {React.Children.toArray(children).map(
         (child, i) =>
           !!child && (
             <>
+              {i > 0 && <SpacerComponent key={i} size={spacing} />}
               {child}
-              {i + 1 < React.Children.count(children) && (
-                <SpacerComponent size={spacing} />
-              )}
             </>
           )
       )}

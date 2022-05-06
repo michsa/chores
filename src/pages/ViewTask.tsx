@@ -10,7 +10,7 @@ import {
   Row,
   SpacedList,
   Icon,
-  PrimaryText,
+  Tag,
 } from '../components'
 import { useDispatch, useSelector } from '../hooks'
 import { deleteTask } from '../redux/thunks'
@@ -104,27 +104,45 @@ const ViewTask = ({
                   <Text variant="primary">
                     {new Date(task.settings.deadline).toDateString()}
                   </Text>
-                  {!!task.settings.deadlineWarning && (
-                    <Text>
-                      Notify {printRecurrence(task.settings.deadlineWarning)}{' '}
-                      before
-                    </Text>
-                  )}
                 </SpacedList>
               </Row>
             )}
-            {!!task.settings.isRecurring && (
-              <Row>
-                <Icon size="small" name="repeat" />
-                <Text>after {printRecurrence(task.settings.recurrence!)}</Text>
-              </Row>
-            )}
+            <SpacedList style={{ alignItems: 'flex-end' }}>
+              {!!task.settings.deadlineWarning && (
+                <Row>
+                  <Icon size="small" name="calendar" />
+                  <Text>
+                    {printRecurrence(task.settings.deadlineWarning)} before
+                  </Text>
+                </Row>
+              )}
+              {!!task.settings.isRecurring && (
+                <Row>
+                  <Icon size="small" name="repeat" />
+                  <Text>
+                    after {printRecurrence(task.settings.recurrence!)}
+                  </Text>
+                </Row>
+              )}
+            </SpacedList>
           </Row>
         )}
 
         <Row as={ViewCard}>
           <Icon name="tag" />
-          <Row as={PrimaryText}>{task.tags.map(t => t.name).join(', ')}</Row>
+          <View
+            style={{
+              flex: 1,
+              flexWrap: 'wrap',
+              flexDirection: 'row',
+              margin: -theme.spacing.xxs,
+            }}>
+            {task.tags.map(t => (
+              <Tag key={t.id} style={{ margin: theme.spacing.xxs }}>
+                {t.name}
+              </Tag>
+            ))}
+          </View>
         </Row>
 
         <Card>
