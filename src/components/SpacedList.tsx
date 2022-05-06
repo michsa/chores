@@ -23,10 +23,10 @@ export const SpacedList = <P extends ViewProps>({
       {React.Children.toArray(children).map(
         (child, i) =>
           !!child && (
-            <>
-              {i > 0 && <SpacerComponent key={i} size={spacing} />}
+            <React.Fragment key={i}>
+              {i > 0 && <SpacerComponent size={spacing} />}
               {child}
-            </>
+            </React.Fragment>
           )
       )}
     </Component>

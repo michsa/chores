@@ -23,14 +23,14 @@ import {
 } from '../components'
 import EditRecurrence from '../components/EditRecurrence'
 import MultilineTextInput from '../components/MultilineTextInput'
-import NumericTextInput from '../components/NumericTextInput'
+import NumberInput from '../components/NumberInput'
 import TagsInput from '../components/TagsInput'
 
 const defaultRecurrence = { frequency: Frequency.WEEK, interval: 1 }
 
 const defaultSetings: TaskSettingsInput = {
   name: '',
-  points: 1,
+  points: undefined,
   priority: 0,
   isRecurring: true,
   recurrence: defaultRecurrence,
@@ -140,11 +140,11 @@ const EditTask = ({
       <Row>
         <Row as={Card} style={{ flex: 2 }}>
           <Icon name="star" />
-          <NumericTextInput
+          <NumberInput
             placeholder="Points"
             style={{ flex: 1 }}
             minValue={1}
-            maxValue={999}
+            maxValue={255}
             value={form.points}
             onChangeText={setField('points')}
           />

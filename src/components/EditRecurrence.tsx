@@ -4,7 +4,7 @@ import { Picker } from '../components'
 import { Frequency, Recurrence } from '../types'
 import { useForm } from '../hooks'
 import { frequencyOptions, maybePlural } from '../utils'
-import NumericTextInput from './NumericTextInput'
+import NumberInput from './NumberInput'
 
 const EditRecurrence = ({
   value = { frequency: Frequency.WEEK, interval: 1 },
@@ -28,7 +28,7 @@ const EditRecurrence = ({
         flexDirection: 'row',
         justifyContent: 'space-around',
       }}>
-      <NumericTextInput
+      <NumberInput
         style={{ flex: 1 }}
         value={form.interval}
         minValue={1}

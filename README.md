@@ -113,9 +113,9 @@ A completion typically but not necessarily indicates that we should mark the tas
 
 ### Settings
 
-- ~~timezone: necessary for chunking metrics by day/week~~
 - theme
 - default deadline warning
+- default number of points (or "none" to start blank)
 
 #### On timezone
 

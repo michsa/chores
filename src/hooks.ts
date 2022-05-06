@@ -21,7 +21,9 @@ export const useForm = <T extends { [k: string]: unknown }>(defaults: T) => {
     // both ramda and lodash curries have insufficient type support, oh well
     setField:
       <K extends keyof T>(key: K) =>
-      (value: T[K]) =>
-        setForm(currentForm => ({ ...currentForm, [key]: value })),
+      (value: T[K]) => {
+        console.log(`setField`, { [key]: value })
+        setForm(currentForm => ({ ...currentForm, [key]: value }))
+      }
   }
 }

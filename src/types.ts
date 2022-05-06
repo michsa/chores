@@ -43,7 +43,10 @@ export type TaskSettings = {
   deadline?: number
   deadlineWarning?: Recurrence
 }
-export type TaskSettingsInput = TaskSettings & { tagNames: string[] }
+export type TaskSettingsInput = Omit<TaskSettings, 'points'> & {
+  points?: number
+  tagNames: string[]
+}
 
 export type Task = {
   id: TaskID
