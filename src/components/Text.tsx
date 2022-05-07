@@ -28,13 +28,18 @@ export const PropertyText = styled(PrimaryText)(({ theme }) => ({
 
 export const Tag = styled.Text<{ color?: keyof Theme['colors'] }>(
   ({ theme, color }) => ({
-    backgroundColor: color ?? theme.colors.underline,
+    backgroundColor: color ?? theme.colors.highlight,
     color: theme.colors.primaryText,
     paddingHorizontal: theme.spacing.m,
     paddingVertical: theme.spacing.xs,
     borderRadius: theme.spacing.s,
   })
 )
+
+export const SmallTag = styled(Tag)(({ theme }) => ({
+  paddingHorizontal: theme.spacing.s,
+  paddingVertical: theme.spacing.xxs,
+}))
 
 export const FakeInputText = styled.Text(({ theme }) => [
   inputStyle,
@@ -62,5 +67,7 @@ export const Text = variants({
   input: FakeInputText,
   default: BaseText,
   tag: Tag,
+  smallTag: SmallTag,
   button: ButtonText,
 })
+export default Text

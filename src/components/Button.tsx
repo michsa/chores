@@ -4,6 +4,7 @@ import { useTheme } from '@emotion/react'
 import { variants } from './utils'
 import { Icon, Text, Row } from '.'
 import { Theme } from '../theme'
+import { readableText } from '../utils'
 
 export type ButtonProps = PressableProps & {
   title?: string
@@ -20,11 +21,12 @@ export const BaseButton = ({
   iconSize,
   labelSize,
   color = 'accent',
-  fontColor = 'primaryText',
+  fontColor,
   style,
   ...props
 }: ButtonProps) => {
   const theme = useTheme()
+  const textColor = fontColor ?? readableText(theme, color)
   return (
     <Pressable
       style={({ pressed }) => [
@@ -43,7 +45,7 @@ export const BaseButton = ({
       }}
       {...props}>
       <Row spacing="xs" style={{ flex: 1, justifyContent: 'center' }}>
-        {icon && <Icon name={icon} color={fontColor} size={iconSize} />}
+        {icon && <Icon name={icon} color={textColor} size={iconSize} />}
         {title && (
           <Text
             style={{
@@ -53,7 +55,7 @@ export const BaseButton = ({
               textTransform: 'uppercase',
               fontWeight: 'bold',
             }}
-            color={fontColor}
+            color={textColor}
             size={labelSize}>
             {title}
           </Text>

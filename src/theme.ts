@@ -2,6 +2,7 @@ const palette = {
   white: '#ffffff',
   offWhite: '#f2f2f2',
 
+  grey0: '#e1e1e1',
   grey1: '#d3d3d3', // light underline
   grey2: '#9e9e9e', // light placeholder text
   grey3: '#8a8a8a', // dark secondary text
@@ -24,6 +25,7 @@ type ThemeColor =
   | 'primaryText'
   | 'placeholderText'
   | 'underline'
+  | 'highlight'
   | 'accent'
   | 'danger'
 
@@ -34,7 +36,7 @@ const highlightColors = {
   danger: palette.danger,
 }
 
-const lightColors: ColorScheme = {
+const lightColors = {
   ...highlightColors,
   background: palette.offWhite,
   foreground: palette.white,
@@ -43,9 +45,10 @@ const lightColors: ColorScheme = {
   primaryText: palette.black,
   placeholderText: palette.grey2,
   underline: palette.grey1,
+  highlight: palette.grey0
 }
 
-const darkColors: ColorScheme = {
+const darkColors = {
   ...highlightColors,
   background: palette.black,
   foreground: palette.offBlack,
@@ -54,6 +57,7 @@ const darkColors: ColorScheme = {
   primaryText: palette.offWhite,
   placeholderText: palette.grey5,
   underline: palette.grey5,
+  highlight: palette.grey6
 }
 
 const spacing = {
@@ -82,6 +86,7 @@ const iconSizes = {
   large: 24,
   header: 24,
   xlarge: 26,
+  xxlarge: 30 // for completion checkmarks
 }
 
 const baseTheme = {

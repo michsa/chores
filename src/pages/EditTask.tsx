@@ -99,7 +99,6 @@ const EditTask = ({
           color="accent"
           onPress={onSubmit}
         />
-        // <Button icon="save"title="Save" onPress={onSubmit} style={{ minHeight: 0, height: 40 }} />
       ),
     })
   }, [navigation, form])
@@ -107,13 +106,7 @@ const EditTask = ({
   type DateField = 'scheduled' | 'deadline'
   const [datePicker, setDatePicker] = useState<DateField | null>(null)
 
-  const DateField = ({
-    field,
-    children,
-  }: {
-    field: DateField
-    children?: React.ReactNode
-  }) => (
+  const DateField = ({ field }: { field: DateField }) => (
     <Row spacing="m">
       <Row style={{ flex: 1 }}>
         <Icon name={field === 'scheduled' ? 'calendar' : 'alert-circle'} />

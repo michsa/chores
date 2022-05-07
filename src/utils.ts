@@ -1,4 +1,12 @@
+import { getLuminance } from 'polished'
+import { Theme } from './theme'
 import { Frequency, Priority, Recurrence } from './types'
+
+export const readableText = (theme: Theme, color: keyof Theme['colors']) => {
+  const lightText = theme.isDark ? 'primaryText' : 'headerBackground'
+  const darkText = theme.isDark ? 'headerBackground' : 'primaryText'
+  return getLuminance(theme.colors[color]) > 0.5 ? darkText : lightText
+}
 
 export const exists = <T>(x: T | undefined): x is T => !!x
 

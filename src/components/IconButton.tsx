@@ -1,8 +1,9 @@
 import React from 'react'
 import { Pressable, Keyboard } from 'react-native'
 import { useTheme } from '@emotion/react'
-import Icon, { IconProps } from './Icon'
+import { readableText } from '../utils'
 import { ButtonProps } from './Button'
+import Icon, { IconProps } from './Icon'
 
 type IconButtonProps = IconProps & {
   containerProps?: Omit<ButtonProps, 'onPress'>
@@ -38,7 +39,7 @@ export const IconButton = ({
       {...containerProps}>
       <Icon
         size="header"
-        color={variant === 'primary' ? 'primaryText' : color}
+        color={variant === 'primary' ? readableText(theme, color) : color}
         {...props}
       />
     </Pressable>

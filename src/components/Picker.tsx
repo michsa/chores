@@ -4,7 +4,7 @@ import { useTheme } from '@emotion/react'
 import { Picker as BasePicker, PickerProps } from '@react-native-picker/picker'
 import { inputStyle } from '../styles'
 
-const PickerContainer = styled.View([
+export const PickerContainer = styled.View([
   inputStyle,
   { paddingLeft: 0, paddingBottom: 0 },
 ])
@@ -21,7 +21,7 @@ export const Picker = <T extends number | string>({
 }) => {
   const theme = useTheme()
   return (
-    <PickerContainer style={[{ flex: 1 }, containerStyle]}>
+    <PickerContainer style={[{ flexGrow: 1 }, containerStyle]}>
       <BasePicker<T>
         dropdownIconColor={theme.colors.text}
         style={[
@@ -41,3 +41,4 @@ export const Picker = <T extends number | string>({
     </PickerContainer>
   )
 }
+export default Picker

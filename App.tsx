@@ -12,6 +12,7 @@ import { store, persistor } from './src/redux/store'
 import EditTask from './src/pages/EditTask'
 import TaskList from './src/pages/TaskList'
 import ViewTask from './src/pages/ViewTask'
+import Completion from './src/pages/EditCompletion'
 import { darkTheme, lightTheme } from './src/theme'
 
 import { TaskStackParams } from './src/types'
@@ -75,6 +76,11 @@ const App = () => {
                   name="addTask"
                   component={EditTask}
                   options={{ title: 'Add Task' }}
+                />
+                <TaskStack.Screen
+                  name="completeTask"
+                  component={Completion}
+                  options={{ title: 'Complete Task' }}
                 />
               </TaskStack.Group>
             </TaskStack.Navigator>

@@ -19,13 +19,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import { reducer as tasks } from './slices/tasks'
 import { reducer as completions } from './slices/completions'
 import { reducer as tags } from './slices/tags'
+import { reducer as categories } from './slices/categories'
+
 
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
 }
 
-const reducer = combineReducers({ tasks, completions, tags })
+const reducer = combineReducers({ tasks, completions, tags, categories })
 export type State = ReturnType<typeof reducer>
 
 const persistedReducer = persistReducer(persistConfig, reducer)

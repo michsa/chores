@@ -5,6 +5,7 @@ export type TaskStackParams = {
   addTask: undefined
   editTask: { id: TaskID }
   viewTask: { id: TaskID }
+  completeTask: { id: TaskID }
 }
 
 export type NavigationProps = {
@@ -12,6 +13,7 @@ export type NavigationProps = {
   addTask: StackScreenProps<TaskStackParams, 'addTask'>
   editTask: StackScreenProps<TaskStackParams, 'editTask'>
   viewTask: StackScreenProps<TaskStackParams, 'viewTask'>
+  completeTask: StackScreenProps<TaskStackParams, 'completeTask'>
 }
 
 export enum Frequency {
@@ -29,7 +31,7 @@ export type Recurrence = {
 export type Priority = -2 | -1 | 0 | 1 | 2
 
 export type TagID = string
-export type Tag = { id: TagID; name: string }
+export type Tag = { id: TagID; name: string; tasks: TaskID[] }
 
 export type TaskID = string
 export type TaskSettings = {
@@ -59,12 +61,23 @@ export type Task = {
 export type TaskWithTags = Task & { tags: Tag[] }
 export type TaskWithCompletions = Task & { completions: Completion[] }
 
-export type CompletionID = string
-export type Completion = {
-  id: CompletionID
+export type CategoryID = string
+export type Category = {
+  id: CategoryID
   name: string
-  createdAt: number
+  completions: CompletionID[]
+}
+
+export type CompletionID = string
+export type CompletionSettings = {
   date: number
   points: number
+  isPartial: boolean
+  category: CategoryID
+}
+
+export type Completion = {
+  id: CompletionID
   taskId: TaskID
+  settings: CompletionSettings
 }

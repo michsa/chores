@@ -12,6 +12,7 @@ import {
   Icon,
   Tag,
 } from '../components'
+import TagList from '../components/TagList'
 import { useDispatch, useSelector } from '../hooks'
 import { deleteTask } from '../redux/thunks'
 import { getTaskWithTags } from '../redux/selectors'
@@ -55,7 +56,7 @@ const ViewTask = ({
             variant="primary"
             size="xlarge"
             name="check-circle"
-            onPress={() => setModal(true)}
+            onPress={() => navigation.navigate('completeTask', { id })}
           />
         </Row>
       ),
@@ -65,14 +66,6 @@ const ViewTask = ({
   if (!task) return null
   return (
     <ScrollView>
-      <Modal transparent visible={modal} onRequestClose={() => setModal(false)}>
-        <View
-          style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Card style={{ width: 200, height: 200 }}>
-            <Text>Complete task</Text>
-          </Card>
-        </View>
-      </Modal>
       <SpacedList style={{ margin: theme.spacing.s }}>
         <ViewCard>
           <Text variant="primary" style={{ fontSize: theme.fontSizes.large }}>
@@ -135,19 +128,7 @@ const ViewTask = ({
 
         <Row as={ViewCard}>
           <Icon name="tag" />
-          <View
-            style={{
-              flex: 1,
-              flexWrap: 'wrap',
-              flexDirection: 'row',
-              margin: -theme.spacing.xxs,
-            }}>
-            {task.tags.map(t => (
-              <Tag key={t.id} style={{ margin: theme.spacing.xxs }}>
-                {t.name}
-              </Tag>
-            ))}
-          </View>
+          <TagList tags={task.tags} />
         </Row>
 
         <Card>
