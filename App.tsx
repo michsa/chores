@@ -7,7 +7,7 @@ import { createStackNavigator } from '@react-navigation/stack'
 import { PersistGate } from 'redux-persist/integration/react'
 import { ThemeProvider as EThemeProvider } from '@emotion/react'
 
-import { HeaderIcon } from './src/components'
+import IconButton from './src/components/IconButton'
 import { store, persistor } from './src/redux/store'
 import EditTask from './src/pages/EditTask'
 import TaskList from './src/pages/TaskList'
@@ -52,9 +52,9 @@ const App = () => {
                 options={({ navigation }) => ({
                   title: 'Tasks',
                   headerRight: () => (
-                    <HeaderIcon
-                      name="plus-square"
-                      size="xlarge"
+                    <IconButton
+                      name="filter"
+                      color="text"
                       onPress={() => navigation.navigate('addTask')}
                     />
                   ),

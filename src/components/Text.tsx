@@ -1,28 +1,40 @@
+import React from 'react'
+import { TextProps as RNTextProps } from 'react-native'
 import styled from '@emotion/native'
 import { inputStyle } from '../styles'
 import { variants } from './utils'
+import { Theme } from '../theme'
 
-const BaseText = styled.Text(({ theme }) => ({
-  color: theme.colors.text,
-  fontSize: theme.fontSizes.small,
-}))
+type ThemeProps = {
+  color?: keyof Theme['colors']
+  size?: keyof Theme['fontSizes']
+}
+export type TextProps = RNTextProps & ThemeProps
 
-export const PrimaryText = styled.Text(({ theme }) => ({
-  color: theme.colors.primaryText,
-  fontSize: theme.fontSizes.regular,
-}))
+const BaseText = styled.Text<ThemeProps>(
+  ({ theme, color = 'text', size = 'small' }) => ({
+    color: theme.colors[color],
+    fontSize: theme.fontSizes[size],
+  })
+)
+
+export const PrimaryText = (props: TextProps) => (
+  <BaseText color="primaryText" size="regular" {...props} />
+)
 
 export const PropertyText = styled(PrimaryText)(({ theme }) => ({
   paddingVertical: theme.spacing.s,
 }))
 
-export const Tag = styled.Text<{ color?: string }>(({ theme, color }) => ({
-  backgroundColor: color ?? theme.colors.underline,
-  color: theme.colors.primaryText,
-  paddingHorizontal: theme.spacing.m,
-  paddingVertical: theme.spacing.xs,
-  borderRadius: theme.spacing.s,
-}))
+export const Tag = styled.Text<{ color?: keyof Theme['colors'] }>(
+  ({ theme, color }) => ({
+    backgroundColor: color ?? theme.colors.underline,
+    color: theme.colors.primaryText,
+    paddingHorizontal: theme.spacing.m,
+    paddingVertical: theme.spacing.xs,
+    borderRadius: theme.spacing.s,
+  })
+)
 
 export const FakeInputText = styled.Text(({ theme }) => [
   inputStyle,
@@ -33,10 +45,22 @@ export const FakeInputText = styled.Text(({ theme }) => [
   },
 ])
 
+export const ButtonText = styled(BaseText)(
+  ({ theme, color = 'primaryText' }) => ({
+    flexShrink: 1,
+    textAlign: 'center',
+    paddingHorizontal: theme.spacing.s,
+    color: theme.colors[color],
+    textTransform: 'uppercase',
+    fontWeight: 'bold',
+  })
+)
+
 export const Text = variants({
   primary: PrimaryText,
   property: PropertyText,
   input: FakeInputText,
   default: BaseText,
   tag: Tag,
+  button: ButtonText,
 })

@@ -67,6 +67,7 @@ const spacing = {
 
 const sizes = {
   inputHeight: 46,
+  buttonHeight: 42
 }
 
 const fontSizes = {

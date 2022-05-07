@@ -6,7 +6,7 @@ import styled from '@emotion/native'
 import {
   Text,
   Card,
-  HeaderIcon,
+  IconButton,
   Row,
   SpacedList,
   Icon,
@@ -38,7 +38,7 @@ const ViewTask = ({
     navigation.setOptions({
       headerRight: () => (
         <Row spacing="l">
-          <HeaderIcon
+          <IconButton
             name="trash-2"
             color="danger"
             onPress={() => {
@@ -46,12 +46,17 @@ const ViewTask = ({
               navigation.navigate('taskList')
             }}
           />
-          <HeaderIcon
+          <IconButton
             name="edit"
             color="text"
             onPress={() => navigation.navigate('editTask', { id })}
           />
-          <HeaderIcon name="check-circle" onPress={() => setModal(true)} />
+          <IconButton
+            variant="primary"
+            size="xlarge"
+            name="check-circle"
+            onPress={() => setModal(true)}
+          />
         </Row>
       ),
     })

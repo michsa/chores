@@ -9,6 +9,8 @@ export * from './Picker'
 export * from './Text'
 export * from './Icon'
 export * from './SpacedList'
+export * from './Button'
+export * from './IconButton'
 
 const BaseTextInput = styled.TextInput(inputStyle)
 

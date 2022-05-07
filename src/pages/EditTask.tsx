@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect } from 'react'
-import { View, Switch, Button, Pressable, ToastAndroid } from 'react-native'
+import { View, Switch, Pressable, ToastAndroid } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { useTheme } from '@emotion/react'
@@ -12,10 +12,9 @@ import { priorityOptions } from '../utils'
 import {
   Text,
   Card,
-  Spacer,
   TextInput,
   Icon,
-  HeaderIcon,
+  IconButton,
   Picker,
   FakeInputText,
   SpacedList,
@@ -25,6 +24,7 @@ import EditRecurrence from '../components/EditRecurrence'
 import MultilineTextInput from '../components/MultilineTextInput'
 import NumberInput from '../components/NumberInput'
 import TagsInput from '../components/TagsInput'
+import Button from '../components/Button'
 
 const defaultRecurrence = { frequency: Frequency.WEEK, interval: 1 }
 
@@ -92,7 +92,14 @@ const EditTask = ({
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
-        <HeaderIcon name="save" color="accent" onPress={onSubmit} />
+        <IconButton
+          variant="primary"
+          size="xlarge"
+          name="save"
+          color="accent"
+          onPress={onSubmit}
+        />
+        // <Button icon="save"title="Save" onPress={onSubmit} style={{ minHeight: 0, height: 40 }} />
       ),
     })
   }, [navigation, form])
@@ -162,19 +169,18 @@ const EditTask = ({
       <TagsInput value={form.tagNames} onUpdate={setField('tagNames')} />
 
       {!form.scheduled && !form.deadline && (
-        <Row style={{ padding: theme.spacing.s }}>
-          <View style={{ flex: 1 }}>
-            <Button
-              title="Set scheduled time"
-              onPress={() => setDatePicker('scheduled')}
-            />
-          </View>
-          <View style={{ flex: 1 }}>
-            <Button
-              title="Set deadline"
-              onPress={() => setDatePicker('deadline')}
-            />
-          </View>
+        <Row style={{ padding: theme.spacing.s }} spacing="m">
+          <Button
+            style={{ flex: 1 }}
+            icon="calendar"
+            title="Schedule"
+            onPress={() => setDatePicker('scheduled')}
+          />
+          <Button
+            style={{ flex: 1 }}
+            icon="alert-circle"
+            title="Set deadline"
+            onPress={() => setDatePicker('deadline')}></Button>
         </Row>
       )}
       {!!(form.scheduled || form.deadline) && (
