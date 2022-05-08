@@ -1,6 +1,7 @@
 import React, { useLayoutEffect, useState } from 'react'
 import { Pressable, FlatList, View } from 'react-native'
 import { useTheme } from '@emotion/react'
+import { compose } from '@reduxjs/toolkit'
 
 import {
   Card,
@@ -10,29 +11,30 @@ import {
   Spacer,
   Row,
   SpacedList,
-  TextInput,
 } from '../components'
 import TagList from '../components/TagList'
-import TagPicker from '../components/TagPicker'
+import FilterControls, { Filter } from '../components/FilterControls'
 import { useSelector } from '../hooks'
-import { getOrderedTasksWithTags, getTags } from '../redux/selectors'
+import { getOrderedTasksWithTags } from '../redux/selectors'
 import { NavigationProps } from '../types'
 import { priorityLabel } from '../utils'
 import { Theme } from '../theme'
+
+const composeFilters =
+  (filters: Filter[]): Filter =>
+  task =>
+    filters.every(filter => filter(task))
 
 const TaskList = ({ navigation }: NavigationProps['taskList']) => {
   const tasks = useSelector(getOrderedTasksWithTags)
   const theme = useTheme()
 
-  const [query, setQuery] = useState('')
-  const [tagIds, setTagIds] = useState<string[]>([])
+  const [filters, setFilters] = useState<Filter[]>([])
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <Row spacing="l">
-          <IconButton name="sliders" color="text" onPress={() => {}} />
-          <IconButton name="filter" color="text" />
           <IconButton
             variant="primary"
             size="xlarge"
@@ -59,35 +61,16 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
     </Row>
   )
 
-  const filteredTasks = tasks.filter(
-    task =>
-      task.settings.name.includes(query) &&
-      tagIds.every(id => task.tagIds.includes(id))
-  )
+  const filteredTasks = tasks.filter(composeFilters(filters))
+
+  const filterIconBg = (pressed: boolean) =>
+    pressed ? 'underline' : 'foreground'
 
   return (
     <React.Fragment>
-      <SpacedList as={Card}>
-        <Row>
-          <Icon name="search" />
-          <TextInput
-            style={{ flex: 1, height: theme.sizes.buttonHeight }}
-            value={query}
-            onChangeText={setQuery}
-          />
-          <IconButton
-            containerProps={{ style: { padding: theme.spacing.s } }}
-            name="chevron-down"
-            color="text"
-          />
-        </Row>
-        <TagPicker
-          value={tagIds}
-          onChange={setTagIds}
-        />
-      </SpacedList>
+      <FilterControls onChangeFilters={setFilters} />
       <FlatList
-        style={{ margin: theme.spacing.s }}
+        style={{ padding: theme.spacing.s }}
         data={filteredTasks}
         ItemSeparatorComponent={() => <Spacer size="m" />}
         renderItem={({ item }) => (
@@ -102,13 +85,12 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
                       paddingHorizontal: theme.spacing.s,
                       paddingVertical: theme.spacing.xxs,
                       borderRadius: theme.spacing.xl,
-                      borderWidth: 1,
-                      borderColor: theme.colors.text,
                       textAlign: 'center',
                       textAlignVertical: 'center',
-                      // backgroundColor: theme.colors.accent,
+                      backgroundColor: theme.colors.highlight,
                     }}
-                    // color="primaryText"
+                    size="regular"
+                    color="primaryText"
                     spacing="xs">
                     {item.settings.points}
                   </Row>

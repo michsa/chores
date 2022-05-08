@@ -38,7 +38,7 @@ const App = () => {
                 background: theme.colors.background,
                 card: theme.colors.headerBackground,
                 text: theme.colors.primaryText,
-                border: theme.colors.underline,
+                border: theme.colors.highlight,
                 notification: '#f00',
               },
             }}>

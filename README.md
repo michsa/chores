@@ -151,15 +151,14 @@ One-offs are completed if there exists any completion record for them with `isPa
 
 Other filter options:
 
-- include tags
-- exclude tags
 - text search (probably just task name)
+- tags: include and exclude
+- priority
+- scheduled
+- deadline
 - recurring or one-off
 - completed or not completed
 - point value range - a double-sided slider would be nice here
-- priority range - also double-sided slider
-- scheduled
-- deadline
 
 ### Sorting
 

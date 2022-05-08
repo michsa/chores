@@ -107,18 +107,17 @@ const EditTask = ({
   const [datePicker, setDatePicker] = useState<DateField | null>(null)
 
   const DateField = ({ field }: { field: DateField }) => (
-    <Row spacing="m">
+    <Row>
       <Row style={{ flex: 1 }}>
         <Icon name={field === 'scheduled' ? 'calendar' : 'alert-circle'} />
         <FakeInputText style={{ flex: 1 }} onPress={() => setDatePicker(field)}>
           {!!form[field] && new Date(form[field] as number).toDateString()}
         </FakeInputText>
       </Row>
-      <Icon
-        name="delete"
-        color="accent"
-        size="header"
+      <IconButton
+        name="x"
         onPress={() => setField(field)(undefined)}
+        containerProps={{ style: { marginRight: -theme.spacing.xs }}}
       />
     </Row>
   )

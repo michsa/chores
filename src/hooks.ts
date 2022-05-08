@@ -14,7 +14,7 @@ export const useSelector = <A extends any[], R>(
   ...rest: A
 ) => useStateSelector(state => selector(state, ...rest))
 
-export const useForm = <T extends { [k: string]: unknown }>(defaults: T) => {
+export const useForm = <T extends { [k: string]: any }>(defaults: T) => {
   const [form, setForm] = useState<T>(defaults)
   return {
     form,

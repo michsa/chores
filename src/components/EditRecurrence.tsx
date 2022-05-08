@@ -35,7 +35,7 @@ const EditRecurrence = ({
         onChangeText={setField('interval')}
       />
       <Picker
-        containerStyle={{ flex: 3, marginLeft: 8 }}
+        containerStyle={{ flexGrow: 3, marginLeft: 8 }}
         selectedValue={form.frequency}
         onValueChange={setField('frequency')}
         options={frequencyOptions.map(option => ({
