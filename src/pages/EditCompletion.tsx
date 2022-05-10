@@ -2,12 +2,7 @@ import React, { useLayoutEffect } from 'react'
 import { ScrollView } from 'react-native'
 import { useTheme } from '@emotion/react'
 
-import {
-  Text,
-  IconButton,
-  Row,
-  SpacedList,
-} from '../components'
+import { Text, IconButton, Row, SpacedList } from '../components'
 import { useDispatch, useSelector } from '../hooks'
 import { getTask, getCategories } from '../redux/selectors'
 import { NavigationProps, CompletionSettings } from '../types'
@@ -16,7 +11,7 @@ const defaultSetings: Partial<CompletionSettings> = {
   date: undefined,
   points: undefined,
   isPartial: undefined,
-  category: undefined
+  category: undefined,
 }
 
 const CompleteTask = ({
@@ -48,7 +43,8 @@ const CompleteTask = ({
   if (!task) return null
   return (
     <ScrollView>
-      <SpacedList><Text>hello</Text>
+      <SpacedList>
+        <Text>hello</Text>
       </SpacedList>
     </ScrollView>
   )

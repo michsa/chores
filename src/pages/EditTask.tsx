@@ -117,7 +117,7 @@ const EditTask = ({
       <IconButton
         name="x"
         onPress={() => setField(field)(undefined)}
-        containerProps={{ style: { marginRight: -theme.spacing.xs }}}
+        containerProps={{ style: { marginRight: -theme.spacing.xs } }}
       />
     </Row>
   )

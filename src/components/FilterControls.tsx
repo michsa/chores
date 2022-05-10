@@ -47,7 +47,7 @@ const FilterButton = ({
   return (
     <IconButton
       color={isActive ? 'accent' : 'primaryText'}
-      backgroundColor={isSelected ? selectedBg : defaultBg }
+      backgroundColor={isSelected ? selectedBg : defaultBg}
       {...props}
     />
   )

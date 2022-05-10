@@ -15,11 +15,11 @@ const useNumericValue = (value?: number | string) => {
  * Text input for manipulating a number value.
  * Supports an undefined value while editing or as part of initial state -
  * if the current value is not a number, 0 is passed to `onChangeText`.
- * 
+ *
  * When the user ends editing (taps outside the component), the current value
  * is clamped to `minValue` and `maxValue`. Waiting until `onEndEditing` to
  * clamp the value allows the user to completely clear the text while editing.
- * 
+ *
  * The downside is that pressing buttons with `keyboardShouldPersistTaps`
  * enabled does not blur the NumberInput so `onEndEditing` does not get called,
  * which means it's possible to act on the input's value before it's clamped.

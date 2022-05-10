@@ -119,7 +119,8 @@ A completion typically but not necessarily indicates that we should mark the tas
 
 #### On timezone
 
-Setting a configurable timezone means we need to either: 
+Setting a configurable timezone means we need to either:
+
 1. do all date math in that timezone explicitly
 2. set the system time to that timezone when the app starts up
 
@@ -132,15 +133,22 @@ We need a datastore that is really flexible about querying, since we should be a
 Eg:
 
 ```ts
-const getSortedAndFilteredTasks = (state: State, ...filters: ((task: Task) => boolean)[]) => state.tasks.filter(compose(...filters))
+const getSortedAndFilteredTasks = (
+  state: State,
+  ...filters: ((task: Task) => boolean)[]
+) => state.tasks.filter(compose(...filters))
 ```
 
 where `filters` would be something like:
 
 ```ts
-const isActive = task => task.scheduled < new Date() || sub(task.deadline, deadlineWarning) < new Date()
+const isActive = task =>
+  task.scheduled < new Date() ||
+  sub(task.deadline, deadlineWarning) < new Date()
 
-const isNotCompleted = task => (!task.isRecurring && !task.lastCompletedAt) || (task.isRecurring && isActive(task))
+const isNotCompleted = task =>
+  (!task.isRecurring && !task.lastCompletedAt) ||
+  (task.isRecurring && isActive(task))
 ```
 
 ### Filter options

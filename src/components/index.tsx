@@ -15,7 +15,10 @@ export * from './IconButton'
 const BaseTextInput = styled.TextInput(inputStyle)
 
 export const TextInput = React.forwardRef(
-  (props: React.ComponentProps<typeof BaseTextInput>, ref: Ref<RNTextInput>) => {
+  (
+    props: React.ComponentProps<typeof BaseTextInput>,
+    ref: Ref<RNTextInput>
+  ) => {
     const theme = useTheme()
     return (
       <BaseTextInput
@@ -36,7 +39,7 @@ export const Card = styled.View(({ theme: { spacing, colors } }) => ({
   backgroundColor: colors.foreground,
   paddingHorizontal: spacing.l,
   paddingVertical: spacing.s,
-  borderRadius: spacing.s, 
+  borderRadius: spacing.s,
   // borderBottomWidth: 1,
   borderColor: colors.highlight,
 }))

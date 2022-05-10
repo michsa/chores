@@ -32,7 +32,7 @@ const TagPicker = ({ value, onChange }: TagPickerProps) => {
           flex: 1,
           borderBottomWidth: 1,
           borderBottomColor: theme.colors.underline,
-          paddingBottom: theme.spacing.xs
+          paddingBottom: theme.spacing.xs,
         }}>
         <TagList
           tags={tags.filter(tag => selected.includes(tag.id))}
@@ -44,7 +44,7 @@ const TagPicker = ({ value, onChange }: TagPickerProps) => {
               borderBottomWidth: 0,
               flexShrink: 1,
               height: theme.sizes.buttonHeight,
-              minWidth: theme.iconSizes.regular
+              minWidth: theme.iconSizes.regular,
             }}
             options={[{ label: '', value: '' }, ...tagOptions]}
             onValueChange={tag => {

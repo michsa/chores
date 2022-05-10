@@ -45,7 +45,7 @@ const lightColors = {
   primaryText: palette.black,
   placeholderText: palette.grey2,
   underline: palette.grey1,
-  highlight: palette.grey0
+  highlight: palette.grey0,
 }
 
 const darkColors = {
@@ -57,7 +57,7 @@ const darkColors = {
   primaryText: palette.offWhite,
   placeholderText: palette.grey5,
   underline: palette.grey5,
-  highlight: palette.grey6
+  highlight: palette.grey6,
 }
 
 const spacing = {
@@ -71,7 +71,7 @@ const spacing = {
 
 const sizes = {
   inputHeight: 46,
-  buttonHeight: 42
+  buttonHeight: 42,
 }
 
 const fontSizes = {
@@ -86,7 +86,7 @@ const iconSizes = {
   large: 24,
   header: 24,
   xlarge: 26,
-  xxlarge: 30 // for completion checkmarks
+  xxlarge: 30, // for completion checkmarks
 }
 
 const baseTheme = {

@@ -21,7 +21,6 @@ import { reducer as completions } from './slices/completions'
 import { reducer as tags } from './slices/tags'
 import { reducer as categories } from './slices/categories'
 
-
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,

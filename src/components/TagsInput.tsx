@@ -31,8 +31,8 @@ const useSelectedTags = (initial: string[]) => {
   // the selected tag replaces the last element of the input.
   const selectTag = (tag: string) =>
     setSelectedTags(current => [...current.slice(0, -1), tag, ''])
-  
-    return { selectedTags, matchingTags, selectTag, setSelectedTags }
+
+  return { selectedTags, matchingTags, selectTag, setSelectedTags }
 }
 
 export const TagsInput = ({ value, onUpdate, ...props }: TagsInputProps) => {
