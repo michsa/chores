@@ -1,7 +1,7 @@
 import React, { useLayoutEffect, useState } from 'react'
-import { Pressable, FlatList, View } from 'react-native'
+import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view'
+import { Pressable, View } from 'react-native'
 import { useTheme } from '@emotion/react'
-import { compose } from '@reduxjs/toolkit'
 
 import {
   Card,
@@ -43,6 +43,7 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
           />
         </Row>
       ),
+      title: `Tasks (${tasks.length})`,
     })
   }, [navigation])
 
@@ -69,10 +70,12 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
   return (
     <React.Fragment>
       <FilterControls onChangeFilters={setFilters} />
-      <FlatList
-        style={{ padding: theme.spacing.s }}
+      <KeyboardAwareFlatList
+        style={{ paddingHorizontal: theme.spacing.s }}
         data={filteredTasks}
         ItemSeparatorComponent={() => <Spacer size="m" />}
+        ListHeaderComponent={Spacer}
+        ListFooterComponent={Spacer}
         renderItem={({ item }) => (
           <Pressable
             onPress={() => navigation.navigate('viewTask', { id: item.id })}>
