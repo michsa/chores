@@ -1,6 +1,7 @@
 import { getLuminance } from 'polished'
 import { Theme } from './theme'
 import { Frequency, Priority, Recurrence } from './types'
+import { add, sub } from 'date-fns'
 
 export const readableText = (theme: Theme, color: keyof Theme['colors']) => {
   const lightText = theme.isDark ? 'primaryText' : 'headerBackground'
@@ -19,6 +20,23 @@ export const frequencies = {
   month: Frequency.MONTH,
   year: Frequency.YEAR,
 }
+
+const frequencyLabels = {
+  [Frequency.DAY]: 'day',
+  [Frequency.WEEK]: 'week',
+  [Frequency.MONTH]: 'month',
+  [Frequency.YEAR]: 'year',
+}
+
+const recurrenceToDuration = (r: Recurrence) => ({
+  [frequencyLabels[r.frequency] + 's']: r.interval,
+})
+
+export const addRecurrence = (r: Recurrence, date: number) =>
+  add(new Date(date), recurrenceToDuration(r)).valueOf()
+
+export const subRecurrence = (r: Recurrence, date: number) =>
+  sub(new Date(date), recurrenceToDuration(r)).valueOf()
 
 export const frequencyOptions = [
   { label: 'day', value: Frequency.DAY },

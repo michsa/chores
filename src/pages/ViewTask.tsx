@@ -13,9 +13,10 @@ import {
   Tag,
 } from '../components'
 import TagList from '../components/TagList'
+import PointsRemaining from '../components/PointsRemaining'
 import { useDispatch, useSelector } from '../hooks'
 import { deleteTask } from '../redux/thunks'
-import { getTaskWithTags } from '../redux/selectors'
+import { getTaskWithTags, getTaskCompletions } from '../redux/selectors'
 import { NavigationProps } from '../types'
 import { priorityLabel, printRecurrence } from '../utils'
 
@@ -32,6 +33,7 @@ const ViewTask = ({
   const theme = useTheme()
   const dispatch = useDispatch()
   const task = useSelector(getTaskWithTags, id)
+  const completions = useSelector(getTaskCompletions, id)
 
   const [modal, setModal] = useState(false)
 
@@ -64,6 +66,9 @@ const ViewTask = ({
   }, [navigation, task])
 
   if (!task) return null
+
+  const pointsRemaining = task.settings.points - (task.runningPoints ?? 0)
+
   return (
     <ScrollView>
       <SpacedList style={{ margin: theme.spacing.s }}>
@@ -75,7 +80,7 @@ const ViewTask = ({
         <Row>
           <Row as={ViewCard} style={{ flex: 2 }}>
             <Icon name="star" />
-            <Text variant="primary">{task.settings.points}</Text>
+            <PointsRemaining task={task} />
           </Row>
           <Row as={ViewCard} style={{ flex: 3 }}>
             <Icon name="flag" />
@@ -135,6 +140,11 @@ const ViewTask = ({
           <Text>Notes</Text>
           <Text variant="property">{task.settings.description}</Text>
         </Card>
+        {completions.map(c => (
+          <Row as={Card} key={c.id}>
+            <Text>{new Date(c.date).toDateString()}</Text>
+          </Row>
+        ))}
       </SpacedList>
     </ScrollView>
   )

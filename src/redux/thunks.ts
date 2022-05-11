@@ -1,7 +1,7 @@
-import { ThunkDispatch, AnyAction } from '@reduxjs/toolkit'
 import { find } from 'lodash'
 import { actions as tasks } from './slices/tasks'
 import { actions as tags } from './slices/tags'
+import { actions as completions } from './slices/completions'
 import {
   TaskSettings,
   TaskSettingsInput,
@@ -9,13 +9,18 @@ import {
   Task,
   TaskID,
   TagID,
+  CompletionInput,
+  CompletionID,
 } from '../types'
+import { getTask } from './selectors'
 import { Thunk } from './store'
 
 export const deleteTask =
   (id: TaskID): Thunk =>
-  dispatch => {
-    // delete all the completions for the task
+  (dispatch, getState) => {
+    const task = getTask(getState(), id)
+    if (!task) return
+    dispatch(completions.removeMany(task.completionIds))
     // possibly remove task from tags index
     dispatch(tasks.remove(id))
   }
@@ -37,6 +42,7 @@ const createTask =
       tagIds,
       createdAt,
       completionIds: [],
+      runningPoints: 0,
     }
     dispatch(tasks.add(newTask))
     return newTask.id
@@ -60,8 +66,19 @@ export const upsertTask =
   dispatch => {
     const taskTags = dispatch(upsertTagsByName(tagNames))
     const tagIds = taskTags.map(t => t.id)
-    const task = dispatch(
+    const taskId = dispatch(
       id ? updateTask(id, { settings, tagIds }) : createTask(settings, tagIds)
     )
-    return task
+    return taskId
+  }
+
+export const completeTask =
+  (input: CompletionInput, taskId: TaskID): Thunk<CompletionID> =>
+  dispatch => {
+    const id = `c-${Date.now()}`
+    const completion = { id, taskId, ...input }
+    console.log({ input, completion })
+    dispatch(completions.add(completion))
+    dispatch(tasks.complete({ id: taskId, completion }))
+    return id
   }

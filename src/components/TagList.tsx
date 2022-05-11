@@ -26,10 +26,9 @@ export const TagList = ({
         margin: -spacing,
       }}>
       {tags.map(t => (
-        <View>
+        <View key={t.id}>
           <Text
             variant={variant === 'small' ? 'smallTag' : 'tag'}
-            key={t.id}
             style={{ margin: spacing, flexGrow: 0 }}
             onPress={() => onPressTag?.(t)}>
             {t.name}

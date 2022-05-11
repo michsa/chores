@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect } from 'react'
-import { View, Switch, Pressable, ToastAndroid } from 'react-native'
+import { Switch, Pressable, ToastAndroid } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { useTheme } from '@emotion/react'
@@ -26,9 +26,13 @@ import NumberInput from '../components/NumberInput'
 import TagsInput from '../components/TagsInput'
 import Button from '../components/Button'
 
+type PartialTaskSettingsInput = Omit<TaskSettingsInput, 'points'> & {
+  points?: number
+}
+
 const defaultRecurrence = { frequency: Frequency.WEEK, interval: 1 }
 
-const defaultSetings: TaskSettingsInput = {
+const defaultSetings: PartialTaskSettingsInput = {
   name: '',
   points: undefined,
   priority: 0,
@@ -39,14 +43,14 @@ const defaultSetings: TaskSettingsInput = {
   tagNames: [],
 }
 
-const useTaskIfExists = (id?: string): TaskSettingsInput => {
+const useTaskIfExists = (id?: string): PartialTaskSettingsInput => {
   const task = id ? useSelector(getTaskWithTags, id) : undefined
   return task
     ? { ...task.settings, tagNames: task.tags.map(tag => tag?.name) }
     : defaultSetings
 }
 
-const validate = (form: Partial<TaskSettingsInput>): TaskSettingsInput => {
+const validate = (form: PartialTaskSettingsInput): TaskSettingsInput => {
   if (!form.name) throw Error('Task must have a name')
   if (!form.points) throw Error('Task must have points')
 
@@ -73,7 +77,7 @@ const EditTask = ({
   const theme = useTheme()
   const dispatch = useDispatch()
   const settings = useTaskIfExists(params?.id)
-  const { form, setField } = useForm<TaskSettingsInput>(settings)
+  const { form, setField } = useForm<PartialTaskSettingsInput>(settings)
 
   const onSubmit = () => {
     console.log('onSubmit', form)

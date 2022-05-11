@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useTheme } from '@emotion/react'
-import { mapValues } from 'lodash'
+import { filter, mapValues, negate, isEqual } from 'lodash'
 import { useForm } from '../hooks'
 import { Theme } from '../theme'
-import { Task } from '../types'
+import { Task, TaskWithCompletions } from '../types'
 import {
   SpacedList,
   Row,
@@ -13,19 +13,10 @@ import {
   IconButtonProps,
   TextInput,
   Section,
+  Picker,
 } from '.'
 import TagPicker from './TagPicker'
-
-export type Filter = (t: Task) => boolean
-
-/**
- * source of truth for the state type for each widget, since this component has
- * to control state for all of them. the other types are derived from this.
- */
-type FilterState = {
-  search: string
-  tags: string[]
-}
+import { subRecurrence } from '../utils'
 
 /**
  * an icon button with different styling depending on whether the filter it's
@@ -53,6 +44,19 @@ const FilterButton = ({
   )
 }
 
+export type Filter = (t: TaskWithCompletions) => boolean
+
+/**
+ * source of truth for the state type for each widget, since this component has
+ * to control state for all of them. the other types are derived from this.
+ */
+type FilterState = {
+  search: string
+  tags: string[]
+  completion: 'complete' | 'todo' | 'all'
+  recurrence: 'recurring' | 'once' | 'all'
+}
+
 /**
  * filter components need to translate a heterogeneous set of inputs/state into
  * an array of filters (task => boolean). getting from state to a filter is
@@ -71,6 +75,17 @@ type FilterWidget<K extends keyof FilterState, T = FilterState[K]> = {
   emptyState: T
 }
 
+const isRecurring: Filter = task => task.settings.isRecurring
+const isCompleted: Filter = task => {
+  if (isRecurring(task)) {
+    const scheduledDate =
+      task.settings.scheduled ??
+      subRecurrence(task.settings.recurrence!, task.settings.deadline!)
+    return scheduledDate > Date.now()
+  }
+  return task.completions.some(c => c.isFull)
+}
+
 const filterWidgets: {
   [key in keyof FilterState]: FilterWidget<key>
 } = {
@@ -79,6 +94,7 @@ const filterWidgets: {
       <Row>
         <Icon name="search" />
         <TextInput
+          placeholder="Search..."
           style={{ flex: 1, height: theme.sizes.buttonHeight }}
           value={state}
           onChangeText={onChangeState}
@@ -97,6 +113,54 @@ const filterWidgets: {
     ],
     emptyState: [],
   },
+  completion: {
+    component: ({ theme, state, onChangeState }) => (
+      <Row>
+        <Icon name="check-circle" />
+        <Picker
+          containerStyle={{ height: theme.sizes.buttonHeight }}
+          selectedValue={state}
+          onValueChange={onChangeState}
+          options={[
+            { label: 'To do', value: 'todo' },
+            { label: 'Completed', value: 'complete' },
+            { label: 'All', value: 'all' },
+          ]}
+        />
+      </Row>
+    ),
+    mapStateToFilters: state =>
+      state === 'complete'
+        ? [isCompleted]
+        : state === 'todo'
+        ? [negate(isCompleted)]
+        : [],
+    emptyState: 'todo',
+  },
+  recurrence: {
+    component: ({ theme, state, onChangeState }) => (
+      <Row>
+        <Icon name="repeat" />
+        <Picker
+          containerStyle={{ height: theme.sizes.buttonHeight }}
+          selectedValue={state}
+          onValueChange={onChangeState}
+          options={[
+            { label: 'Recurring', value: 'recurring' },
+            { label: 'One-off', value: 'once' },
+            { label: 'All', value: 'all' },
+          ]}
+        />
+      </Row>
+    ),
+    mapStateToFilters: state =>
+      state === 'recurring'
+        ? [isRecurring]
+        : state === 'once'
+        ? [negate(isRecurring)]
+        : [],
+    emptyState: 'all',
+  },
 }
 
 const filterIcons: { icon: string; key: keyof FilterState }[] = [
@@ -105,13 +169,19 @@ const filterIcons: { icon: string; key: keyof FilterState }[] = [
   // { key: 'priority', icon: 'flag' },
   // { key: 'date', icon: 'calendar' },
   // { key: 'points', icon: 'star' },
-  // { key: 'recurrence', icon: 'repeat' },
-  // { key: 'completion', icon: 'check-circle' },
+  { key: 'completion', icon: 'check-circle' },
+  { key: 'recurrence', icon: 'repeat' },
 ]
 
-const isActive = (state: any): boolean => {
-  if (Array.isArray(state)) return !!state.length
-  return !!state
+const isActive = (state: FilterState, key: keyof FilterState): boolean => {
+  const value = !isEqual(state[key], filterWidgets[key].emptyState)
+  console.log(`isActive`, {
+    key,
+    state: state[key],
+    emptyState: filterWidgets[key].emptyState,
+    value,
+  })
+  return value
 }
 
 const getFilterWidget = (key: keyof FilterState) =>
@@ -162,18 +232,19 @@ const FilterControls = ({ onChangeFilters }: FilterControlsProps) => {
         <Row>
           <Icon name="filter" />
           <Row style={{ flex: 1 /*justifyContent: 'space-evenly'*/ }}>
-            {filterIcons.map(filter => (
+            {filterIcons.map(({ key, icon }) => (
               <FilterButton
-                isSelected={selectedFilter === filter.key}
-                isActive={isActive(form[filter.key])}
-                name={filter.icon}
+                key={key}
+                isSelected={selectedFilter === key}
+                isActive={isActive(form, key)}
+                name={icon}
                 onPress={() =>
                   setSelectedFilter(currentFilter =>
-                    currentFilter === filter.key ? undefined : filter.key
+                    currentFilter === key ? undefined : key
                   )
                 }
                 onLongPress={() =>
-                  setField(filter.key)(getFilterWidget(filter.key).emptyState)
+                  setField(key)(getFilterWidget(key).emptyState)
                 }
               />
             ))}

@@ -40,6 +40,7 @@ const TagPicker = ({ value, onChange }: TagPickerProps) => {
             setSelected(currentTags => without(currentTags, tag.id))
           }>
           <Picker
+            key="picker"
             containerStyle={{
               borderBottomWidth: 0,
               flexShrink: 1,

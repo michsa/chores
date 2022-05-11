@@ -13,9 +13,10 @@ import {
   SpacedList,
 } from '../components'
 import TagList from '../components/TagList'
+import PointsRemaining from '../components/PointsRemaining'
 import FilterControls, { Filter } from '../components/FilterControls'
 import { useSelector } from '../hooks'
-import { getOrderedTasksWithTags } from '../redux/selectors'
+import { getOrderedTasks } from '../redux/selectors'
 import { NavigationProps } from '../types'
 import { priorityLabel } from '../utils'
 import { Theme } from '../theme'
@@ -26,10 +27,11 @@ const composeFilters =
     filters.every(filter => filter(task))
 
 const TaskList = ({ navigation }: NavigationProps['taskList']) => {
-  const tasks = useSelector(getOrderedTasksWithTags)
+  const tasks = useSelector(getOrderedTasks)
   const theme = useTheme()
 
   const [filters, setFilters] = useState<Filter[]>([])
+  const filteredTasks = tasks.filter(composeFilters(filters))
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -43,9 +45,9 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
           />
         </Row>
       ),
-      title: `Tasks (${tasks.length})`,
+      title: `Tasks (${filteredTasks.length})`,
     })
-  }, [navigation])
+  }, [navigation, filteredTasks])
 
   const DetailSection = ({
     icon,
@@ -61,11 +63,6 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
       <Text color={color}>{text}</Text>
     </Row>
   )
-
-  const filteredTasks = tasks.filter(composeFilters(filters))
-
-  const filterIconBg = (pressed: boolean) =>
-    pressed ? 'underline' : 'foreground'
 
   return (
     <React.Fragment>
@@ -95,7 +92,7 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
                     size="regular"
                     color="primaryText"
                     spacing="xs">
-                    {item.settings.points}
+                    <PointsRemaining task={item} />
                   </Row>
 
                   {item.settings.isRecurring && (
@@ -110,6 +107,7 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
                     <View style={{ flex: 0 }}>
                       <DetailSection
                         icon="flag"
+                        color="accent"
                         text={priorityLabel(item.settings.priority)}
                       />
                     </View>
