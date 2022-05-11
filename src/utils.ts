@@ -1,13 +1,38 @@
 import { getLuminance } from 'polished'
 import { Theme } from './theme'
-import { Frequency, Priority, Recurrence } from './types'
-import { add, sub } from 'date-fns'
+import { Frequency, Priority, Recurrence, DateTime } from './types'
+import { add, sub, formatRelative, format } from 'date-fns'
+
+// export const toDate = (dt: DateTime, defaultTime: string = '12:00') => {
+//   const date = new Date(`${dt.date}T${dt.time ?? defaultTime}`)
+//   console.log('toDate', date.toISOString())
+//   return date
+// }
+
+export const formatValue = (
+  type: 'date' | 'time',
+  date: Date
+): DateTime[typeof type] =>
+  type === 'date'
+    ? [date.getFullYear(), date.getMonth(), date.getDate()]
+    : [date.getHours(), date.getMinutes()]
+
+export const toDateTime = (date: Date, parseTime: boolean = false) =>
+  ({
+    date: formatValue('date', date),
+    time: parseTime ? formatValue('time', date) : undefined,
+  } as DateTime)
+
+export const toDate = (dt: DateTime, defaultTime: [number, number] = [12, 0]) =>
+  new Date(...dt.date, ...(dt.time ?? defaultTime))
 
 export const readableText = (theme: Theme, color: keyof Theme['colors']) => {
   const lightText = theme.isDark ? 'primaryText' : 'headerBackground'
   const darkText = theme.isDark ? 'headerBackground' : 'primaryText'
   return getLuminance(theme.colors[color]) > 0.5 ? darkText : lightText
 }
+
+export const printDate = (date: number) => formatRelative(date, new Date())
 
 export const exists = <T>(x: T | undefined): x is T => !!x
 

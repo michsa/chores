@@ -1,14 +1,20 @@
-import React, { useState, useLayoutEffect } from 'react'
+import React, { useState, useLayoutEffect, useEffect } from 'react'
 import { Switch, Pressable, ToastAndroid } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { useTheme } from '@emotion/react'
+import { format } from 'date-fns'
 
 import { useDispatch, useForm, useSelector } from '../hooks'
 import { upsertTask } from '../redux/thunks'
 import { getTaskWithTags } from '../redux/selectors'
-import { TaskSettingsInput, Frequency, NavigationProps } from '../types'
-import { priorityOptions } from '../utils'
+import {
+  TaskSettingsInput,
+  Frequency,
+  NavigationProps,
+  DateTime,
+} from '../types'
+import { priorityOptions, toDateTime } from '../utils'
 import {
   Text,
   Card,
@@ -25,10 +31,13 @@ import MultilineTextInput from '../components/MultilineTextInput'
 import NumberInput from '../components/NumberInput'
 import TagsInput from '../components/TagsInput'
 import Button from '../components/Button'
+import DateTimeInput, { formatValue } from '../components/DateTimeInput'
 
 type PartialTaskSettingsInput = Omit<TaskSettingsInput, 'points'> & {
   points?: number
 }
+
+const defaultDateTime = toDateTime(new Date())
 
 const defaultRecurrence = { frequency: Frequency.WEEK, interval: 1 }
 
@@ -107,25 +116,6 @@ const EditTask = ({
     })
   }, [navigation, form])
 
-  type DateField = 'scheduled' | 'deadline'
-  const [datePicker, setDatePicker] = useState<DateField | null>(null)
-
-  const DateField = ({ field }: { field: DateField }) => (
-    <Row>
-      <Row style={{ flex: 1 }}>
-        <Icon name={field === 'scheduled' ? 'calendar' : 'alert-circle'} />
-        <FakeInputText style={{ flex: 1 }} onPress={() => setDatePicker(field)}>
-          {!!form[field] && new Date(form[field] as number).toDateString()}
-        </FakeInputText>
-      </Row>
-      <IconButton
-        name="x"
-        onPress={() => setField(field)(undefined)}
-        containerProps={{ style: { marginRight: -theme.spacing.xs } }}
-      />
-    </Row>
-  )
-
   return (
     <SpacedList
       as={KeyboardAwareScrollView}
@@ -170,19 +160,34 @@ const EditTask = ({
             style={{ flex: 1 }}
             icon="calendar"
             title="Schedule"
-            onPress={() => setDatePicker('scheduled')}
+            onPress={() => {
+              console.log({ defaultDateTime })
+              setField('scheduled')(defaultDateTime)
+            }}
           />
           <Button
             style={{ flex: 1 }}
             icon="alert-circle"
             title="Set deadline"
-            onPress={() => setDatePicker('deadline')}></Button>
+            onPress={() => setField('deadline')(defaultDateTime)}></Button>
         </Row>
       )}
       {!!(form.scheduled || form.deadline) && (
         <SpacedList as={Card}>
-          {!!form.scheduled && <DateField field="scheduled" />}
-          {!!form.deadline && <DateField field="deadline" />}
+          {!!form.scheduled && (
+            <DateTimeInput
+              value={form.scheduled}
+              onChange={setField('scheduled')}
+              icon="calendar"
+            />
+          )}
+          {!!form.deadline && (
+            <DateTimeInput
+              value={form.deadline}
+              onChange={setField('deadline')}
+              icon="alert-circle"
+            />
+          )}
           {!!form.deadline && (
             <Row>
               <Icon size="small" name="calendar" />
@@ -223,18 +228,6 @@ const EditTask = ({
           onChangeText={setField('description')}
         />
       </Card>
-
-      {!!datePicker && (
-        <DateTimePicker
-          mode="date"
-          minimumDate={new Date()}
-          value={new Date(form.scheduled ?? Date.now())}
-          onChange={(e, date) => {
-            setDatePicker(null)
-            if (e.type === 'set') setField(datePicker)(date?.valueOf())
-          }}
-        />
-      )}
     </SpacedList>
   )
 }

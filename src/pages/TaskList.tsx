@@ -18,7 +18,7 @@ import FilterControls, { Filter } from '../components/FilterControls'
 import { useSelector } from '../hooks'
 import { getOrderedTasks } from '../redux/selectors'
 import { NavigationProps } from '../types'
-import { priorityLabel } from '../utils'
+import { priorityLabel, printDate } from '../utils'
 import { Theme } from '../theme'
 
 const composeFilters =
@@ -116,19 +116,19 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
                     {!!item.settings.scheduled && (
                       <DetailSection
                         icon="calendar"
-                        text={new Date(item.settings.scheduled).toDateString()}
+                        text={printDate(item.settings.scheduled)}
                       />
                     )}
                     {!!item.settings.deadline && (
                       <DetailSection
                         icon="alert-circle"
-                        text={new Date(item.settings.deadline).toDateString()}
+                        text={printDate(item.settings.deadline)}
                       />
                     )}
                     {!item.settings.deadline && !item.settings.scheduled && (
                       <DetailSection
                         icon="clock"
-                        text={new Date(item.createdAt).toDateString()}
+                        text={printDate(item.createdAt)}
                       />
                     )}
                   </View>

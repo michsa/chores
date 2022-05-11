@@ -30,6 +30,12 @@ export type Recurrence = {
 
 export type Priority = -2 | -1 | 0 | 1 | 2
 
+// used for configurable dates
+export type DateTime = {
+  date: [number, number, number] // year, month, day
+  time?: [number, number] // hour, minute
+}
+
 export type TagID = string
 export type Tag = {
   id: TagID
@@ -45,8 +51,8 @@ export type TaskSettings = {
   isRecurring: boolean
   recurrence?: Recurrence
   description: string
-  scheduled?: number
-  deadline?: number
+  scheduled?: DateTime
+  deadline?: DateTime
   deadlineWarning?: Recurrence
 }
 export type TaskSettingsInput = TaskSettings & {
@@ -75,7 +81,7 @@ export type Category = {
 
 export type CompletionID = string
 export type CompletionInput = {
-  date: number
+  date: DateTime
   points: number
   isFull: boolean
   // category: CategoryID
