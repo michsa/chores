@@ -1,18 +1,31 @@
-import React, { useState, useLayoutEffect } from 'react'
+import React, { useLayoutEffect } from 'react'
 import { Pressable, Switch, ToastAndroid } from 'react-native'
 import { useTheme } from '@emotion/react'
-import DateTimePicker from '@react-native-community/datetimepicker'
 import { add } from 'date-fns'
+import { maxBy } from 'lodash'
 
 import { Card, Text, IconButton, Row, SpacedList, Icon } from '../components'
+import MultilineTextInput from '../components/MultilineTextInput'
 import NumberInput from '../components/NumberInput'
+import DateTimeInput from '../components/DateTimeInput'
 import { useDispatch, useSelector, useForm } from '../hooks'
 import { getTask } from '../redux/selectors'
 import { completeTask } from '../redux/thunks'
-import { NavigationProps, CompletionInput } from '../types'
+import { NavigationProps, CompletionInput, DateTime } from '../types'
+import {
+  toDateTime,
+  addRecurrence,
+  toDate,
+  printRecurrence,
+  printDate,
+} from '../utils'
+
+const defaultDateTime = toDateTime(new Date(), true)
 
 type PartialCompletionInput = Omit<CompletionInput, 'points'> & {
   points?: number
+  nextDate?: DateTime
+  notes?: string
 }
 
 const validate = (form: PartialCompletionInput): CompletionInput => {
@@ -36,7 +49,7 @@ const CompleteTask = ({
   const pointsRemaining = task.settings.points - (task.runningPoints ?? 0)
 
   const { form, setField } = useForm<PartialCompletionInput>({
-    date: Date.now(),
+    date: defaultDateTime,
     points: pointsRemaining,
     isFull: true,
   })
@@ -69,19 +82,26 @@ const CompleteTask = ({
     })
   }, [navigation, form])
 
-  const [datePicker, setDatePicker] = useState<boolean>(false)
+  const scheduleOrDeadline = task.settings.scheduled ?? task.settings.deadline
+  const recurrenceBasis = maxBy(
+    [
+      scheduleOrDeadline,
+      { date: form.date.date, time: scheduleOrDeadline?.time },
+    ],
+    r => r && toDate(r)
+  )
+  console.log({ recurrenceBasis })
 
   if (!task) return null
   return (
-    <SpacedList>
+    <SpacedList style={{ margin: theme.spacing.s }}>
       <Row as={Card}>
-        <Icon name="calendar" />
-        <Text
-          style={{ flex: 1 }}
-          variant="input"
-          onPress={() => setDatePicker(true)}>
-          {!!form.date && new Date(form.date as number).toDateString()}
-        </Text>
+        <DateTimeInput
+          icon="calendar"
+          value={form.date}
+          onChange={setField('date')}
+          maximumDate={add(new Date(), { days: 1 })}
+        />
       </Row>
       <Row>
         <Row as={Card} style={{ flex: 2 }}>
@@ -116,17 +136,45 @@ const CompleteTask = ({
           </Row>
         </Pressable>
       </Row>
-      {!!datePicker && (
-        <DateTimePicker
-          mode="date"
-          maximumDate={add(new Date(), { days: 1 })}
-          value={new Date(form.date ?? Date.now())}
-          onChange={(e, date) => {
-            setDatePicker(false)
-            if (e.type === 'set') setField('date')(date!.valueOf())
-          }}
-        />
+      {form.isFull && task.settings.isRecurring && (
+        <SpacedList as={Card}>
+          <Row spacing="m">
+            <Text style={{ flex: 1 }}>Repeat on</Text>
+            {task.settings.scheduled && (
+              <Row>
+                <Icon size="small" color="placeholderText" name="calendar" />
+                <Text color="placeholderText">
+                  {printDate(task.settings.scheduled)}
+                </Text>
+              </Row>
+            )}
+            {task.settings.deadline && (
+              <Row>
+                <Icon size="small" name="alert-circle" />
+                <Text>{printDate(task.settings.deadline)}</Text>
+              </Row>
+            )}
+            <Row>
+              <Icon size="small" color="placeholderText" name="repeat" />
+              <Text color="placeholderText">
+                {printRecurrence(task.settings.recurrence!)}
+              </Text>
+            </Row>
+          </Row>
+          <DateTimeInput
+            icon="repeat"
+            value={addRecurrence(task.settings.recurrence!, recurrenceBasis!)}
+            onChange={setField('nextDate')}
+          />
+        </SpacedList>
       )}
+      <Card>
+        <Text>Notes</Text>
+        <MultilineTextInput
+          value={form.notes}
+          onChangeText={setField('notes')}
+        />
+      </Card>
     </SpacedList>
   )
 }

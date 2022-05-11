@@ -1,7 +1,8 @@
 import React, { useLayoutEffect, useState } from 'react'
-import { View, ScrollView, Modal } from 'react-native'
+import { ScrollView } from 'react-native'
 import { useTheme } from '@emotion/react'
 import styled from '@emotion/native'
+import { sortBy, reverse } from 'lodash'
 
 import {
   Text,
@@ -10,7 +11,7 @@ import {
   Row,
   SpacedList,
   Icon,
-  Tag,
+  Divider,
 } from '../components'
 import TagList from '../components/TagList'
 import PointsRemaining from '../components/PointsRemaining'
@@ -18,7 +19,7 @@ import { useDispatch, useSelector } from '../hooks'
 import { deleteTask } from '../redux/thunks'
 import { getTaskWithTags, getTaskCompletions } from '../redux/selectors'
 import { NavigationProps } from '../types'
-import { priorityLabel, printRecurrence } from '../utils'
+import { priorityLabel, printRecurrence, printDate, toDate } from '../utils'
 
 const ViewCard = styled(Card)(({ theme }) => ({
   paddingVertical: theme.spacing.m,
@@ -96,7 +97,7 @@ const ViewTask = ({
               <Row>
                 <Icon name="calendar" />
                 <Text variant="primary">
-                  {new Date(task.settings.scheduled).toDateString()}
+                  {printDate(task.settings.scheduled)}
                 </Text>
               </Row>
             )}
@@ -105,7 +106,7 @@ const ViewTask = ({
                 <Icon name="alert-circle" />
                 <SpacedList>
                   <Text variant="primary">
-                    {new Date(task.settings.deadline).toDateString()}
+                    {printDate(task.settings.deadline)}
                   </Text>
                 </SpacedList>
               </Row>
@@ -140,11 +141,66 @@ const ViewTask = ({
           <Text>Notes</Text>
           <Text variant="property">{task.settings.description}</Text>
         </Card>
-        {completions.map(c => (
-          <Row as={Card} key={c.id}>
-            <Text>{new Date(c.date).toDateString()}</Text>
-          </Row>
-        ))}
+
+        {completions.length && (
+          <SpacedList>
+            <Divider size="xs" />
+
+            <Row
+              style={{
+                padding: theme.spacing.xs,
+              }}>
+              <Icon color="primaryText" size="small" name="check" />
+              <Text
+                size="regular"
+                color="primaryText"
+                style={{ fontWeight: '500' }}>
+                Completions
+              </Text>
+            </Row>
+
+            {reverse(sortBy(completions, c => toDate(c.date))).map(c => {
+              // const [expanded, setExpanded] = useState(false)
+              return (
+                <SpacedList key={c.id} as={Card}>
+                  <Row style={{ minHeight: theme.iconSizes.xxlarge }}>
+                    <Row style={{ flex: 1 }} spacing="l">
+                      <Icon
+                        name={c.isFull ? 'check-circle' : 'circle'}
+                        color={c.isFull ? 'primaryText' : 'primaryText'}
+                      />
+                      <Row>
+                        <Icon size="small" name="star" />
+                        <Text variant="primary">{c.points}</Text>
+                      </Row>
+                      <Row>
+                        <Icon size="small" name="clock" />
+                        <Text variant="primary">{printDate(c.date)}</Text>
+                      </Row>
+                      {/* {c.notes && (
+                    <IconButton
+                      size="small"
+                      name={expanded ? 'chevron-down' : 'chevron-right'}
+                      color={c.notes ? 'text' : 'foreground'}
+                      onPress={() => setExpanded(x => !x)}
+                    />
+                  )} */}
+                    </Row>
+                    {/* <IconButton
+                  size="small"
+                  name="edit-2"
+                  color="text"
+                  containerProps={{
+                    style: { marginRight: -theme.spacing.xs },
+                  }}
+                /> */}
+                  </Row>
+                  {c.notes && <Text>{c.notes}</Text>}
+                </SpacedList>
+              )
+            })}
+          </SpacedList>
+        )}
       </SpacedList>
     </ScrollView>
   )

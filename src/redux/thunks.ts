@@ -73,12 +73,15 @@ export const upsertTask =
   }
 
 export const completeTask =
-  (input: CompletionInput, taskId: TaskID): Thunk<CompletionID> =>
+  (
+    { nextDate, ...input }: CompletionInput,
+    taskId: TaskID
+  ): Thunk<CompletionID> =>
   dispatch => {
     const id = `c-${Date.now()}`
     const completion = { id, taskId, ...input }
     console.log({ input, completion })
     dispatch(completions.add(completion))
-    dispatch(tasks.complete({ id: taskId, completion }))
+    dispatch(tasks.complete({ id: taskId, completion, nextDate }))
     return id
   }

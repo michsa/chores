@@ -1,19 +1,13 @@
-import React, { useState, useLayoutEffect, useEffect } from 'react'
+import React, { useLayoutEffect } from 'react'
 import { Switch, Pressable, ToastAndroid } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import DateTimePicker from '@react-native-community/datetimepicker'
 import { useTheme } from '@emotion/react'
-import { format } from 'date-fns'
+import { sub } from 'date-fns'
 
 import { useDispatch, useForm, useSelector } from '../hooks'
 import { upsertTask } from '../redux/thunks'
 import { getTaskWithTags } from '../redux/selectors'
-import {
-  TaskSettingsInput,
-  Frequency,
-  NavigationProps,
-  DateTime,
-} from '../types'
+import { TaskSettingsInput, Frequency, NavigationProps } from '../types'
 import { priorityOptions, toDateTime } from '../utils'
 import {
   Text,
@@ -31,7 +25,7 @@ import MultilineTextInput from '../components/MultilineTextInput'
 import NumberInput from '../components/NumberInput'
 import TagsInput from '../components/TagsInput'
 import Button from '../components/Button'
-import DateTimeInput, { formatValue } from '../components/DateTimeInput'
+import DateTimeInput from '../components/DateTimeInput'
 
 type PartialTaskSettingsInput = Omit<TaskSettingsInput, 'points'> & {
   points?: number
@@ -119,11 +113,12 @@ const EditTask = ({
   return (
     <SpacedList
       as={KeyboardAwareScrollView}
-      style={{ margin: theme.spacing.s, flex: 1, zIndex: 1 }}
+      style={{ margin: theme.spacing.s }}
       // this allows us to select a tag from the dropdown without first collapsing the keyboard
       keyboardShouldPersistTaps="always">
       <Card>
         <TextInput
+          autoFocus
           placeholder="Name"
           style={{ fontSize: theme.fontSizes.large }}
           value={form.name}
@@ -176,16 +171,20 @@ const EditTask = ({
         <SpacedList as={Card}>
           {!!form.scheduled && (
             <DateTimeInput
+              clearable
               value={form.scheduled}
               onChange={setField('scheduled')}
               icon="calendar"
+              minimumDate={sub(new Date(), { months: 1 })}
             />
           )}
           {!!form.deadline && (
             <DateTimeInput
+              clearable
               value={form.deadline}
               onChange={setField('deadline')}
               icon="alert-circle"
+              minimumDate={sub(new Date(), { months: 1 })}
             />
           )}
           {!!form.deadline && (

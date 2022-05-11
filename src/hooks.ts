@@ -22,7 +22,7 @@ export const useForm = <T extends { [k: string]: any }>(defaults: T) => {
     setField:
       <K extends keyof T>(key: K) =>
       (value: T[K]) => {
-        console.log(`setField`, { [key]: value })
+        // console.log(`setField`, { [key]: value })
         setForm(currentForm => ({ ...currentForm, [key]: value }))
       },
   }

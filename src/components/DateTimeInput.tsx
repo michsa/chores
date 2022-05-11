@@ -1,85 +1,66 @@
 import React, { useState, useEffect } from 'react'
-import { Modal } from 'react-native'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { useTheme } from '@emotion/react'
-import {
-  differenceInWeeks,
-  format,
-  formatISO,
-  isSameYear,
-  isToday,
-  isTomorrow,
-} from 'date-fns'
 
 import { useForm } from '../hooks'
 import { DateTime } from '../types'
 import { Icon, IconButton, Text, FakeInputText, Row } from '../components'
-import { toDate } from '../utils'
-
-export const formatValue = (
-  type: 'date' | 'time',
-  date: Date
-): DateTime[typeof type] =>
-  type === 'date'
-    ? [date.getFullYear(), date.getMonth(), date.getDate()]
-    : [date.getHours(), date.getMinutes()]
-
-const formatDate = (dt: DateTime) => {
-  const date = toDate(dt)
-  const now = new Date()
-  if (isToday(date)) return 'Today'
-  if (isTomorrow(date)) return 'Tomorrow'
-  const weekDiff = differenceInWeeks(date, now)
-  if (weekDiff < 2) {
-    const weekStr = weekDiff === 1 ? 'Next ' : ''
-    return weekStr + format(date, 'EEEE')
-  }
-  return format(date, 'EEE, MMM dd' + (isSameYear(now, date) ? '' : ' yyyy'))
-}
-
-const formatTime = (dt: DateTime) =>
-  dt.time ? format(toDate(dt), 'h:mm a') : undefined
+import { toDate, formatDate, formatTime, formatValue } from '../utils'
 
 type PickerState = 'date' | 'time' | null
 
-export const DateTimeInput = ({
-  value,
-  onChange,
-  icon,
-  startOpen = true,
-}: {
-  value: DateTime
+type ClearableProps = {
   onChange: (dt?: DateTime) => void
+  clearable: true
+}
+type NonClearableProps = {
+  onChange: (dt: DateTime) => void
+  clearable?: false
+}
+type DateTimeInputProps = {
+  value: DateTime
   icon: string
   startOpen?: boolean
-}) => {
+  minimumDate?: Date
+  maximumDate?: Date
+} & (ClearableProps | NonClearableProps)
+
+export const DateTimeInput = (props: DateTimeInputProps) => {
+  // discriminated union types don't work with destructuring :(
+  const { value, icon, startOpen, minimumDate, maximumDate } = props
   const theme = useTheme()
   const { form, setField } = useForm<DateTime>(value)
   const [picker, setPicker] = useState<PickerState>(startOpen ? 'date' : null)
-  useEffect(() => onChange(form), [form])
+
+  useEffect(() => props.onChange(form), [form])
+
   return (
-    <Row>
-      <Row style={{ flex: 1 }}>
+    <Row spacing="xs">
+      <Row style={{ flex: 3 }}>
         <Icon name={icon} />
-        <FakeInputText style={{ flex: 2 }} onPress={() => setPicker('date')}>
+        <FakeInputText style={{ flex: 1 }} onPress={() => setPicker('date')}>
           {formatDate(form)}
         </FakeInputText>
+      </Row>
+      <Text>
         {!!picker && (
           <DateTimePicker
-            style={{ width: 0 }}
             mode={picker}
-            minimumDate={new Date()}
+            {...{ minimumDate, maximumDate }}
             value={toDate(form) ?? new Date()}
             onChange={(e, date) => {
-              if (date && e.type === 'set') {
-                const formatted = formatValue(picker, date)
-                console.log(formatted)
-                setField(picker)(formatted)
-              }
+              const field = picker
               setPicker(null)
+              if (date && e.type === 'set') {
+                const formatted = formatValue(field, date)
+                console.log(formatted)
+                setField(field)(formatted)
+              }
             }}
           />
         )}
+      </Text>
+      <Row style={{ flex: 2 }}>
         <Icon name="clock" color={form.time ? undefined : 'placeholderText'} />
         <FakeInputText
           style={{
@@ -93,11 +74,13 @@ export const DateTimeInput = ({
           {formatTime(form) ?? 'Time'}
         </FakeInputText>
       </Row>
-      <IconButton
-        name="x"
-        onPress={() => onChange(undefined)}
-        containerProps={{ style: { marginRight: -theme.spacing.xs } }}
-      />
+      {props.clearable && (
+        <IconButton
+          name="x"
+          onPress={() => props.onChange(undefined)}
+          containerProps={{ style: { marginRight: -theme.spacing.xs } }}
+        />
+      )}
     </Row>
   )
 }

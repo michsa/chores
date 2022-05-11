@@ -30,7 +30,19 @@ export type Recurrence = {
 
 export type Priority = -2 | -1 | 0 | 1 | 2
 
-// used for configurable dates
+/**
+ * used for user-defined dates. date and time are separate because time is
+ * optional - when we convert this to a timestamp for date math, we use a
+ * default time (hardcoded for now, but hopefully someday configurable in app
+ * settings).
+ *
+ * these values are timezone-agnostic since they should always be interpreted
+ * in local time. however, it seems our implementation of Date parses strings
+ * without zone data as being in UTC rather than local time (eg, `...T05:00`
+ * is interpreted as `...T05:00Z`). constructing a date from numeric args works
+ * as expected though, so we use arrays of numbers for date and time instead of
+ * strings.
+ */
 export type DateTime = {
   date: [number, number, number] // year, month, day
   time?: [number, number] // hour, minute
@@ -84,10 +96,12 @@ export type CompletionInput = {
   date: DateTime
   points: number
   isFull: boolean
+  nextDate?: DateTime
+  notes?: string
   // category: CategoryID
 }
 
 export type Completion = {
   id: CompletionID
   taskId: TaskID
-} & CompletionInput
+} & Omit<CompletionInput, 'nextDate'>

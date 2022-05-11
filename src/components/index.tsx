@@ -59,7 +59,7 @@ type DividerProps = {
   color?: keyof Theme['colors']
 }
 export const Divider = styled(Spacer)<DividerProps>(
-  ({ direction = 'h', size = 's', color = 'underline', theme }) => ({
+  ({ direction = 'h', size = 's', color = 'highlight', theme }) => ({
     alignSelf: 'stretch',
     ...(direction === 'h' && {
       borderBottomWidth: 1,

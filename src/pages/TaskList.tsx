@@ -104,34 +104,30 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
                 </Row>
                 <Row spacing="m" style={{ flex: 12 }}>
                   {!!item.settings.priority && (
-                    <View style={{ flex: 0 }}>
-                      <DetailSection
-                        icon="flag"
-                        color="accent"
-                        text={priorityLabel(item.settings.priority)}
-                      />
-                    </View>
+                    <DetailSection
+                      icon="flag"
+                      color="accent"
+                      text={priorityLabel(item.settings.priority)}
+                    />
                   )}
-                  <View style={{ flex: 5 }}>
-                    {!!item.settings.scheduled && (
-                      <DetailSection
-                        icon="calendar"
-                        text={printDate(item.settings.scheduled)}
-                      />
-                    )}
-                    {!!item.settings.deadline && (
-                      <DetailSection
-                        icon="alert-circle"
-                        text={printDate(item.settings.deadline)}
-                      />
-                    )}
-                    {!item.settings.deadline && !item.settings.scheduled && (
-                      <DetailSection
-                        icon="clock"
-                        text={printDate(item.createdAt)}
-                      />
-                    )}
-                  </View>
+                  {!!item.settings.scheduled && (
+                    <DetailSection
+                      icon="calendar"
+                      text={printDate(item.settings.scheduled)}
+                    />
+                  )}
+                  {!!item.settings.deadline && (
+                    <DetailSection
+                      icon="alert-circle"
+                      text={printDate(item.settings.deadline)}
+                    />
+                  )}
+                  {!item.settings.deadline && !item.settings.scheduled && (
+                    <DetailSection
+                      icon="clock"
+                      text={printDate(item.createdAt)}
+                    />
+                  )}
                 </Row>
                 {!!item.tags.length && (
                   <Row spacing="xs">
