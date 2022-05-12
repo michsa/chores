@@ -81,6 +81,7 @@ const fontSizes = {
 }
 
 const iconSizes = {
+  xsmall: 14,
   small: 16,
   regular: 20,
   large: 24,

@@ -139,7 +139,7 @@ const filterWidgets: {
         todo: [isActive],
         all: [],
       }[state]),
-    emptyState: 'all',
+    emptyState: 'todo',
   },
   recurrence: {
     component: ({ theme, state, onChangeState }) => (

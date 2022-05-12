@@ -1,7 +1,8 @@
 import React, { useLayoutEffect, useState } from 'react'
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view'
-import { Pressable, View } from 'react-native'
+import { Pressable } from 'react-native'
 import { useTheme } from '@emotion/react'
+import { sortBy } from 'lodash'
 
 import {
   Card,
@@ -17,8 +18,8 @@ import PointsRemaining from '../components/PointsRemaining'
 import FilterControls, { Filter } from '../components/FilterControls'
 import { useSelector } from '../hooks'
 import { getOrderedTasks } from '../redux/selectors'
-import { NavigationProps } from '../types'
-import { priorityLabel, printDate } from '../utils'
+import { NavigationProps, DateTime } from '../types'
+import { priorityLabel, printDate, calcUrgency } from '../utils'
 import { Theme } from '../theme'
 
 const composeFilters =
@@ -26,17 +27,44 @@ const composeFilters =
   task =>
     filters.every(filter => filter(task))
 
+type DetailSectionProps = {
+  icon: string
+  text: any
+  color?: keyof Theme['colors']
+}
+const DetailSection = ({ icon, text, color }: DetailSectionProps) => (
+  <Row spacing="xs">
+    <Icon color={color} name={icon} size="small" />
+    <Text color={color}>{text}</Text>
+  </Row>
+)
+
+const DateSection = ({
+  date,
+  ...props
+}: { date: number | DateTime } & Omit<DetailSectionProps, 'text'>) => (
+  <DetailSection {...props} text={printDate(date)} />
+)
+
 const TaskList = ({ navigation }: NavigationProps['taskList']) => {
   const tasks = useSelector(getOrderedTasks)
   const theme = useTheme()
 
   const [filters, setFilters] = useState<Filter[]>([])
-  const filteredTasks = tasks.filter(composeFilters(filters))
+  const filteredTasks = sortBy(
+    tasks.filter(composeFilters(filters)),
+    t => -calcUrgency(t)
+  )
 
   useLayoutEffect(() => {
     navigation.setOptions({
       headerRight: () => (
         <Row spacing="l">
+          <IconButton
+            size="xlarge"
+            name="sort-asc"
+            onPress={() => navigation.navigate('addTask')}
+          />
           <IconButton
             variant="primary"
             size="xlarge"
@@ -48,21 +76,6 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
       title: `Tasks (${filteredTasks.length})`,
     })
   }, [navigation, filteredTasks])
-
-  const DetailSection = ({
-    icon,
-    text,
-    color,
-  }: {
-    icon: string
-    text: any
-    color?: keyof Theme['colors']
-  }) => (
-    <Row spacing="xs">
-      <Icon color={color} name={icon} size="small" />
-      <Text color={color}>{text}</Text>
-    </Row>
-  )
 
   return (
     <React.Fragment>
@@ -102,7 +115,13 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
                     {item.settings.name}
                   </Text>
                 </Row>
-                <Row spacing="m" style={{ flex: 12 }}>
+                <Row
+                  spacing="m"
+                  style={{
+                    justifyContent: 'flex-start',
+                    flex: 0,
+                    width: 'auto',
+                  }}>
                   {!!item.settings.priority && (
                     <DetailSection
                       icon="flag"
@@ -111,23 +130,26 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
                     />
                   )}
                   {!!item.settings.scheduled && (
-                    <DetailSection
+                    <DateSection
                       icon="calendar"
-                      text={printDate(item.settings.scheduled)}
+                      date={item.settings.scheduled}
                     />
                   )}
                   {!!item.settings.deadline && (
-                    <DetailSection
+                    <DateSection
                       icon="alert-circle"
-                      text={printDate(item.settings.deadline)}
+                      date={item.settings.deadline}
                     />
                   )}
                   {!item.settings.deadline && !item.settings.scheduled && (
-                    <DetailSection
-                      icon="clock"
-                      text={printDate(item.createdAt)}
-                    />
+                    <DateSection icon="clock" date={item.createdAt} />
                   )}
+                  <DetailSection
+                    color="placeholderText"
+                    icon="alert-triangle"
+                    // iconSize="xsmall"
+                    text={calcUrgency(item).toFixed(2)}
+                  />
                 </Row>
                 {!!item.tags.length && (
                   <Row spacing="xs">
