@@ -24,7 +24,6 @@ export const Picker = <T extends number | string>({
     <PickerContainer style={[{ flexGrow: 1 }, containerStyle]}>
       <BasePicker<T>
         dropdownIconColor={theme.colors.text}
-        mode="dropdown"
         style={[
           {
             marginLeft: -theme.spacing.s,

@@ -77,8 +77,9 @@ export const DateTimeInput = (props: DateTimeInputProps) => {
       {props.clearable && (
         <IconButton
           name="x"
+          size="regular"
           onPress={() => props.onChange(undefined)}
-          containerProps={{ style: { marginRight: -theme.spacing.xs } }}
+          containerStyle={{ marginRight: -theme.spacing.xs }}
         />
       )}
     </Row>

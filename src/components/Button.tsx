@@ -1,5 +1,5 @@
 import React from 'react'
-import { Pressable, PressableProps, Keyboard } from 'react-native'
+import { Pressable, PressableProps, Keyboard, ViewStyle } from 'react-native'
 import { useTheme } from '@emotion/react'
 import { variants } from './utils'
 import { Icon, Text, Row } from '.'
@@ -13,6 +13,7 @@ export type ButtonProps = PressableProps & {
   labelSize?: keyof Theme['fontSizes']
   color?: keyof Theme['colors']
   fontColor?: keyof Theme['colors']
+  style?: ViewStyle
 }
 export const BaseButton = ({
   onPress,
@@ -29,7 +30,7 @@ export const BaseButton = ({
   const textColor = fontColor ?? readableText(theme, color)
   return (
     <Pressable
-      style={({ pressed }) => [
+      style={[
         {
           minHeight: theme.sizes.buttonHeight,
           borderRadius: theme.spacing.s,
@@ -37,7 +38,8 @@ export const BaseButton = ({
           paddingHorizontal: theme.spacing.l,
           paddingVertical: theme.spacing.s,
         },
-        typeof style === 'function' ? style({ pressed }) : style,
+        style,
+        // typeof style === 'function' ? style({ pressed }) : style,
       ]}
       onPress={(e: any) => {
         Keyboard.dismiss()
@@ -65,32 +67,32 @@ export const BaseButton = ({
   )
 }
 
-export const OutlineButton = ({
-  style,
-  color = 'accent',
-  ...props
-}: Omit<ButtonProps, 'fontColor'>) => {
-  const theme = useTheme()
-  return (
-    <BaseButton
-      style={({ pressed }) => [
-        {
-          borderWidth: 1,
-          backgroundColor: pressed
-            ? theme.colors.foreground
-            : theme.colors.background,
-          borderColor: theme.colors[color],
-        },
-        typeof style === 'function' ? style({ pressed }) : style,
-      ]}
-      fontColor={color}
-      {...props}
-    />
-  )
-}
+// export const OutlineButton = ({
+//   style,
+//   color = 'accent',
+//   ...props
+// }: Omit<ButtonProps, 'fontColor'>) => {
+//   const theme = useTheme()
+//   return (
+//     <BaseButton
+//       style={({ pressed }) => [
+//         {
+//           borderWidth: 1,
+//           backgroundColor: pressed
+//             ? theme.colors.foreground
+//             : theme.colors.background,
+//           borderColor: theme.colors[color],
+//         },
+//         // typeof style === 'function' ? style({ pressed }) : style,
+//       ]}
+//       fontColor={color}
+//       {...props}
+//     />
+//   )
+// }
 
 export const Button = variants({
   default: BaseButton,
-  outline: OutlineButton,
+  // outline: OutlineButton,
 })
 export default Button

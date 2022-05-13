@@ -1,12 +1,12 @@
-import React, { useLayoutEffect, useState } from 'react'
+import React, { useLayoutEffect } from 'react'
 import { ScrollView } from 'react-native'
 import { useTheme } from '@emotion/react'
-import styled from '@emotion/native'
 import { sortBy, reverse } from 'lodash'
 
 import {
   Text,
   Card,
+  ViewCard,
   IconButton,
   Row,
   SpacedList,
@@ -21,10 +21,6 @@ import { getTaskWithTags, getTaskCompletions } from '../redux/selectors'
 import { NavigationProps } from '../types'
 import { priorityLabel, printRecurrence, printDate, toDate } from '../utils'
 
-const ViewCard = styled(Card)(({ theme }) => ({
-  paddingVertical: theme.spacing.m,
-}))
-
 const ViewTask = ({
   navigation,
   route: {
@@ -35,8 +31,6 @@ const ViewTask = ({
   const dispatch = useDispatch()
   const task = useSelector(getTaskWithTags, id)
   const completions = useSelector(getTaskCompletions, id)
-
-  const [modal, setModal] = useState(false)
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -67,14 +61,11 @@ const ViewTask = ({
   }, [navigation, task])
 
   if (!task) return null
-
-  const pointsRemaining = task.settings.points - (task.runningPoints ?? 0)
-
   return (
     <ScrollView>
       <SpacedList style={{ margin: theme.spacing.s }}>
         <ViewCard>
-          <Text variant="primary" style={{ fontSize: theme.fontSizes.large }}>
+          <Text variant="primary" size="large">
             {task.settings.name}
           </Text>
         </ViewCard>
@@ -190,9 +181,7 @@ const ViewTask = ({
                   size="small"
                   name="edit-2"
                   color="text"
-                  containerProps={{
-                    style: { marginRight: -theme.spacing.xs },
-                  }}
+                  containerStyle={{ marginRight: -theme.spacing.xs }}
                 /> */}
                   </Row>
                   {c.notes && <Text>{c.notes}</Text>}

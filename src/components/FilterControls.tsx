@@ -52,7 +52,10 @@ export type Filter = (t: TaskWithCompletions) => boolean
  */
 type FilterState = {
   search: string
-  tags: string[]
+  tags: {
+    include: string[]
+    exclude: string[]
+  }
   completion: 'upcoming' | 'completed' | 'todo' | 'all'
   recurrence: 'recurring' | 'once' | 'all'
 }
@@ -77,16 +80,13 @@ type FilterWidget<K extends keyof FilterState, T = FilterState[K]> = {
 
 const isRecurring: Filter = task => task.settings.isRecurring
 const hasBeenCompleted: Filter = task => task.completions.some(c => c.isFull)
-
 const isFuture: Filter = task => scheduledDate(task) > new Date()
 
-const isActive: Filter = task =>
-  !isFuture(task) && (isRecurring(task) || !hasBeenCompleted(task))
+const isCompleted: Filter = task => !isRecurring(task) && hasBeenCompleted(task)
 
-const isUpcoming: Filter = task =>
-  isFuture(task) && (isRecurring(task) || !hasBeenCompleted(task))
+const isActive: Filter = task => !isFuture(task) && !isCompleted(task)
 
-const isCompleted: Filter = task => hasBeenCompleted(task) && !isActive(task)
+const isUpcoming: Filter = task => isFuture(task) && !isCompleted(task)
 
 const filterWidgets: {
   [key in keyof FilterState]: FilterWidget<key>
@@ -101,6 +101,14 @@ const filterWidgets: {
           value={state}
           onChangeText={onChangeState}
         />
+        {!!state && (
+          <IconButton
+            name="x"
+            size="regular"
+            containerStyle={{ padding: theme.spacing.xs }}
+            onPress={() => onChangeState('')}
+          />
+        )}
       </Row>
     ),
     mapStateToFilters: query => [task => task.settings.name.includes(query)],
@@ -108,12 +116,28 @@ const filterWidgets: {
   },
   tags: {
     component: ({ state, onChangeState }) => (
-      <TagPicker value={state} onChange={onChangeState} />
+      <SpacedList spacing="s">
+        <TagPicker
+          icon="plus"
+          value={state.include}
+          onChange={include => onChangeState({ ...state, include })}
+          excludeTags={state.exclude}
+          placeholderText="Include tags..."
+        />
+        <TagPicker
+          icon="minus"
+          value={state.exclude}
+          onChange={exclude => onChangeState({ ...state, exclude })}
+          excludeTags={state.include}
+          placeholderText="Exclude tags..."
+        />
+      </SpacedList>
     ),
-    mapStateToFilters: tagIds => [
-      task => tagIds.every(id => task.tagIds.includes(id)),
+    mapStateToFilters: ({ include, exclude }) => [
+      task => include.every(id => task.tagIds.includes(id)),
+      task => exclude.every(id => !task.tagIds.includes(id)),
     ],
-    emptyState: [],
+    emptyState: { include: [], exclude: [] },
   },
   completion: {
     component: ({ theme, state, onChangeState }) => (

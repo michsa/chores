@@ -12,6 +12,7 @@ import {
   Spacer,
   Row,
   SpacedList,
+  Button,
 } from '../components'
 import TagList from '../components/TagList'
 import PointsRemaining from '../components/PointsRemaining'
@@ -60,10 +61,11 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
     navigation.setOptions({
       headerRight: () => (
         <Row spacing="l">
-          <IconButton
-            size="xlarge"
-            name="sort-asc"
-            onPress={() => navigation.navigate('addTask')}
+          <Button
+            style={{ minHeight: theme.sizes.headerButtonHeight }}
+            color="headerForeground"
+            icon="sort-desc"
+            title="Urgency"
           />
           <IconButton
             variant="primary"

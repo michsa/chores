@@ -3,10 +3,12 @@ import { get } from 'lodash'
 import { useTheme } from '@emotion/react'
 import FeatherIcon from 'react-native-vector-icons/Feather'
 import Octicon from 'react-native-vector-icons/Octicons'
+import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import { Theme } from '../theme'
 import { variants } from './utils'
 
 const octicons = ['filter', 'stopwatch']
+const materialIcons = ['add-alarm']
 
 type FeatherIconProps = React.ComponentProps<typeof FeatherIcon>
 export type IconProps = Omit<FeatherIconProps, 'size'> & {
@@ -24,8 +26,11 @@ const BaseIcon = ({
   const themeSize =
     typeof size === 'string' ? get(theme.iconSizes, size, 20) : size
   const themeColor = theme.colors[color]
-  const Component =
-    name.startsWith('sort') || octicons.includes(name) ? Octicon : FeatherIcon
+  const Component = materialIcons.includes(name)
+    ? MaterialIcon
+    : name.startsWith('sort') || octicons.includes(name)
+    ? Octicon
+    : FeatherIcon
   return (
     <Component size={themeSize} color={themeColor} name={name} {...props} />
   )

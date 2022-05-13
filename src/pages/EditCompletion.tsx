@@ -1,10 +1,18 @@
 import React, { useLayoutEffect } from 'react'
-import { Pressable, Switch, ToastAndroid } from 'react-native'
+import { Pressable, Switch, ToastAndroid, View } from 'react-native'
 import { useTheme } from '@emotion/react'
 import { add } from 'date-fns'
 import { maxBy } from 'lodash'
 
-import { Card, Text, IconButton, Row, SpacedList, Icon } from '../components'
+import {
+  Card,
+  ViewCard,
+  Text,
+  IconButton,
+  Row,
+  SpacedList,
+  Icon,
+} from '../components'
 import MultilineTextInput from '../components/MultilineTextInput'
 import NumberInput from '../components/NumberInput'
 import DateTimeInput from '../components/DateTimeInput'
@@ -54,11 +62,24 @@ const CompleteTask = ({
     isFull: true,
   })
 
+  const scheduleOrDeadline = task.settings.scheduled ?? task.settings.deadline
+  const recurrenceBasis = maxBy(
+    [
+      scheduleOrDeadline,
+      { date: form.date.date, time: scheduleOrDeadline?.time },
+    ],
+    r => r && toDate(r)
+  )
+  const defaultNextDate = task.settings.isRecurring
+    ? addRecurrence(task.settings.recurrence!, recurrenceBasis!)
+    : undefined
+
   const onSubmit = () => {
     console.log('completeTask', form)
 
     try {
-      const formToSubmit = validate(form)
+      const nextDate = form.nextDate ?? defaultNextDate
+      const formToSubmit = validate({ ...form, nextDate })
       dispatch(completeTask(formToSubmit, task.id))
       navigation.goBack()
       navigation.navigate('viewTask', { id })
@@ -82,22 +103,16 @@ const CompleteTask = ({
     })
   }, [navigation, form])
 
-  const scheduleOrDeadline = task.settings.scheduled ?? task.settings.deadline
-  const recurrenceBasis = maxBy(
-    [
-      scheduleOrDeadline,
-      { date: form.date.date, time: scheduleOrDeadline?.time },
-    ],
-    r => r && toDate(r)
-  )
-  console.log({ recurrenceBasis })
-
   if (!task) return null
   return (
     <SpacedList style={{ margin: theme.spacing.s }}>
+      <Row as={ViewCard}>
+        <Icon name="check" size="large" />
+        <Text size="large">{task.settings.name}</Text>
+      </Row>
       <Row as={Card}>
         <DateTimeInput
-          icon="calendar"
+          icon="stopwatch"
           value={form.date}
           onChange={setField('date')}
           maximumDate={add(new Date(), { days: 1 })}
@@ -124,7 +139,7 @@ const CompleteTask = ({
           style={{ flex: 4 }}
           onPress={() => setField('isFull')(!form.isFull)}>
           <Row as={Card}>
-            <Icon name="check-circle" />
+            <Icon name={form.isFull ? 'check-circle' : 'circle'} />
             <Text style={{ flex: 1 }}>
               {form.isFull ? 'Fully complete!' : 'Partially complete'}
             </Text>
@@ -138,34 +153,70 @@ const CompleteTask = ({
       </Row>
       {form.isFull && task.settings.isRecurring && (
         <SpacedList as={Card}>
-          <Row spacing="m">
-            <Text style={{ flex: 1 }}>Repeat on</Text>
-            {task.settings.scheduled && (
-              <Row>
-                <Icon size="small" color="placeholderText" name="calendar" />
+          <Row spacing="m" style={{ alignItems: 'flex-end' }}>
+            <Text style={{ flex: 0 }}>
+              Next {task.settings.deadline ? 'deadline' : 'scheduled'}
+            </Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                flexWrap: 'wrap',
+                flex: 1,
+                justifyContent: 'flex-end',
+              }}>
+              {task.settings.scheduled && (
+                <Row>
+                  <Icon size="small" color="placeholderText" name="calendar" />
+                  <Text color="placeholderText">
+                    {printDate(task.settings.scheduled)}
+                  </Text>
+                </Row>
+              )}
+              {task.settings.deadline && (
+                <Row>
+                  <Icon
+                    size="small"
+                    color="placeholderText"
+                    name="alert-circle"
+                  />
+                  <Text color="placeholderText">
+                    {printDate(task.settings.deadline)}
+                  </Text>
+                </Row>
+              )}
+              <Row style={{ marginLeft: theme.spacing.s }}>
+                <Icon size="small" color="placeholderText" name="repeat" />
                 <Text color="placeholderText">
-                  {printDate(task.settings.scheduled)}
+                  {printRecurrence(task.settings.recurrence!)}
                 </Text>
               </Row>
-            )}
-            {task.settings.deadline && (
-              <Row>
-                <Icon size="small" name="alert-circle" />
-                <Text>{printDate(task.settings.deadline)}</Text>
-              </Row>
-            )}
-            <Row>
-              <Icon size="small" color="placeholderText" name="repeat" />
-              <Text color="placeholderText">
-                {printRecurrence(task.settings.recurrence!)}
-              </Text>
-            </Row>
+            </View>
           </Row>
-          <DateTimeInput
-            icon="repeat"
-            value={addRecurrence(task.settings.recurrence!, recurrenceBasis!)}
-            onChange={setField('nextDate')}
-          />
+          {form.nextDate ? (
+            <DateTimeInput
+              icon="repeat"
+              value={form.nextDate}
+              onChange={setField('nextDate')}
+              clearable
+              startOpen
+            />
+          ) : (
+            <Row>
+              <Icon name="repeat" />
+              <Text
+                variant="input"
+                style={{ flex: 1, borderBottomColor: theme.colors.foreground }}>
+                {printDate(defaultNextDate!)}
+              </Text>
+              <IconButton
+                size="small"
+                name="edit-2"
+                color="text"
+                onPress={() => setField('nextDate')(defaultNextDate)}
+              />
+            </Row>
+          )}
         </SpacedList>
       )}
       <Card>

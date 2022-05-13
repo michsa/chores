@@ -10,6 +10,7 @@ const palette = {
   grey5: '#414141', // dark placeholder text (actual inverse of light mode: 616161)
   grey6: '#2c2c2c', // dark underline
 
+  lightOffBlack: '#1d1d1d',
   offBlack: '#101010', // '#0d0d0d',
   black: '#000000',
 
@@ -41,6 +42,7 @@ const lightColors = {
   background: palette.offWhite,
   foreground: palette.white,
   headerBackground: palette.white,
+  headerForeground: palette.offWhite,
   text: palette.grey4,
   primaryText: palette.black,
   placeholderText: palette.grey2,
@@ -53,6 +55,7 @@ const darkColors = {
   background: palette.black,
   foreground: palette.offBlack,
   headerBackground: palette.black,
+  headerForeground: palette.lightOffBlack,
   text: palette.grey3,
   primaryText: palette.offWhite,
   placeholderText: palette.grey5,
@@ -72,6 +75,7 @@ const spacing = {
 const sizes = {
   inputHeight: 46,
   buttonHeight: 42,
+  headerButtonHeight: 36,
 }
 
 const fontSizes = {

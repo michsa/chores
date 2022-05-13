@@ -44,6 +44,10 @@ export const Card = styled.View(({ theme: { spacing, colors } }) => ({
   borderColor: colors.highlight,
 }))
 
+export const ViewCard = styled(Card)(({ theme }) => ({
+  paddingVertical: theme.spacing.m,
+}))
+
 export const Spacer = styled.View<{ size?: keyof Theme['spacing'] }>(
   ({ size = 's', theme }) => ({
     flex: 0,
