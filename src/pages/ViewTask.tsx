@@ -114,9 +114,7 @@ const ViewTask = ({
               {!!task.settings.isRecurring && (
                 <Row>
                   <Icon size="small" name="repeat" />
-                  <Text>
-                    after {printRecurrence(task.settings.recurrence!)}
-                  </Text>
+                  <Text>after {printRecurrence(task.settings.recurrence)}</Text>
                 </Row>
               )}
             </SpacedList>

@@ -1,5 +1,7 @@
 import { StackScreenProps } from '@react-navigation/stack'
 
+/* -- NAVIGATION -- */
+
 export type TaskStackParams = {
   taskList: undefined
   addTask: undefined
@@ -15,6 +17,8 @@ export type NavigationProps = {
   viewTask: StackScreenProps<TaskStackParams, 'viewTask'>
   completeTask: StackScreenProps<TaskStackParams, 'completeTask'>
 }
+
+/* -- MISC -- */
 
 export enum Frequency {
   DAY,
@@ -48,6 +52,8 @@ export type DateTime = {
   time?: [number, number] // hour, minute
 }
 
+/* -- TAGS -- */
+
 export type TagID = string
 export type Tag = {
   id: TagID
@@ -55,18 +61,64 @@ export type Tag = {
   // tasks: TaskID[]
 }
 
+/* -- TASKS -- */
+
 export type TaskID = string
-export type TaskSettings = {
+
+interface ScheduledSettings {
+  scheduled: DateTime
+  deadline?: undefined
+  deadlineWarning?: undefined
+}
+interface DeadlineSettings {
+  deadline: DateTime
+  deadlineWarning: Recurrence
+  scheduled?: undefined
+}
+interface UnscheduledSettings {
+  scheduled?: undefined
+  deadline?: undefined
+  deadlineWarning?: undefined
+}
+
+interface RecurringSettings {
+  isRecurring: true
+  recurrence: Recurrence
+}
+interface OneTimeSettings {
+  isRecurring: false
+  recurrence?: undefined
+}
+
+type BaseTaskSettings = {
   name: string
   points: number
   priority: Priority
-  isRecurring: boolean
-  recurrence?: Recurrence
   description: string
-  scheduled?: DateTime
-  deadline?: DateTime
-  deadlineWarning?: Recurrence
 }
+
+export type ScheduledTaskSettings = BaseTaskSettings &
+  ScheduledSettings &
+  (RecurringSettings | OneTimeSettings)
+
+export type DeadlineTaskSettings = BaseTaskSettings &
+  DeadlineSettings &
+  (RecurringSettings | OneTimeSettings)
+
+export type UnscheduledTaskSettings = BaseTaskSettings &
+  UnscheduledSettings &
+  OneTimeSettings
+
+export type RecurringTaskSettings = BaseTaskSettings &
+  RecurringSettings &
+  (ScheduledSettings | DeadlineSettings)
+
+export type OneTimeTaskSettings = BaseTaskSettings &
+  OneTimeSettings &
+  (ScheduledSettings | DeadlineSettings | UnscheduledSettings)
+
+export type TaskSettings = RecurringTaskSettings | OneTimeTaskSettings
+
 export type TaskSettingsInput = TaskSettings & {
   tagNames: string[]
 }
@@ -84,12 +136,16 @@ export type TaskWithTags = Task & { tags: Tag[] }
 export type TaskWithCompletions = Task & { completions: Completion[] }
 export type TaskWithTagsAndCompletions = TaskWithTags & TaskWithCompletions
 
+/* -- CATEGORIES -- */
+
 export type CategoryID = string
 export type Category = {
   id: CategoryID
   name: string
   completions: CompletionID[]
 }
+
+/* -- COMPLETIONS -- */
 
 export type CompletionID = string
 export type CompletionInput = {

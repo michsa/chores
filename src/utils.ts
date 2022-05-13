@@ -61,17 +61,14 @@ export const readableText = (theme: Theme, color: keyof Theme['colors']) => {
   return getLuminance(theme.colors[color]) > 0.5 ? darkText : lightText
 }
 
-export const scheduledDate = (task: Task) => {
-  let result = task.settings.scheduled
+export const scheduledDate = (task: Task) =>
+  task.settings.scheduled
     ? toDate(task.settings.scheduled)
     : task.settings.deadline
     ? toDate(
-        subRecurrence(task.settings.deadlineWarning!, task.settings.deadline!)
+        subRecurrence(task.settings.deadlineWarning, task.settings.deadline)
       )
     : new Date(task.createdAt)
-  // console.log(`scheduledDate ${task.settings.name}`, result, new Date())
-  return result
-}
 
 /**
  * function to generate a sigmoid curve. we use this to translate day offsets

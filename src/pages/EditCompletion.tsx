@@ -19,7 +19,12 @@ import DateTimeInput from '../components/DateTimeInput'
 import { useDispatch, useSelector, useForm } from '../hooks'
 import { getTask } from '../redux/selectors'
 import { completeTask } from '../redux/thunks'
-import { NavigationProps, CompletionInput, DateTime } from '../types'
+import {
+  NavigationProps,
+  CompletionInput,
+  DateTime,
+  TaskSettings,
+} from '../types'
 import {
   toDateTime,
   addRecurrence,
@@ -42,6 +47,23 @@ const validate = (form: PartialCompletionInput): CompletionInput => {
   return form as CompletionInput
 }
 
+const calcDefaultNextDate = (
+  settings: TaskSettings,
+  completionDate: DateTime
+) => {
+  if (!settings.isRecurring) return undefined
+
+  const scheduleOrDeadline = settings.scheduled ?? settings.deadline
+  const recurrenceBasis = maxBy(
+    [
+      scheduleOrDeadline,
+      { date: completionDate.date, time: scheduleOrDeadline.time },
+    ],
+    r => r && toDate(r)
+  )!
+  return addRecurrence(settings.recurrence, recurrenceBasis)
+}
+
 const CompleteTask = ({
   navigation,
   route: {
@@ -62,17 +84,7 @@ const CompleteTask = ({
     isFull: true,
   })
 
-  const scheduleOrDeadline = task.settings.scheduled ?? task.settings.deadline
-  const recurrenceBasis = maxBy(
-    [
-      scheduleOrDeadline,
-      { date: form.date.date, time: scheduleOrDeadline?.time },
-    ],
-    r => r && toDate(r)
-  )
-  const defaultNextDate = task.settings.isRecurring
-    ? addRecurrence(task.settings.recurrence!, recurrenceBasis!)
-    : undefined
+  const defaultNextDate = calcDefaultNextDate(task.settings, form.date)
 
   const onSubmit = () => {
     console.log('completeTask', form)
@@ -82,7 +94,7 @@ const CompleteTask = ({
       const formToSubmit = validate({ ...form, nextDate })
       dispatch(completeTask(formToSubmit, task.id))
       navigation.goBack()
-      navigation.navigate('viewTask', { id })
+      // navigation.navigate('viewTask', { id })
     } catch (e: unknown) {
       console.log(typeof e)
       const error = (e as Error).toString()
@@ -103,7 +115,6 @@ const CompleteTask = ({
     })
   }, [navigation, form])
 
-  if (!task) return null
   return (
     <SpacedList style={{ margin: theme.spacing.s }}>
       <Row as={ViewCard}>
@@ -188,7 +199,7 @@ const CompleteTask = ({
               <Row style={{ marginLeft: theme.spacing.s }}>
                 <Icon size="small" color="placeholderText" name="repeat" />
                 <Text color="placeholderText">
-                  {printRecurrence(task.settings.recurrence!)}
+                  {printRecurrence(task.settings.recurrence)}
                 </Text>
               </Row>
             </View>
@@ -207,7 +218,7 @@ const CompleteTask = ({
               <Text
                 variant="input"
                 style={{ flex: 1, borderBottomColor: theme.colors.foreground }}>
-                {printDate(defaultNextDate!)}
+                {defaultNextDate && printDate(defaultNextDate)}
               </Text>
               <IconButton
                 size="small"

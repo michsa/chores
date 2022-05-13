@@ -19,7 +19,7 @@ import PointsRemaining from '../components/PointsRemaining'
 import FilterControls, { Filter } from '../components/FilterControls'
 import { useSelector } from '../hooks'
 import { getOrderedTasks } from '../redux/selectors'
-import { NavigationProps, DateTime } from '../types'
+import { NavigationProps, DateTime, TaskWithTagsAndCompletions } from '../types'
 import { priorityLabel, printDate, calcUrgency } from '../utils'
 import { Theme } from '../theme'
 
@@ -88,7 +88,7 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
         ItemSeparatorComponent={() => <Spacer size="m" />}
         ListHeaderComponent={Spacer}
         ListFooterComponent={Spacer}
-        renderItem={({ item }) => (
+        renderItem={({ item }: { item: TaskWithTagsAndCompletions }) => (
           <Pressable
             onPress={() => navigation.navigate('viewTask', { id: item.id })}>
             <Row as={Card} style={{ paddingRight: theme.spacing.m }}>

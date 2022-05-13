@@ -61,13 +61,13 @@ const validate = (form: PartialTaskSettingsInput): TaskSettingsInput => {
 }
 
 const cleanup = (form: TaskSettingsInput) => {
-  if (form.deadlineWarning && !form.deadline) {
+  if (!form.deadline) {
     delete form.deadlineWarning
   }
   if (!form.scheduled && !form.deadline) {
     form.isRecurring = false
   }
-  if (form.recurrence && !form.isRecurring) {
+  if (!form.isRecurring) {
     delete form.recurrence
   }
   return form
