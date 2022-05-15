@@ -13,6 +13,7 @@ import EditTask from './src/pages/EditTask'
 import TaskList from './src/pages/TaskList'
 import ViewTask from './src/pages/ViewTask'
 import Completion from './src/pages/EditCompletion'
+import Metrics from './src/pages/Metrics'
 import { darkTheme, lightTheme } from './src/theme'
 
 import { TaskStackParams } from './src/types'
@@ -50,16 +51,12 @@ const App = () => {
               <TaskStack.Screen
                 name="taskList"
                 component={TaskList}
-                options={({ navigation }) => ({
-                  title: 'Tasks',
-                  headerRight: () => (
-                    <IconButton
-                      name="filter"
-                      color="text"
-                      onPress={() => navigation.navigate('addTask')}
-                    />
-                  ),
-                })}
+                options={{ title: 'Tasks' }}
+              />
+              <TaskStack.Screen
+                name="metrics"
+                component={Metrics}
+                options={{ title: 'Point totals' }}
               />
               <TaskStack.Screen
                 name="editTask"

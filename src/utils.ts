@@ -18,6 +18,11 @@ import {
   isTomorrow,
   isYesterday,
   differenceInDays,
+  startOfDay,
+  startOfHour,
+  startOfWeek,
+  startOfYear,
+  startOfMonth,
 } from 'date-fns'
 
 export const formatValue = (
@@ -149,6 +154,20 @@ const frequencyLabels = {
   [Frequency.WEEK]: 'week',
   [Frequency.MONTH]: 'month',
   [Frequency.YEAR]: 'year',
+}
+const frequencyClampFunctions = {
+  [Frequency.DAY]: startOfDay,
+  [Frequency.WEEK]: startOfWeek,
+  [Frequency.MONTH]: startOfMonth,
+  [Frequency.YEAR]: startOfYear,
+}
+
+export const clampDateTime = (
+  dt: DateTime,
+  freq: Frequency = Frequency.DAY
+) => {
+  const fn = frequencyClampFunctions[freq]
+  return fn(toDate(dt))
 }
 
 const recurrenceToDuration = (r: Recurrence) => ({

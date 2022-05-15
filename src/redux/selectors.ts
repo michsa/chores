@@ -1,6 +1,10 @@
 import { createSelector } from 'reselect'
 import { exists } from '../utils'
-import { TaskWithTags, TaskWithTagsAndCompletions } from '../types'
+import {
+  TaskWithTags,
+  TaskWithTagsAndCompletions,
+  CompletionWithTask,
+} from '../types'
 import { selectors as tasks } from './slices/tasks'
 import { selectors as tags } from './slices/tags'
 import { selectors as completions } from './slices/completions'
@@ -12,6 +16,13 @@ export const getTaskIds = tasks.selectIds
 
 export const getTags = tags.selectAll
 export const getCategories = categories.selectAll
+
+export const getCompletions = completions.selectAll
+export const getCompletionsWithTasks = createSelector(
+  [getCompletions, tasks.selectEntities],
+  (completions, tasks): CompletionWithTask[] =>
+    completions.map(c => ({ ...c, task: tasks[c.taskId]! }))
+)
 
 export const getTaskWithTags = createSelector(
   [tasks.selectById, tags.selectEntities],

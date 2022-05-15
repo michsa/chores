@@ -3,6 +3,7 @@ import { StackScreenProps } from '@react-navigation/stack'
 /* -- NAVIGATION -- */
 
 export type TaskStackParams = {
+  metrics: undefined
   taskList: undefined
   addTask: undefined
   editTask: { id: TaskID }
@@ -161,3 +162,4 @@ export type Completion = {
   id: CompletionID
   taskId: TaskID
 } & Omit<CompletionInput, 'nextDate'>
+export type CompletionWithTask = Completion & { task: Task }

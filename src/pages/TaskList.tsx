@@ -66,6 +66,7 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
             color="headerForeground"
             icon="sort-desc"
             title="Urgency"
+            onPress={() => navigation.navigate('metrics')}
           />
           <IconButton
             variant="primary"
