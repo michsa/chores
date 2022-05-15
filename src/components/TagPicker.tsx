@@ -66,7 +66,11 @@ const TagPicker = ({
           />
         </TagList>
       </View>
-      <IconButton name="x" size="regular" onPress={() => setSelected([])} />
+      <IconButton
+        name="delete"
+        size="regular"
+        onPress={() => setSelected([])}
+      />
     </Row>
   )
 }

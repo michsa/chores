@@ -17,7 +17,6 @@ const MultilineTextInput = (props: TextInputProps) => {
       }}
       onContentSizeChange={event => {
         const { contentSize } = event.nativeEvent
-        console.log({ contentSize })
         setHeight(contentSize.height)
       }}
       multiline

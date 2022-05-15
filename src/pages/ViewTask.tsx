@@ -72,7 +72,7 @@ const ViewTask = ({
         <Row>
           <Row as={ViewCard} style={{ flex: 2 }}>
             <Icon name="star" />
-            <PointsRemaining task={task} />
+            <PointsRemaining {...task} />
           </Row>
           <Row as={ViewCard} style={{ flex: 3 }}>
             <Icon name="flag" />

@@ -64,6 +64,9 @@ export type Tag = {
 
 /* -- TASKS -- */
 
+export type Filter<T = Task> = (t: T) => boolean
+export type FilterWithCompletions = Filter<TaskWithCompletions>
+
 export type TaskID = string
 
 interface ScheduledSettings {

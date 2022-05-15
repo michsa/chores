@@ -3,7 +3,7 @@ import { useTheme } from '@emotion/react'
 import { mapValues, negate, isEqual } from 'lodash'
 import { useForm } from '../hooks'
 import { Theme } from '../theme'
-import { TaskWithCompletions } from '../types'
+import { Filter, FilterWithCompletions } from '../types'
 import {
   SpacedList,
   Row,
@@ -16,7 +16,13 @@ import {
   Picker,
 } from '.'
 import TagPicker from './TagPicker'
-import { scheduledDate } from '../utils'
+import {
+  isRecurring,
+  isInProgress,
+  isCompleted,
+  isUpcoming,
+  isActive,
+} from '../redux/filters'
 
 /**
  * an icon button with different styling depending on whether the filter it's
@@ -44,8 +50,6 @@ const FilterButton = ({
   )
 }
 
-export type Filter = (t: TaskWithCompletions) => boolean
-
 /**
  * source of truth for the state type for each widget, since this component has
  * to control state for all of them. the other types are derived from this.
@@ -56,7 +60,7 @@ type FilterState = {
     include: string[]
     exclude: string[]
   }
-  completion: 'upcoming' | 'completed' | 'todo' | 'all'
+  completion: 'upcoming' | 'completed' | 'todo' | 'partial' | 'all'
   recurrence: 'recurring' | 'once' | 'all'
 }
 
@@ -74,43 +78,41 @@ type FilterComponentProps<T = unknown> = {
 }
 type FilterWidget<K extends keyof FilterState, T = FilterState[K]> = {
   component: React.ComponentType<FilterComponentProps<T>>
-  mapStateToFilters: (state: T) => Filter[]
+  mapStateToFilters: (state: T) => FilterWithCompletions[]
   emptyState: T
 }
-
-const isRecurring: Filter = task => task.settings.isRecurring
-const hasBeenCompleted: Filter = task => task.completions.some(c => c.isFull)
-const isFuture: Filter = task => scheduledDate(task) > new Date()
-
-const isCompleted: Filter = task => !isRecurring(task) && hasBeenCompleted(task)
-
-const isActive: Filter = task => !isFuture(task) && !isCompleted(task)
-
-const isUpcoming: Filter = task => isFuture(task) && !isCompleted(task)
 
 const filterWidgets: {
   [key in keyof FilterState]: FilterWidget<key>
 } = {
   search: {
-    component: ({ theme, state, onChangeState }) => (
-      <Row>
-        <Icon name="search" />
-        <TextInput
-          placeholder="Search..."
-          style={{ flex: 1, height: theme.sizes.buttonHeight }}
-          value={state}
-          onChangeText={onChangeState}
-        />
-        {!!state && (
-          <IconButton
-            name="x"
-            size="regular"
-            containerStyle={{ padding: theme.spacing.xs }}
-            onPress={() => onChangeState('')}
+    component: ({ theme, state, onChangeState }) => {
+      const ref = React.useRef(null)
+      return (
+        <Row>
+          <Icon name="search" />
+          <TextInput
+            ref={ref}
+            autoFocus
+            placeholder="Search..."
+            style={{ flex: 1, height: theme.sizes.buttonHeight }}
+            value={state}
+            onChangeText={onChangeState}
           />
-        )}
-      </Row>
-    ),
+          {!!state && (
+            <IconButton
+              name="delete"
+              size="regular"
+              onPress={() => {
+                onChangeState('')
+                // @ts-ignore
+                ref.current.focus()
+              }}
+            />
+          )}
+        </Row>
+      )
+    },
     mapStateToFilters: query => [task => task.settings.name.includes(query)],
     emptyState: '',
   },
@@ -149,6 +151,7 @@ const filterWidgets: {
           onValueChange={onChangeState}
           options={[
             { label: 'To do', value: 'todo' },
+            { label: 'In progress', value: 'partial' },
             { label: 'Upcoming', value: 'upcoming' },
             { label: 'Completed', value: 'completed' },
             { label: 'All', value: 'all' },
@@ -162,6 +165,7 @@ const filterWidgets: {
         completed: [isCompleted],
         todo: [isActive],
         all: [],
+        partial: [isInProgress],
       }[state]),
     emptyState: 'todo',
   },
@@ -209,7 +213,7 @@ const getFilterWidget = (key: keyof FilterState) =>
 
 type FilterControlsProps = {
   // filters: FilterState
-  onChangeFilters: (filters: Filter[]) => void
+  onChangeFilters: (filters: FilterWithCompletions[]) => void
 }
 const FilterControls = ({ onChangeFilters }: FilterControlsProps) => {
   const theme = useTheme()

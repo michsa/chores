@@ -13,6 +13,7 @@ import {
   SpacedList,
   Icon,
 } from '../components'
+import PointsRemaining from '../components/PointsRemaining'
 import MultilineTextInput from '../components/MultilineTextInput'
 import NumberInput from '../components/NumberInput'
 import DateTimeInput from '../components/DateTimeInput'
@@ -32,8 +33,6 @@ import {
   printRecurrence,
   printDate,
 } from '../utils'
-
-const defaultDateTime = toDateTime(new Date(), true)
 
 type PartialCompletionInput = Omit<CompletionInput, 'points'> & {
   points?: number
@@ -77,6 +76,7 @@ const CompleteTask = ({
   if (!task) return null
 
   const pointsRemaining = task.settings.points - (task.runningPoints ?? 0)
+  const defaultDateTime = toDateTime(new Date(), true)
 
   const { form, setField } = useForm<PartialCompletionInput>({
     date: defaultDateTime,
@@ -130,10 +130,10 @@ const CompleteTask = ({
         />
       </Row>
       <Row>
-        <Row as={Card} style={{ flex: 2 }}>
+        <Row as={Card} style={{ flex: 5 }}>
           <Icon name="star" />
           <NumberInput
-            placeholder="Points"
+            placeholder="Pts"
             style={{ flex: 1 }}
             minValue={1}
             maxValue={255}
@@ -143,11 +143,11 @@ const CompleteTask = ({
               setField('isFull')(p >= pointsRemaining)
             }}
           />
-          <Text>/</Text>
-          <Text size="regular">{pointsRemaining}</Text>
+          <Text>of</Text>
+          <PointsRemaining {...task} />
         </Row>
         <Pressable
-          style={{ flex: 4 }}
+          style={{ flex: 9 }}
           onPress={() => setField('isFull')(!form.isFull)}>
           <Row as={Card}>
             <Icon name={form.isFull ? 'check-circle' : 'circle'} />

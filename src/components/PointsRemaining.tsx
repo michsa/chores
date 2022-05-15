@@ -1,16 +1,21 @@
 import React from 'react'
-import { Task } from '../types'
+import { Task, TaskSettings } from '../types'
 import { Row, Text } from '.'
 
-export const PointsRemaining = ({ task }: { task: Task }) => {
-  const pointsRemaining = task.settings.points - (task.runningPoints ?? 0)
+export const PointsRemaining = ({
+  settings,
+  runningPoints,
+}: {
+  settings: TaskSettings
+  runningPoints: number
+}) => {
+  const pointsRemaining = settings.points - (runningPoints ?? 0)
+  console.log({ pointsRemaining })
   return (
     <Row as={Text} spacing="xs">
       <Text variant="primary">{pointsRemaining}</Text>
-      {task.runningPoints > 0 && <Text>/</Text>}
-      {task.runningPoints > 0 && (
-        <Text size="regular">{task.settings.points}</Text>
-      )}
+      {runningPoints > 0 && <Text>/</Text>}
+      {runningPoints > 0 && <Text>{settings.points}</Text>}
     </Row>
   )
 }

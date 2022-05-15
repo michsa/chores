@@ -10,6 +10,7 @@ export type IconButtonProps = IconProps & {
   containerStyle?: PressableProps['style']
   variant?: 'default' | 'primary'
   backgroundColor?: (pressed: boolean) => keyof Theme['colors']
+  disabled?: boolean
 }
 export const IconButton = ({
   onPress,
@@ -18,6 +19,7 @@ export const IconButton = ({
   backgroundColor,
   containerStyle,
   variant = 'default',
+  disabled,
   ...props
 }: IconButtonProps) => {
   const theme = useTheme()
@@ -27,6 +29,7 @@ export const IconButton = ({
   }
   return (
     <Pressable
+      disabled={disabled}
       removeClippedSubviews
       style={({ pressed }) => [
         {
