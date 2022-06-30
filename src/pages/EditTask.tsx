@@ -16,7 +16,6 @@ import {
   Icon,
   IconButton,
   Picker,
-  FakeInputText,
   SpacedList,
   Row,
 } from '../components'
@@ -29,6 +28,7 @@ import DateTimeInput from '../components/DateTimeInput'
 
 type PartialTaskSettingsInput = Omit<TaskSettingsInput, 'points'> & {
   points?: number
+  isBucket?: boolean
 }
 
 const defaultDateTime = toDateTime(new Date())
@@ -44,23 +44,39 @@ const defaultSetings: PartialTaskSettingsInput = {
   deadlineWarning: defaultRecurrence,
   description: '',
   tagNames: [],
+  isBucket: false,
 }
 
 const useTaskIfExists = (id?: string): PartialTaskSettingsInput => {
   const task = id ? useSelector(getTaskWithTags, id) : undefined
   return task
-    ? { ...task.settings, tagNames: task.tags.map(tag => tag?.name) }
+    ? {
+        ...task.settings,
+        tagNames: task.tags.map(tag => tag?.name),
+        isBucket: 'points' in task.settings,
+      }
     : defaultSetings
 }
 
 const validate = (form: PartialTaskSettingsInput): TaskSettingsInput => {
   if (!form.name) throw Error('Task must have a name')
-  if (!form.points) throw Error('Task must have points')
+  if (!form.points && !form.isBucket)
+    throw Error('Non-bucket task must have points')
 
+  delete form.isBucket
   return form as TaskSettingsInput
 }
 
-const cleanup = (form: TaskSettingsInput) => {
+const cleanup = (form: PartialTaskSettingsInput) => {
+  if (!!form.points) {
+    form.isBucket = false
+  }
+  if (form.isBucket) {
+    delete form.scheduled
+    delete form.deadline
+    delete form.points
+  }
+
   if (!form.deadline) {
     delete form.deadlineWarning
   }
@@ -70,6 +86,7 @@ const cleanup = (form: TaskSettingsInput) => {
   if (!form.isRecurring) {
     delete form.recurrence
   }
+
   return form
 }
 
@@ -80,13 +97,16 @@ const EditTask = ({
   const theme = useTheme()
   const dispatch = useDispatch()
   const settings = useTaskIfExists(params?.id)
-  const { form, setField } = useForm<PartialTaskSettingsInput>(settings)
+  const { form, setField } = useForm<PartialTaskSettingsInput>(
+    settings,
+    cleanup
+  )
 
   const onSubmit = () => {
     console.log('onSubmit', form)
     try {
       const formToSubmit = validate(form)
-      const id = dispatch(upsertTask(cleanup(formToSubmit), params?.id))
+      const id = dispatch(upsertTask(formToSubmit, params?.id))
       navigation.goBack()
       navigation.navigate('viewTask', { id })
     } catch (e: unknown) {
@@ -126,30 +146,48 @@ const EditTask = ({
         />
       </Card>
       <Row>
-        <Row as={Card} style={{ flex: 2 }}>
+        <Row as={Card} style={{ flex: 1 }}>
           <Icon name="star" />
           <NumberInput
             placeholder="Points"
             style={{ flex: 1 }}
-            minValue={1}
-            maxValue={255}
+            maxValue={50}
             value={form.points}
-            onChangeText={setField('points')}
+            onChangeText={value => {
+              setField('points')(value)
+              // if (!!value) setField('isBucket')(false)
+            }}
           />
         </Row>
-        <Row as={Card} style={{ flex: 3 }}>
-          <Icon name="flag" />
-          <Picker
-            selectedValue={form.priority}
-            onValueChange={setField('priority')}
-            options={priorityOptions}
-          />
-        </Row>
+        {!form.points && (
+          <Pressable
+            style={{ flex: 1 }}
+            onPress={() => setField('isBucket')(!form.isBucket)}>
+            <Row as={Card}>
+              <Icon size="small" name="archive" />
+              <Text style={{ flex: 1 }}>Bucket?</Text>
+              <Switch
+                style={{ height: theme.sizes.inputHeight - theme.spacing.s }}
+                value={form.isBucket}
+                onValueChange={setField('isBucket')}
+              />
+            </Row>
+          </Pressable>
+        )}
+      </Row>
+
+      <Row as={Card} style={{ flex: 3 }}>
+        <Icon name="flag" />
+        <Picker
+          selectedValue={form.priority}
+          onValueChange={setField('priority')}
+          options={priorityOptions}
+        />
       </Row>
 
       <TagsInput value={form.tagNames} onUpdate={setField('tagNames')} />
 
-      {!form.scheduled && !form.deadline && (
+      {!form.scheduled && !form.deadline && !form.isBucket && (
         <Row style={{ padding: theme.spacing.s }} spacing="m">
           <Button
             style={{ flex: 1 }}

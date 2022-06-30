@@ -3,7 +3,7 @@ import { useTheme } from '@emotion/react'
 import { mapValues, negate, isEqual } from 'lodash'
 import { useForm } from '../hooks'
 import { Theme } from '../theme'
-import { Filter, FilterWithCompletions } from '../types'
+import { FilterWithCompletions } from '../types'
 import {
   SpacedList,
   Row,

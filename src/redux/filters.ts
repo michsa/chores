@@ -6,13 +6,15 @@ export const composeFilters =
   task =>
     filters.every(filter => filter(task))
 
+export const isBucket: Filter = task => !('points' in task.settings)
+
 export const isRecurring: Filter = task => task.settings.isRecurring
 export const hasBeenCompleted: FilterWithCompletions = task =>
   task.completions.some(c => c.isFull)
 export const isFuture: Filter = task => scheduledDate(task) > new Date()
 
 export const isCompleted: FilterWithCompletions = task =>
-  !isRecurring(task) && hasBeenCompleted(task)
+  !isRecurring(task) && !isBucket(task) && hasBeenCompleted(task)
 
 export const isActive: FilterWithCompletions = task =>
   !isFuture(task) && !isCompleted(task)

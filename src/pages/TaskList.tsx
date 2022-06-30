@@ -158,7 +158,8 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
                     as={Text}
                     style={{
                       paddingHorizontal: theme.spacing.s,
-                      paddingVertical: theme.spacing.xxs,
+                      height: theme.iconSizes.xlarge,
+                      minWidth: theme.iconSizes.xlarge,
                       borderRadius: theme.spacing.xl,
                       textAlign: 'center',
                       textAlignVertical: 'center',

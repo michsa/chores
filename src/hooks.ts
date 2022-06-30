@@ -14,7 +14,10 @@ export const useSelector = <A extends any[], R>(
   ...rest: A
 ) => useStateSelector(state => selector(state, ...rest))
 
-export const useForm = <T extends { [k: string]: any }>(defaults: T) => {
+export const useForm = <T extends { [k: string]: any }>(
+  defaults: T,
+  onSet: (form: T) => T = x => x
+) => {
   const [form, setForm] = useState<T>(defaults)
   return {
     form,
@@ -22,8 +25,7 @@ export const useForm = <T extends { [k: string]: any }>(defaults: T) => {
     setField:
       <K extends keyof T>(key: K) =>
       (value: T[K]) => {
-        // console.log(`setField`, { [key]: value })
-        setForm(currentForm => ({ ...currentForm, [key]: value }))
+        setForm(currentForm => onSet({ ...currentForm, [key]: value }))
       },
   }
 }
