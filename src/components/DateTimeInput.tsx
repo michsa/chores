@@ -5,7 +5,7 @@ import { useTheme } from '@emotion/react'
 import { useForm } from '../hooks'
 import { DateTime } from '../types'
 import { Icon, IconButton, Text, FakeInputText, Row } from '../components'
-import { toDate, formatDate, formatTime, formatValue } from '../utils'
+import { toDate, formatDate, formatTime, parseValue } from '../utils'
 
 type PickerState = 'date' | 'time' | null
 
@@ -52,7 +52,7 @@ export const DateTimeInput = (props: DateTimeInputProps) => {
               const field = picker
               setPicker(null)
               if (date && e.type === 'set') {
-                const formatted = formatValue(field, date)
+                const formatted = parseValue(field, date)
                 console.log(formatted)
                 setField(field)(formatted)
               }

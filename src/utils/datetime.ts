@@ -6,18 +6,31 @@ import {
   isTomorrow,
   isYesterday,
   differenceInDays,
+  formatRelative,
+  differenceInYears,
+  differenceInMonths,
+  differenceInWeeks,
 } from 'date-fns'
 import { Frequency, DateTime, Task } from '../types'
 import { subRecurrence } from './recurrence'
 import { frequencyClampFunctions } from './frequency'
 
-export const formatValue = (
+export const parseValue = (
   type: 'date' | 'time',
   date: Date
 ): DateTime[typeof type] =>
   type === 'date'
     ? [date.getFullYear(), date.getMonth(), date.getDate()]
     : [date.getHours(), date.getMinutes()]
+
+export const toDateTime = (date: Date, parseTime: boolean = false) =>
+  ({
+    date: parseValue('date', date),
+    time: parseTime ? parseValue('time', date) : undefined,
+  } as DateTime)
+
+export const toDate = (dt: DateTime, defaultTime: [number, number] = [12, 0]) =>
+  new Date(...dt.date, ...(dt.time ?? defaultTime))
 
 export const formatDate = (dt: DateTime) => {
   const date = toDate(dt)
@@ -31,20 +44,41 @@ export const formatDate = (dt: DateTime) => {
     if (dayDiff < 0) return 'last ' + format(date, 'EEEE')
     return 'next ' + format(date, 'EEEE')
   }
-  return format(date, isSameYear(now, date) ? 'EEEE, MMM d' : 'MMM d, yyyy')
+  return format(date, isSameYear(now, date) ? 'EEE M/d' : 'M/d/yy')
+}
+
+const diffLabelMapping = [
+  { fn: differenceInYears, label: 'y' },
+  { fn: differenceInMonths, label: 'mo' },
+  { fn: differenceInWeeks, label: 'w' },
+  { fn: differenceInDays, label: 'd' },
+]
+
+const diffFormats = {
+  long: ['* ago', 'in *'],
+  short: ['-*', '+*'],
+}
+type DiffStyle = keyof typeof diffFormats
+
+const formatDiff = (diff: string, isPast: boolean, style: DiffStyle = 'long') =>
+  diffFormats[style][isPast ? 0 : 1].replace('*', diff)
+
+export const formatRelativeDate = (dt: DateTime, style: DiffStyle = 'long') => {
+  const date = toDate(dt)
+  const now = new Date()
+
+  for (let diff of diffLabelMapping) {
+    const d = diff.fn(date, now)
+    if (Math.abs(d) < 2 && diff.label !== 'd') continue
+
+    const isPast = d < 0
+    const diffString = Math.abs(d) + diff.label
+    return formatDiff(diffString, isPast, style)
+  }
 }
 
 export const formatTime = (dt: DateTime) =>
   dt.time ? format(toDate(dt), 'h:mm a') : undefined
-
-export const toDateTime = (date: Date, parseTime: boolean = false) =>
-  ({
-    date: formatValue('date', date),
-    time: parseTime ? formatValue('time', date) : undefined,
-  } as DateTime)
-
-export const toDate = (dt: DateTime, defaultTime: [number, number] = [12, 0]) =>
-  new Date(...dt.date, ...(dt.time ?? defaultTime))
 
 export const scheduledDate = (task: Task) =>
   task.settings.scheduled
@@ -57,7 +91,15 @@ export const scheduledDate = (task: Task) =>
 
 export const printDate = (date: number | DateTime) => {
   const dt = typeof date === 'number' ? toDateTime(new Date(date)) : date
-  return formatDate(dt) + (dt.time ? ' at ' + formatTime(dt) : '')
+  return (
+    `${formatDate(dt)} (${formatRelativeDate(dt)})` +
+    (dt.time ? ', ' + formatTime(dt) : '')
+  )
+}
+
+export const printRelativeDate = (date: number | DateTime) => {
+  const dt = typeof date === 'number' ? toDateTime(new Date(date)) : date
+  return formatRelativeDate(dt, 'long')
 }
 
 export const clampDateTime = (

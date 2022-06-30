@@ -27,7 +27,7 @@ import {
   Completion,
   FilterWithCompletions,
 } from '../types'
-import { priorityLabel, printDate, calcUrgency, toDate } from '../utils'
+import { priorityLabel, printRelativeDate, calcUrgency, toDate } from '../utils'
 import { Theme } from '../theme'
 
 type DetailSectionProps = {
@@ -46,7 +46,7 @@ const DateSection = ({
   date,
   ...props
 }: { date: number | DateTime } & Omit<DetailSectionProps, 'text'>) => (
-  <DetailSection {...props} text={printDate(date)} />
+  <DetailSection {...props} text={printRelativeDate(date)} />
 )
 
 const LastCompletionSection = ({
