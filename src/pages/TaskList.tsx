@@ -2,7 +2,7 @@ import React, { useLayoutEffect, useState } from 'react'
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view'
 import { Pressable } from 'react-native'
 import { useTheme } from '@emotion/react'
-import { sortBy, memoize, last } from 'lodash'
+import { sortBy, last } from 'lodash'
 
 import {
   Card,
@@ -13,13 +13,13 @@ import {
   Row,
   SpacedList,
   Button,
+  Divider,
 } from '../components'
-import TagList from '../components/TagList'
 import PointsRemaining from '../components/PointsRemaining'
 import FilterControls from '../components/FilterControls'
-import { useSelector } from '../hooks'
+import { useSelector, useFlags } from '../hooks'
 import { getOrderedTasks } from '../redux/selectors'
-import { isCompleted, isActive } from '../redux/filters'
+import { isCompleted } from '../redux/filters'
 import {
   NavigationProps,
   DateTime,
@@ -68,34 +68,16 @@ const LastCompletionSection = ({
   ) : null
 }
 
-// const lastCompletionDate = memoize(
-//   flow([sb<Completion>(c => toDate(c.date)), last, get('date')]),
-//   map((c: Completion) => c.id)
-// )
-
-// const lastCompletion = memoize(
-//   (completions: Completion[]) =>
-//     last(
-//       sortBy(
-//         completions.filter(c => c.isFull),
-//         c => toDate(c.date)
-//       )
-//     ),
-//   completions => completions.filter(c => c.isFull).map(c => c.id)
-// )
-
-// const lastCompletionDate2 = memoize(
-//   (completions: Completion[]) => completions[completions.length - 1].date,
-//   completions => completions.map(c => c.id)
-// )
-
 const TaskList = ({ navigation }: NavigationProps['taskList']) => {
   const [filters, setFilters] = useState<FilterWithCompletions[]>([])
   const tasks = useSelector(getOrderedTasks, filters)
   const theme = useTheme()
+  const { isSet: isPinned, toggle: togglePin } = useFlags()
 
-  const sortedTasks = sortBy(tasks, t => -calcUrgency(t))
-  console.log(sortedTasks)
+  const sortedTasks = sortBy(
+    tasks,
+    t => -calcUrgency(t) - (isPinned(t.id) ? 1000 : 0)
+  )
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -120,34 +102,58 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
     })
   }, [navigation, sortedTasks])
 
+  const ref = React.useRef(null)
+
   return (
     <React.Fragment>
       <FilterControls onChangeFilters={setFilters} />
       <KeyboardAwareFlatList
+        ref={ref}
         keyboardShouldPersistTaps="always"
         style={{ paddingHorizontal: theme.spacing.s }}
         data={sortedTasks}
-        ItemSeparatorComponent={() => <Spacer size="m" />}
+        ItemSeparatorComponent={() => <Spacer size="s" />}
         ListHeaderComponent={Spacer}
         ListFooterComponent={Spacer}
+        initialNumToRender={1}
         // hack to force rerendering tasks in the list when they're completed
         keyExtractor={task => task.id + task.runningPoints}
         renderItem={({ item }: { item: TaskWithTagsAndCompletions }) => (
           <Pressable
-            onPress={() => navigation.navigate('viewTask', { id: item.id })}>
+            onPress={() => navigation.navigate('viewTask', { id: item.id })}
+            onLongPress={() => {
+              togglePin(item.id)
+              console.log(ref.current)
+              // @ts-ignore
+              ref.current.scrollToPosition(0, 0, true)
+            }}>
             <Row
               as={Card}
               style={{
                 paddingHorizontal: theme.spacing.m,
-                borderLeftWidth: 8,
-                borderColor: isCompleted(item)
+                borderLeftWidth: theme.spacing.s,
+                borderColor: isPinned(item.id)
+                  ? theme.colors.pin
+                  : isCompleted(item)
                   ? theme.colors.accent
                   : item.settings.deadline
                   ? theme.colors.danger
                   : theme.colors.highlight,
+                // backgroundColor: isPinned(item.id)
+                //   ? theme.colors.pin
+                //   : theme.colors.foreground,
               }}>
-              <SpacedList style={{ flex: 1 }} spacing="s">
+              <SpacedList style={{ flex: 1 }} spacing="s" spacer={Spacer}>
                 <Row>
+                  {isPinned(item.id) && (
+                    <Icon
+                      size="small"
+                      // style={{ margin: -4 }}
+                      name="pin"
+                      color={isPinned(item.id) ? 'pin' : 'underline'}
+                      // onPress={() => togglePin(item.id)}
+                    />
+                  )}
                   <Row
                     as={Text}
                     style={{
@@ -208,19 +214,13 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
                     text={calcUrgency(item).toFixed(2)}
                   />
                 </Row>
-                <LastCompletionSection {...item} />
-                {!!item.tags.length && (
-                  <Row spacing="xs">
-                    <Icon name="tag" size="small" />
-                    <TagList tags={item.tags} variant="small" />
-                  </Row>
-                )}
               </SpacedList>
               {!isCompleted(item) && (
                 <IconButton
+                  variant="primary"
                   name="check-circle"
                   color="accent"
-                  size="xxlarge"
+                  size="xlarge"
                   onPress={() =>
                     navigation.navigate('completeTask', { id: item.id })
                   }
@@ -231,13 +231,6 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
           </Pressable>
         )}
       />
-      {/* <Button
-        variant="outline"
-        icon="plus-circle"
-        title="Add task"
-        style={{ margin: theme.spacing.s }}
-        onPress={() => navigation.navigate('addTask')}
-      /> */}
     </React.Fragment>
   )
 }

@@ -16,6 +16,7 @@ const palette = {
 
   accent: 'teal',
   danger: 'indianred',
+  pin: 'darksalmon',
 }
 
 type ThemeColor =
@@ -35,6 +36,7 @@ type ColorScheme = { [k in ThemeColor]: string }
 const highlightColors = {
   accent: palette.accent,
   danger: palette.danger,
+  pin: palette.pin,
 }
 
 const lightColors = {

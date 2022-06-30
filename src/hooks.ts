@@ -27,3 +27,12 @@ export const useForm = <T extends { [k: string]: any }>(defaults: T) => {
       },
   }
 }
+
+export const useFlags = () => {
+  const [state, setState] = useState<{ [k: string]: boolean }>({})
+
+  return {
+    isSet: (x: string) => !!state[x],
+    toggle: (x: string) => setState(p => ({ ...p, [x]: !p[x] })),
+  }
+}

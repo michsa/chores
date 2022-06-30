@@ -7,7 +7,7 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import { Theme } from '../theme'
 import { variants } from './utils'
 
-const octicons = ['filter', 'stopwatch']
+const octicons = ['stopwatch', 'pin']
 const materialIcons = ['add-alarm']
 
 type FeatherIconProps = React.ComponentProps<typeof FeatherIcon>
