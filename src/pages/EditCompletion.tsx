@@ -130,7 +130,7 @@ const CompleteTask = ({
         />
       </Row>
       <Row>
-        <Row as={Card} style={{ flex: 5 }}>
+        <Row as={Card} style={{ flex: 3 }}>
           <Icon name="star" />
           <NumberInput
             placeholder="Pts"
@@ -147,12 +147,12 @@ const CompleteTask = ({
           <PointsRemaining {...task} />
         </Row>
         <Pressable
-          style={{ flex: 9 }}
+          style={{ flex: 4 }}
           onPress={() => setField('isFull')(!form.isFull)}>
           <Row as={Card}>
             <Icon name={form.isFull ? 'check-circle' : 'circle'} />
             <Text style={{ flex: 1 }}>
-              {form.isFull ? 'Fully complete!' : 'Partially complete'}
+              {form.isFull ? 'Complete!' : 'Partial'}
             </Text>
             <Switch
               style={{ height: theme.sizes.inputHeight - theme.spacing.s }}
