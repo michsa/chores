@@ -126,10 +126,12 @@ const ViewTask = ({
           <TagList tags={task.tags} />
         </Row>
 
-        <Card>
-          <Text>Notes</Text>
-          <Text variant="property">{task.settings.description}</Text>
-        </Card>
+        {!!task.settings.description && (
+          <Card>
+            <Text>Notes</Text>
+            <Text variant="property">{task.settings.description}</Text>
+          </Card>
+        )}
 
         {completions.length && (
           <SpacedList>
@@ -163,7 +165,7 @@ const ViewTask = ({
                         <Text variant="primary">{c.points}</Text>
                       </Row>
                       <Row>
-                        <Icon size="small" name="clock" />
+                        <Icon size="small" name="stopwatch" />
                         <Text variant="primary">{printDate(c.date)}</Text>
                       </Row>
                       {/* {c.notes && (
