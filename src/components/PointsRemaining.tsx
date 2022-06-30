@@ -10,7 +10,6 @@ export const PointsRemaining = ({
   runningPoints: number
 }) => {
   const pointsRemaining = settings.points - (runningPoints ?? 0)
-  console.log({ pointsRemaining })
   return (
     <Row as={Text} spacing="xs">
       <Text variant="primary">{pointsRemaining}</Text>

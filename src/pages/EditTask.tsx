@@ -156,7 +156,6 @@ const EditTask = ({
             icon="calendar"
             title="Schedule"
             onPress={() => {
-              console.log({ defaultDateTime })
               setField('scheduled')(defaultDateTime)
             }}
           />

@@ -59,10 +59,9 @@ const TagPicker = ({
             }}
             style={{ color: theme.colors.placeholderText }}
             options={[{ label: placeholderText, value: '' }, ...tagOptions]}
-            onValueChange={tag => {
+            onValueChange={tag =>
               tag && setSelected(currentTags => [...currentTags, tag])
-              console.log({ tag, selected })
-            }}
+            }
           />
         </TagList>
       </View>
