@@ -25,16 +25,18 @@ export const useForm = <T extends { [k: string]: any }>(
     setField:
       <K extends keyof T>(key: K) =>
       (value: T[K]) => {
-        setForm(currentForm => onSet({ ...currentForm, [key]: value }))
+        setForm(onSet({ ...form, [key]: value }))
       },
   }
 }
 
-export const useFlags = () => {
-  const [state, setState] = useState<{ [k: string]: boolean }>({})
+type FlagState<T extends string> = Partial<{ [k in T]: boolean }>
+
+export const useFlags = <T extends string>(initialState: FlagState<T> = {}) => {
+  const [state, setState] = useState<FlagState<T>>(initialState)
 
   return {
-    isSet: (x: string) => !!state[x],
-    toggle: (x: string) => setState(p => ({ ...p, [x]: !p[x] })),
+    isSet: (x: T) => !!state[x],
+    toggle: (x: T) => setState(p => ({ ...p, [x]: !p[x] })),
   }
 }

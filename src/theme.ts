@@ -10,8 +10,8 @@ const palette = {
   grey5: '#414141', // dark placeholder text (actual inverse of light mode: 616161)
   grey6: '#2c2c2c', // dark underline
 
-  lightOffBlack: '#1d1d1d',
-  offBlack: '#101010', // '#0d0d0d',
+  lightOffBlack: '#222222', // '#1d1d1d',
+  offBlack: '#131313', // '#101010' // '#0d0d0d',
   black: '#000000',
 
   accent: 'teal',

@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
+import { View } from 'react-native'
 import { useTheme } from '@emotion/react'
 import { mapValues, negate, isEqual } from 'lodash'
-import { useForm } from '../hooks'
+import { useForm, useFlags } from '../hooks'
 import { Theme } from '../theme'
-import { FilterWithCompletions } from '../types'
+import { FilterWithCompletions, DateTime } from '../types'
 import {
   SpacedList,
   Row,
@@ -14,7 +15,10 @@ import {
   TextInput,
   Section,
   Picker,
+  Text,
+  Spacer,
 } from '.'
+// import DateTimeInput from './DateTimeInput'
 import TagPicker from './TagPicker'
 import {
   isRecurring,
@@ -23,6 +27,16 @@ import {
   isUpcoming,
   isActive,
 } from '../redux/filters'
+import { priorityOptions } from '../utils'
+import NumberInput from './NumberInput'
+import { Switch } from 'react-native-gesture-handler'
+
+type BucketState = 'include' | 'exclude' | 'only'
+const nextBucketState: { [k in BucketState]: BucketState } = {
+  include: 'only',
+  exclude: 'include',
+  only: 'include',
+}
 
 /**
  * an icon button with different styling depending on whether the filter it's
@@ -62,6 +76,15 @@ type FilterState = {
   }
   completion: 'upcoming' | 'completed' | 'todo' | 'partial' | 'all'
   recurrence: 'recurring' | 'once' | 'all'
+  priority: [number, number]
+  points: {
+    range: [number, number]
+    buckets: BucketState
+  }
+  // date: {
+  //   type: 'scheduled' | 'deadline'
+  //   range: [DateTime?, DateTime?]
+  // }
 }
 
 /**
@@ -118,22 +141,25 @@ const filterWidgets: {
   },
   tags: {
     component: ({ state, onChangeState }) => (
-      <SpacedList spacing="s">
-        <TagPicker
-          icon="plus"
-          value={state.include}
-          onChange={include => onChangeState({ ...state, include })}
-          excludeTags={state.exclude}
-          placeholderText="Include tags..."
-        />
-        <TagPicker
-          icon="minus"
-          value={state.exclude}
-          onChange={exclude => onChangeState({ ...state, exclude })}
-          excludeTags={state.include}
-          placeholderText="Exclude tags..."
-        />
-      </SpacedList>
+      <Row>
+        <Icon name="tag" />
+        <SpacedList spacing="s" style={{ flex: 1 }}>
+          <TagPicker
+            icon="plus"
+            value={state.include}
+            onChange={include => onChangeState({ ...state, include })}
+            excludeTags={state.exclude}
+            placeholderText="Include tags..."
+          />
+          <TagPicker
+            icon="minus"
+            value={state.exclude}
+            onChange={exclude => onChangeState({ ...state, exclude })}
+            excludeTags={state.include}
+            placeholderText="Exclude tags..."
+          />
+        </SpacedList>
+      </Row>
     ),
     mapStateToFilters: ({ include, exclude }) => [
       task => include.every(id => task.tagIds.includes(id)),
@@ -193,16 +219,139 @@ const filterWidgets: {
         : [],
     emptyState: 'all',
   },
+  priority: {
+    component: ({ state, onChangeState }) => (
+      <Row spacing="s">
+        <Icon name="flag" />
+        <Picker
+          options={priorityOptions.filter(({ value }) => value <= state[1])}
+          selectedValue={state[0]}
+          onValueChange={value => onChangeState([value, state[1]])}
+        />
+        <Text>–</Text>
+        <Picker
+          options={priorityOptions.filter(({ value }) => value >= state[0])}
+          selectedValue={state[1]}
+          onValueChange={value => onChangeState([state[0], value])}
+        />
+      </Row>
+    ),
+    mapStateToFilters: range => [
+      task =>
+        task.settings.priority >= range[0] &&
+        task.settings.priority <= range[1],
+    ],
+    emptyState: [-2, 2],
+  },
+  points: {
+    component: ({ state, onChangeState }) => (
+      <Row spacing="s">
+        <Icon name="star" style={{ flex: 0 }} />
+        <Row style={{ flex: 2 }}>
+          <NumberInput
+            style={{ flex: 1 }}
+            value={state.range[0]}
+            onChangeText={value => {
+              onChangeState({
+                ...state,
+                range: [value, Math.max(value, state.range[1])],
+              })
+            }}
+            maxValue={state.range[1]}
+          />
+          <Text>–</Text>
+          <NumberInput
+            style={{ flex: 1 }}
+            value={state.range[1]}
+            minValue={state.range[0]}
+            onChangeText={value =>
+              onChangeState({
+                ...state,
+                range: [Math.min(value, state.range[0]), value],
+              })
+            }
+          />
+        </Row>
+        <Spacer size="l" />
+        <Row>
+          <IconButton
+            name="archive"
+            variant={state.buckets === 'only' ? 'primary' : 'default'}
+            color={state.buckets === 'exclude' ? 'text' : 'accent'}
+            onPress={() =>
+              onChangeState({
+                ...state,
+                buckets: nextBucketState[state.buckets],
+              })
+            }
+          />
+          <Switch
+            value={state.buckets !== 'exclude'}
+            onValueChange={value =>
+              onChangeState({
+                ...state,
+                buckets: value ? 'include' : 'exclude',
+              })
+            }
+          />
+        </Row>
+      </Row>
+    ),
+    mapStateToFilters: state => [
+      task => {
+        switch (state.buckets) {
+          case 'exclude':
+            return 'points' in task.settings
+          case 'only':
+            return !('points' in task.settings)
+          default:
+            return true
+        }
+      },
+      task =>
+        !('points' in task.settings) ||
+        task.settings.points >= (state.range[0] ?? -Infinity),
+      task =>
+        !('points' in task.settings) ||
+        task.settings.points <= (state.range[1] ?? Infinity),
+    ],
+    emptyState: { range: [1, 50], buckets: 'include' },
+  },
+  // date: {
+  //   component: ({ theme, state, onChangeState }) => (
+  //     <Row>
+  //       <Icon name="repeat" />
+  //       <DateTimeInput
+  //         clearable
+  //         icon={state.type === 'deadline' ? 'alert-circle' : 'calendar'}
+  //         value={state.range[0]}
+  //         onChange={value =>
+  //           onChangeState({ ...state, range: [value, state.range[1]] })
+  //         }
+  //       />
+  //       <DateTimeInput
+  //         clearable
+  //         icon={state.type === 'deadline' ? 'alert-circle' : 'calendar'}
+  //         value={state.range[1]}
+  //         onChange={value =>
+  //           onChangeState({ ...state, range: [state.range[0], value] })
+  //         }
+  //       />
+  //     </Row>
+  //   ),
+  //   mapStateToFilters: state => [],
+  //   emptyState: { type: 'scheduled', range: [] },
+  // },
 }
 
 const filterIcons: { icon: string; key: keyof FilterState }[] = [
   { key: 'search', icon: 'search' },
-  { key: 'tags', icon: 'tag' },
-  // { key: 'priority', icon: 'flag' },
-  // { key: 'date', icon: 'calendar' },
-  // { key: 'points', icon: 'star' },
   { key: 'completion', icon: 'check-circle' },
+  { key: 'points', icon: 'star' },
   { key: 'recurrence', icon: 'repeat' },
+  { key: 'tags', icon: 'tag' },
+  { key: 'priority', icon: 'flag' },
+  // { key: 'date', icon: 'calendar' },
 ]
 
 const filterIsActive = (state: FilterState, key: keyof FilterState): boolean =>
@@ -217,9 +366,10 @@ type FilterControlsProps = {
 }
 const FilterControls = ({ onChangeFilters }: FilterControlsProps) => {
   const theme = useTheme()
-  const [selectedFilter, setSelectedFilter] = useState<
-    keyof FilterState | undefined
-  >('search')
+  const { isSet: isOpen, toggle } = useFlags<keyof FilterState>({
+    search: true,
+  })
+
   const { form, setField } = useForm<FilterState>(
     mapValues(filterWidgets, x => x.emptyState) as FilterState
   )
@@ -231,17 +381,25 @@ const FilterControls = ({ onChangeFilters }: FilterControlsProps) => {
     onChangeFilters(filters)
   }, [form])
 
-  const renderFilterComponent = () => {
-    if (!selectedFilter) return null
-    const FilterComponent = getFilterWidget(selectedFilter).component
-    return (
-      <FilterComponent
-        theme={theme}
-        state={form[selectedFilter] as FilterState[typeof selectedFilter]}
-        onChangeState={setField(selectedFilter)}
-      />
-    )
-  }
+  const renderFilterComponents = () =>
+    filterIcons.map(({ key }) => {
+      if (!isOpen(key)) return null
+      const FilterComponent = getFilterWidget(key).component
+      return (
+        <View
+          key={key + JSON.stringify(form[key])}
+          style={{
+            minHeight: theme.sizes.buttonHeight,
+            justifyContent: 'center',
+          }}>
+          <FilterComponent
+            theme={theme}
+            state={form[key]}
+            onChangeState={setField(key)}
+          />
+        </View>
+      )
+    })
 
   return (
     <Section
@@ -255,26 +413,22 @@ const FilterControls = ({ onChangeFilters }: FilterControlsProps) => {
       <SpacedList as={Card}>
         <Row>
           <Icon name="filter" />
-          <Row style={{ flex: 1 /*justifyContent: 'space-evenly'*/ }}>
+          <Row style={{ flex: 1, justifyContent: 'space-evenly' }}>
             {filterIcons.map(({ key, icon }) => (
               <FilterButton
                 key={key}
-                isSelected={selectedFilter === key}
+                isSelected={isOpen(key)}
                 isActive={filterIsActive(form, key)}
                 name={icon}
-                onPress={() =>
-                  setSelectedFilter(currentFilter =>
-                    currentFilter === key ? undefined : key
-                  )
-                }
-                onLongPress={() =>
+                onPress={() => toggle(key)}
+                onLongPress={() => {
                   setField(key)(getFilterWidget(key).emptyState)
-                }
+                }}
               />
             ))}
           </Row>
         </Row>
-        {renderFilterComponent()}
+        {renderFilterComponents()}
       </SpacedList>
     </Section>
   )
