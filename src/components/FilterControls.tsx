@@ -366,9 +366,7 @@ type FilterControlsProps = {
 }
 const FilterControls = ({ onChangeFilters }: FilterControlsProps) => {
   const theme = useTheme()
-  const { isSet: isOpen, toggle } = useFlags<keyof FilterState>({
-    search: true,
-  })
+  const { isSet: isOpen, toggle } = useFlags<keyof FilterState>(['search'])
 
   const { form, setField } = useForm<FilterState>(
     mapValues(filterWidgets, x => x.emptyState) as FilterState

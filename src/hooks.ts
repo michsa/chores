@@ -5,6 +5,7 @@ import {
   useSelector as baseUseSelector,
 } from 'react-redux'
 import type { State, Dispatch } from './redux/store'
+import { mapToObject } from './utils'
 
 export const useDispatch = () => baseUseDispatch<Dispatch>()
 export const useStateSelector: TypedUseSelectorHook<State> = baseUseSelector
@@ -32,11 +33,24 @@ export const useForm = <T extends { [k: string]: any }>(
 
 type FlagState<T extends string> = Partial<{ [k in T]: boolean }>
 
-export const useFlags = <T extends string>(initialState: FlagState<T> = {}) => {
-  const [state, setState] = useState<FlagState<T>>(initialState)
+export const useFlags = <T extends string>(initialState: T[] = []) => {
+  const [state, setState] = useState<FlagState<T>>(
+    mapToObject(
+      initialState,
+      x => x,
+      () => true
+    )
+  )
 
   return {
     isSet: (x: T) => !!state[x],
     toggle: (x: T) => setState(p => ({ ...p, [x]: !p[x] })),
+    enabled: (Object.entries(state) as [T, boolean][]).reduce(
+      (xs, [x, isSet]) => {
+        if (isSet) xs.push(x)
+        return xs
+      },
+      [] as T[]
+    ),
   }
 }

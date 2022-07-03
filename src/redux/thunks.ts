@@ -2,6 +2,7 @@ import { find } from 'lodash'
 import { actions as tasks } from './slices/tasks'
 import { actions as tags } from './slices/tags'
 import { actions as completions } from './slices/completions'
+import { actions as pins } from './slices/pins'
 import {
   TaskSettings,
   TaskSettingsInput,
@@ -14,6 +15,13 @@ import {
 } from '../types'
 import { getTask } from './selectors'
 import { Thunk } from './store'
+
+export const savePins =
+  (pinsToSave: TaskID[]): Thunk =>
+  dispatch => {
+    console.log(`savePins ${pinsToSave}`)
+    dispatch(pins.save(pinsToSave))
+  }
 
 export const deleteTask =
   (id: TaskID): Thunk =>

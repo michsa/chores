@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view'
 import { Pressable } from 'react-native'
 import { useTheme } from '@emotion/react'
@@ -13,13 +13,13 @@ import {
   Row,
   SpacedList,
   Button,
-  Divider,
 } from '../components'
 import PointsRemaining from '../components/PointsRemaining'
 import FilterControls from '../components/FilterControls'
-import { useSelector, useFlags } from '../hooks'
+import { useSelector, useFlags, useDispatch } from '../hooks'
 import { getOrderedTasks } from '../redux/selectors'
 import { isCompleted } from '../redux/filters'
+import { savePins } from '../redux/thunks'
 import {
   NavigationProps,
   DateTime,
@@ -69,10 +69,16 @@ const LastCompletionSection = ({
 }
 
 const TaskList = ({ navigation }: NavigationProps['taskList']) => {
+  const dispatch = useDispatch()
+
   const [filters, setFilters] = useState<FilterWithCompletions[]>([])
   const tasks = useSelector(getOrderedTasks, filters)
+
+  // pinned tasks stick to the top of the task list
+  const pins = useSelector(state => state.pins)
+  const { isSet: isPinned, toggle: togglePin, enabled } = useFlags(pins)
+
   const theme = useTheme()
-  const { isSet: isPinned, toggle: togglePin } = useFlags()
 
   const sortedTasks = sortBy(
     tasks,
@@ -123,7 +129,8 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
             onPress={() => navigation.navigate('viewTask', { id: item.id })}
             onLongPress={() => {
               togglePin(item.id)
-              console.log(ref.current)
+              dispatch(savePins(enabled))
+              // console.log(ref.current)
               // @ts-ignore
               ref.current.scrollToPosition(0, 0, true)
             }}>
