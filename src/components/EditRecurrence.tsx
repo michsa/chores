@@ -1,21 +1,21 @@
 import React, { useEffect } from 'react'
 import { View, ViewStyle } from 'react-native'
 import { Picker } from '../components'
-import { Frequency, Recurrence } from '../types'
+import { Frequency, Interval } from '../types'
 import { useForm } from '../hooks'
 import { frequencyOptions, maybePlural } from '../utils'
 import NumberInput from './NumberInput'
 
 const EditRecurrence = ({
-  value = { frequency: Frequency.WEEK, interval: 1 },
+  value = { frequency: Frequency.WEEK, count: 1 },
   style = {},
   onChange,
 }: {
-  value?: Recurrence
+  value?: Interval
   style?: ViewStyle
-  onChange: (r: Recurrence) => void
+  onChange: (r: Interval) => void
 }) => {
-  const { form, setField } = useForm<Recurrence>(value)
+  const { form, setField } = useForm<Interval>(value)
 
   useEffect(() => {
     onChange(form)
@@ -30,7 +30,7 @@ const EditRecurrence = ({
       }}>
       <NumberInput
         style={{ flex: 1 }}
-        value={form.interval}
+        value={form.count}
         minValue={1}
         onChangeText={setField('interval')}
       />
@@ -40,7 +40,7 @@ const EditRecurrence = ({
         onValueChange={setField('frequency')}
         options={frequencyOptions.map(option => ({
           ...option,
-          label: maybePlural(option.label, form.interval),
+          label: maybePlural(option.label, form.count),
         }))}
       />
     </View>

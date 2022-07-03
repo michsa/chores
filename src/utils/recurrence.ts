@@ -1,18 +1,18 @@
 import { add, sub } from 'date-fns'
-import { Recurrence, DateTime } from '../types'
+import { Interval, DateTime } from '../types'
 import { frequencyLabel } from './frequency'
 import { toDate, toDateTime } from './datetime'
 import { maybePlural } from './misc'
 
-const recurrenceToDuration = (r: Recurrence) => ({
-  [frequencyLabel(r.frequency) + 's']: r.interval,
+const intervalToDuration = (r: Interval) => ({
+  [frequencyLabel(r.frequency) + 's']: r.count,
 })
 
-export const addRecurrence = (r: Recurrence, date: DateTime) =>
-  toDateTime(add(toDate(date), recurrenceToDuration(r)), !!date.time)
+export const addInterval = (r: Interval, date: DateTime) =>
+  toDateTime(add(toDate(date), intervalToDuration(r)), !!date.time)
 
-export const subRecurrence = (r: Recurrence, date: DateTime) =>
-  toDateTime(sub(toDate(date), recurrenceToDuration(r)), !!date.time)
+export const subInterval = (r: Interval, date: DateTime) =>
+  toDateTime(sub(toDate(date), intervalToDuration(r)), !!date.time)
 
-export const printRecurrence = (r: Recurrence) =>
-  `${r.interval} ${maybePlural(frequencyLabel(r.frequency)!, r.interval)}`
+export const printInterval = (r: Interval) =>
+  `${r.count} ${maybePlural(frequencyLabel(r.frequency)!, r.count)}`

@@ -28,9 +28,9 @@ import {
 } from '../types'
 import {
   toDateTime,
-  addRecurrence,
+  addInterval,
   toDate,
-  printRecurrence,
+  printInterval,
   printDate,
 } from '../utils'
 
@@ -60,7 +60,7 @@ const calcDefaultNextDate = (
     ],
     r => r && toDate(r)
   )!
-  return addRecurrence(settings.recurrence, recurrenceBasis)
+  return addInterval(settings.recurrence, recurrenceBasis)
 }
 
 const CompleteTask = ({
@@ -199,7 +199,7 @@ const CompleteTask = ({
               <Row style={{ marginLeft: theme.spacing.s }}>
                 <Icon size="small" color="placeholderText" name="repeat" />
                 <Text color="placeholderText">
-                  {printRecurrence(task.settings.recurrence)}
+                  {printInterval(task.settings.recurrence)}
                 </Text>
               </Row>
             </View>

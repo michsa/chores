@@ -12,7 +12,7 @@ import {
   differenceInWeeks,
 } from 'date-fns'
 import { Frequency, DateTime, Task } from '../types'
-import { subRecurrence } from './recurrence'
+import { subInterval } from './recurrence'
 import { frequencyClampFunctions } from './frequency'
 
 export const parseValue = (
@@ -84,9 +84,7 @@ export const scheduledDate = (task: Task) =>
   task.settings.scheduled
     ? toDate(task.settings.scheduled)
     : task.settings.deadline
-    ? toDate(
-        subRecurrence(task.settings.deadlineWarning, task.settings.deadline)
-      )
+    ? toDate(subInterval(task.settings.deadlineWarning, task.settings.deadline))
     : new Date(task.createdAt)
 
 export const printDate = (date: number | DateTime) => {

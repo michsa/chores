@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from '../hooks'
 import { deleteTask } from '../redux/thunks'
 import { getTaskWithTags, getTaskCompletions } from '../redux/selectors'
 import { NavigationProps } from '../types'
-import { priorityLabel, printRecurrence, printDate, toDate } from '../utils'
+import { priorityLabel, printInterval, printDate, toDate } from '../utils'
 
 const ViewTask = ({
   navigation,
@@ -107,14 +107,14 @@ const ViewTask = ({
                 <Row>
                   <Icon size="small" name="calendar" />
                   <Text>
-                    {printRecurrence(task.settings.deadlineWarning)} before
+                    {printInterval(task.settings.deadlineWarning)} before
                   </Text>
                 </Row>
               )}
               {!!task.settings.isRecurring && (
                 <Row>
                   <Icon size="small" name="repeat" />
-                  <Text>after {printRecurrence(task.settings.recurrence)}</Text>
+                  <Text>after {printInterval(task.settings.recurrence)}</Text>
                 </Row>
               )}
             </SpacedList>

@@ -16,7 +16,7 @@ import { SpacedList, Text, Card, Row } from '../components'
 import { useSelector } from '../hooks'
 import { getCompletionsWithTasks } from '../redux/selectors'
 import { toDate, clampDateTime, printDate } from '../utils'
-import { Completion, CompletionWithTask, Recurrence, Frequency } from '../types'
+import { Completion, CompletionWithTask, Interval, Frequency } from '../types'
 
 const TEST_TAG = 'tag-test-1652406724046'
 

@@ -12,9 +12,9 @@ export enum Frequency {
 }
 export type FrequencyLabel = 'day' | 'week' | 'month' | 'year'
 
-export type Recurrence = {
+export type Interval = {
   frequency: Frequency
-  interval: number
+  count: number
 }
 
 /**
