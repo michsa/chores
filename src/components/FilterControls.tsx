@@ -387,7 +387,7 @@ const FilterControls = ({ onChangeFilters }: FilterControlsProps) => {
       const FilterComponent = getFilterWidget(key).component
       return (
         <View
-          key={key + JSON.stringify(form[key])}
+          key={key}
           style={{
             minHeight: theme.sizes.buttonHeight,
             justifyContent: 'center',
