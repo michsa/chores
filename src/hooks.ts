@@ -26,7 +26,8 @@ export const useForm = <T extends { [k: string]: any }>(
     setField:
       <K extends keyof T>(key: K) =>
       (value: T[K]) => {
-        setForm(onSet({ ...form, [key]: value }))
+        console.log(`setField`, { [key]: value })
+        setForm(form => onSet({ ...form, [key]: value }))
       },
   }
 }
