@@ -15,6 +15,7 @@ import {
 } from '../components'
 import TagList from '../components/TagList'
 import PointsRemaining from '../components/PointsRemaining'
+import BucketSize from '../components/BucketSize'
 import { useDispatch, useSelector } from '../hooks'
 import { deleteTask } from '../redux/thunks'
 import { getTaskWithTags, getTaskCompletions } from '../redux/selectors'
@@ -64,15 +65,33 @@ const ViewTask = ({
   return (
     <ScrollView>
       <SpacedList style={{ margin: theme.spacing.s }}>
-        <ViewCard>
+        <Row spacing="l" as={ViewCard}>
+          {task.settings.type === 'bucket' && (
+            <Icon
+              name="archive"
+              color="primaryText"
+              style={{
+                backgroundColor: theme.colors.highlight,
+                borderRadius: theme.spacing.xl,
+                paddingVertical: theme.spacing.xs + theme.spacing.xxs,
+                paddingHorizontal: theme.spacing.s,
+                marginVertical: -theme.spacing.xs,
+                marginHorizontal: -theme.spacing.xs,
+              }}
+            />
+          )}
           <Text variant="primary" size="large">
             {task.settings.name}
           </Text>
-        </ViewCard>
+        </Row>
         <Row>
           <Row as={ViewCard} style={{ flex: 2 }}>
             <Icon name="star" />
-            <PointsRemaining {...task} />
+            {task.settings.type === 'bucket' ? (
+              <BucketSize {...task.settings} />
+            ) : (
+              <PointsRemaining {...task} />
+            )}
           </Row>
           <Row as={ViewCard} style={{ flex: 3 }}>
             <Icon name="flag" />
@@ -111,10 +130,10 @@ const ViewTask = ({
                   </Text>
                 </Row>
               )}
-              {!!task.settings.isRecurring && (
+              {task.settings.type === 'recurring' && (
                 <Row>
                   <Icon size="small" name="repeat" />
-                  <Text>after {printInterval(task.settings.recurrence)}</Text>
+                  <Text>after {printInterval(task.settings.interval)}</Text>
                 </Row>
               )}
             </SpacedList>
@@ -133,6 +152,8 @@ const ViewTask = ({
           </Card>
         )}
 
+        <Text>{JSON.stringify(task.settings, null, 2)}</Text>
+
         {completions.length && (
           <SpacedList>
             <Divider size="xs" />
@@ -150,44 +171,33 @@ const ViewTask = ({
               </Text>
             </Row>
 
-            {reverse(sortBy(completions, c => toDate(c.date))).map(c => {
-              // const [expanded, setExpanded] = useState(false)
-              return (
-                <SpacedList key={c.id} as={Card}>
-                  <Row style={{ minHeight: theme.iconSizes.xxlarge }}>
-                    <Row style={{ flex: 1 }} spacing="l">
-                      <Icon
-                        name={c.isFull ? 'check-circle' : 'circle'}
-                        color={c.isFull ? 'primaryText' : 'primaryText'}
-                      />
-                      <Row>
-                        <Icon size="small" name="star" />
-                        <Text variant="primary">{c.points}</Text>
-                      </Row>
-                      <Row>
-                        <Icon size="small" name="stopwatch" />
-                        <Text variant="primary">{printDate(c.date)}</Text>
-                      </Row>
-                      {/* {c.notes && (
-                    <IconButton
-                      size="small"
-                      name={expanded ? 'chevron-down' : 'chevron-right'}
-                      color={c.notes ? 'text' : 'foreground'}
-                      onPress={() => setExpanded(x => !x)}
+            {reverse(sortBy(completions, c => toDate(c.date))).map(c => (
+              <SpacedList key={c.id} as={Card}>
+                <Row style={{ minHeight: theme.iconSizes.xxlarge }}>
+                  <Row style={{ flex: 1 }} spacing="l">
+                    <Icon
+                      name={c.isFull ? 'check-circle' : 'circle'}
+                      color={c.isFull ? 'primaryText' : 'primaryText'}
                     />
-                  )} */}
+                    <Row>
+                      <Icon size="small" name="star" />
+                      <Text variant="primary">{c.points}</Text>
                     </Row>
-                    {/* <IconButton
-                  size="small"
-                  name="edit-2"
-                  color="text"
-                  containerStyle={{ marginRight: -theme.spacing.xs }}
-                /> */}
+                    <Row>
+                      <Icon size="small" name="stopwatch" />
+                      <Text variant="primary">{printDate(c.date)}</Text>
+                    </Row>
                   </Row>
-                  {c.notes && <Text>{c.notes}</Text>}
-                </SpacedList>
-              )
-            })}
+                  <IconButton
+                    size="small"
+                    name="edit-2"
+                    color="text"
+                    containerStyle={{ marginRight: -theme.spacing.xs }}
+                  />
+                </Row>
+                {c.notes && <Text>{c.notes}</Text>}
+              </SpacedList>
+            ))}
           </SpacedList>
         )}
       </SpacedList>

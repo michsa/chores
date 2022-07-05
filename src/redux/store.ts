@@ -7,6 +7,7 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
+  createMigrate,
 } from 'redux-persist'
 import {
   configureStore,
@@ -25,6 +26,14 @@ import { reducer as pins } from './slices/pins'
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
+  version: 1,
+  migrate: createMigrate(
+    {
+      // @ts-ignore types for redux-persist migrations are busted https://github.com/rt2zz/redux-persist/issues/1065
+      2: (state: State) => state,
+    },
+    { debug: true }
+  ),
 }
 
 const reducer = combineReducers({ tasks, completions, tags, categories, pins })

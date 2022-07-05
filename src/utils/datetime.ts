@@ -6,13 +6,12 @@ import {
   isTomorrow,
   isYesterday,
   differenceInDays,
-  formatRelative,
   differenceInYears,
   differenceInMonths,
   differenceInWeeks,
 } from 'date-fns'
 import { Frequency, DateTime, Task } from '../types'
-import { subInterval } from './recurrence'
+import { subInterval } from './interval'
 import { frequencyClampFunctions } from './frequency'
 
 export const parseValue = (

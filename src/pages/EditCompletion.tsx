@@ -50,7 +50,7 @@ const calcDefaultNextDate = (
   settings: TaskSettings,
   completionDate: DateTime
 ) => {
-  if (!settings.isRecurring) return undefined
+  if (settings.type !== 'recurring') return undefined
 
   const scheduleOrDeadline = settings.scheduled ?? settings.deadline
   const recurrenceBasis = maxBy(
@@ -60,7 +60,7 @@ const calcDefaultNextDate = (
     ],
     r => r && toDate(r)
   )!
-  return addInterval(settings.recurrence, recurrenceBasis)
+  return addInterval(settings.interval, recurrenceBasis)
 }
 
 const CompleteTask = ({
@@ -162,7 +162,7 @@ const CompleteTask = ({
           </Row>
         </Pressable>
       </Row>
-      {form.isFull && task.settings.isRecurring && (
+      {form.isFull && task.settings.type === 'recurring' && (
         <SpacedList as={Card}>
           <Row spacing="m" style={{ alignItems: 'flex-end' }}>
             <Text style={{ flex: 0 }}>
@@ -199,7 +199,7 @@ const CompleteTask = ({
               <Row style={{ marginLeft: theme.spacing.s }}>
                 <Icon size="small" color="placeholderText" name="repeat" />
                 <Text color="placeholderText">
-                  {printInterval(task.settings.recurrence)}
+                  {printInterval(task.settings.interval)}
                 </Text>
               </Row>
             </View>

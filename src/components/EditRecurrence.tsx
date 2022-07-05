@@ -32,7 +32,7 @@ const EditRecurrence = ({
         style={{ flex: 1 }}
         value={form.count}
         minValue={1}
-        onChangeText={setField('interval')}
+        onChangeText={setField('count')}
       />
       <Picker
         containerStyle={{ flexGrow: 3, marginLeft: 8 }}

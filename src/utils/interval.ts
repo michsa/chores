@@ -14,5 +14,6 @@ export const addInterval = (r: Interval, date: DateTime) =>
 export const subInterval = (r: Interval, date: DateTime) =>
   toDateTime(sub(toDate(date), intervalToDuration(r)), !!date.time)
 
-export const printInterval = (r: Interval) =>
-  `${r.count} ${maybePlural(frequencyLabel(r.frequency)!, r.count)}`
+export const printInterval = (r: Interval, alwaysShowCount: boolean = true) =>
+  (alwaysShowCount || r.count > 1 ? `${r.count} ` : '') +
+  maybePlural(frequencyLabel(r.frequency)!, r.count)

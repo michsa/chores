@@ -14,7 +14,7 @@ export type FrequencyLabel = 'day' | 'week' | 'month' | 'year'
 
 export type Interval = {
   frequency: Frequency
-  interval: number
+  count: number
 }
 
 /**

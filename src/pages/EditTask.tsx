@@ -7,7 +7,12 @@ import { sub } from 'date-fns'
 import { useDispatch, useForm, useSelector } from '../hooks'
 import { upsertTask } from '../redux/thunks'
 import { getTaskWithTags } from '../redux/selectors'
-import { TaskSettingsInput, Frequency, NavigationProps } from '../types'
+import {
+  TaskSettings,
+  TaskSettingsInput,
+  Frequency,
+  NavigationProps,
+} from '../types'
 import { priorityOptions, toDateTime } from '../utils'
 import {
   Text,
@@ -28,23 +33,21 @@ import DateTimeInput from '../components/DateTimeInput'
 
 type PartialTaskSettingsInput = Omit<TaskSettingsInput, 'points'> & {
   points?: number
-  isBucket?: boolean
 }
 
 const defaultDateTime = toDateTime(new Date())
 
-const defaultRecurrence = { frequency: Frequency.WEEK, interval: 1 }
+const defaultInterval = { frequency: Frequency.WEEK, interval: 1, count: 1 }
 
 const defaultSetings: PartialTaskSettingsInput = {
   name: '',
   points: undefined,
   priority: 0,
-  isRecurring: true,
-  recurrence: defaultRecurrence,
-  deadlineWarning: defaultRecurrence,
+  type: 'once',
+  interval: defaultInterval,
+  deadlineWarning: defaultInterval,
   description: '',
   tagNames: [],
-  isBucket: false,
 }
 
 const useTaskIfExists = (id?: string): PartialTaskSettingsInput => {
@@ -53,40 +56,31 @@ const useTaskIfExists = (id?: string): PartialTaskSettingsInput => {
     ? {
         ...task.settings,
         tagNames: task.tags.map(tag => tag?.name),
-        isBucket: 'points' in task.settings,
       }
     : defaultSetings
 }
 
 const validate = (form: PartialTaskSettingsInput): TaskSettingsInput => {
   if (!form.name) throw Error('Task must have a name')
-  if (!form.points && !form.isBucket)
-    throw Error('Non-bucket task must have points')
+  if (!form.points) throw Error('Task must have points')
 
-  delete form.isBucket
   return form as TaskSettingsInput
 }
 
 const cleanup = (form: PartialTaskSettingsInput) => {
-  if (!!form.points) {
-    form.isBucket = false
-  }
-  if (form.isBucket) {
+  if (form.type === 'bucket') {
     delete form.scheduled
     delete form.deadline
-    delete form.points
   }
-
   if (!form.deadline) {
     delete form.deadlineWarning
   }
-  if (!form.scheduled && !form.deadline) {
-    form.isRecurring = false
+  if (form.type === 'recurring' && !form.scheduled && !form.deadline) {
+    form.type = 'once'
   }
-  if (!form.isRecurring) {
-    delete form.recurrence
+  if (form.type === 'once') {
+    delete form.interval
   }
-
   return form
 }
 
@@ -101,6 +95,12 @@ const EditTask = ({
     settings,
     cleanup
   )
+
+  const toggleBucket = (shouldSet = form.type !== 'bucket') =>
+    setField('type')(shouldSet ? 'bucket' : 'once')
+
+  const toggleRecurring = (shouldSet = form.type !== 'recurring') =>
+    setField('type')(shouldSet ? 'recurring' : 'once')
 
   const onSubmit = () => {
     console.log('onSubmit', form)
@@ -145,36 +145,41 @@ const EditTask = ({
           onChangeText={setField('name')}
         />
       </Card>
-      <Row>
-        <Row as={Card} style={{ flex: 1 }}>
-          <Icon name="star" />
-          <NumberInput
-            placeholder="Points"
-            style={{ flex: 1 }}
-            maxValue={50}
-            value={form.points}
-            onChangeText={value => {
-              setField('points')(value)
-              // if (!!value) setField('isBucket')(false)
-            }}
-          />
-        </Row>
-        {!form.points && (
-          <Pressable
-            style={{ flex: 1 }}
-            onPress={() => setField('isBucket')(!form.isBucket)}>
-            <Row as={Card}>
-              <Icon size="small" name="archive" />
-              <Text style={{ flex: 1 }}>Bucket?</Text>
+      <SpacedList as={Card}>
+        <Row spacing="xl">
+          <Row style={{ flex: 1 }}>
+            <Icon name="star" />
+            <NumberInput
+              placeholder="Points"
+              style={{ flex: 1 }}
+              maxValue={50}
+              value={form.points}
+              onChangeText={setField('points')}
+            />
+          </Row>
+          <Pressable onPress={() => toggleBucket()}>
+            <Row style={{ flex: 1 }}>
+              <Icon size="regular" name="archive" />
+              <Text>Bucket?</Text>
               <Switch
                 style={{ height: theme.sizes.inputHeight - theme.spacing.s }}
-                value={form.isBucket}
-                onValueChange={setField('isBucket')}
+                value={form.type === 'bucket'}
+                onValueChange={toggleBucket}
               />
             </Row>
           </Pressable>
+        </Row>
+        {form.type === 'bucket' && (
+          <Row>
+            <Icon size="small" name="calendar" />
+            <Text>per</Text>
+            <EditRecurrence
+              value={form.interval}
+              onChange={setField('interval')}
+            />
+          </Row>
         )}
-      </Row>
+      </SpacedList>
 
       <Row as={Card} style={{ flex: 3 }}>
         <Icon name="flag" />
@@ -187,7 +192,7 @@ const EditTask = ({
 
       <TagsInput value={form.tagNames} onUpdate={setField('tagNames')} />
 
-      {!form.scheduled && !form.deadline && !form.isBucket && (
+      {!form.scheduled && !form.deadline && form.type !== 'bucket' && (
         <Row style={{ padding: theme.spacing.s }} spacing="m">
           <Button
             style={{ flex: 1 }}
@@ -237,20 +242,22 @@ const EditTask = ({
           )}
           <Row>
             <Icon size="small" name="repeat" />
-            <Text>{form.isRecurring ? 'Repeat after' : 'Do not repeat'}</Text>
-            {form.isRecurring && (
+            <Text>
+              {form.type === 'recurring' ? 'Repeat after' : 'Do not repeat'}
+            </Text>
+            {form.type === 'recurring' && (
               <EditRecurrence
-                value={form.recurrence}
-                onChange={setField('recurrence')}
+                value={form.interval}
+                onChange={setField('interval')}
               />
             )}
             <Pressable
               style={{ flex: 1, paddingLeft: theme.spacing.xl }}
-              onPress={() => setField('isRecurring')(!form.isRecurring)}>
+              onPress={() => toggleRecurring()}>
               <Switch
                 style={{ height: theme.sizes.inputHeight - theme.spacing.s }}
-                value={form.isRecurring}
-                onValueChange={setField('isRecurring')}
+                value={form.type === 'recurring'}
+                onValueChange={toggleRecurring}
               />
             </Pressable>
           </Row>

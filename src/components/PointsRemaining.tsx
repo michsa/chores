@@ -1,5 +1,5 @@
 import React from 'react'
-import { Task, TaskSettings } from '../types'
+import { TaskSettings } from '../types'
 import { Row, Text, Icon } from '.'
 
 export const PointsRemaining = ({
@@ -9,15 +9,8 @@ export const PointsRemaining = ({
   settings: TaskSettings
   runningPoints: number
 }) => {
-  if (!('points' in settings)) {
-    return (
-      <Icon
-        name="archive"
-        size="small"
-        color="primaryText"
-        style={{ paddingVertical: 8 }}
-      />
-    )
+  if (settings.type === 'bucket') {
+    return <Icon name="archive" size="small" color="primaryText" />
   }
   const pointsRemaining = settings.points - (runningPoints ?? 0)
   return (

@@ -178,7 +178,7 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
                     <PointsRemaining {...item} />
                   </Row>
 
-                  {item.settings.isRecurring && (
+                  {item.settings.type === 'recurring' && (
                     <Icon size="small" name="repeat" />
                   )}
                   <Text variant="primary" style={{ fontSize: 18 }}>

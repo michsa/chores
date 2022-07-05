@@ -298,22 +298,22 @@ const filterWidgets: {
       </Row>
     ),
     mapStateToFilters: state => [
-      task => {
+      ({ settings }) => {
         switch (state.buckets) {
           case 'exclude':
-            return 'points' in task.settings
+            return settings.type !== 'bucket'
           case 'only':
-            return !('points' in task.settings)
+            return settings.type === 'bucket'
           default:
             return true
         }
       },
-      task =>
-        !('points' in task.settings) ||
-        task.settings.points >= (state.range[0] ?? -Infinity),
-      task =>
-        !('points' in task.settings) ||
-        task.settings.points <= (state.range[1] ?? Infinity),
+      ({ settings }) =>
+        settings.type === 'bucket' ||
+        settings.points >= (state.range[0] ?? -Infinity),
+      ({ settings }) =>
+        settings.type === 'bucket' ||
+        settings.points <= (state.range[1] ?? Infinity),
     ],
     emptyState: { range: [1, 50], buckets: 'include' },
   },

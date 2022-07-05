@@ -9,18 +9,18 @@ type BaseTaskSettings = {
   name: string
   points: number
   priority: Priority
-  description: string
+  type: 'recurring' | 'once' | 'bucket'
+  description?: string // deprecated
+  notes?: string
 
   scheduled?: DateTime
   deadline?: DateTime
   deadlineWarning?: Interval // required on tasks with a deadline
 
-  isRecurring?: boolean // deprecated, use `type` instead
-  type: 'recurring' | 'one-time' | 'bucket'
-  // required on recurring tasks and buckets. `interval` would be
-  // a better name. determines the recurrence interval of the task
-  // (if recurring)
-  recurrence?: Interval
+  // required on recurring tasks & buckets, absent on one-time tasks.
+  // for recurring tasks, determines the recurrence interval.
+  // for buckets, determines the bucket "size" as points per interval.
+  interval?: Interval
 
   parent?: TaskID
   children?: TaskID[]
@@ -48,21 +48,18 @@ interface UnscheduledSettings {
 }
 
 interface RecurringSettings {
-  isRecurring: true
   type: 'recurring'
-  recurrence: Interval
+  interval: Interval
 }
 interface OneTimeSettings {
-  isRecurring: false
   type: 'once'
-  recurrence?: undefined
+  interval?: undefined
 }
 interface BucketSettings {
-  isRecurring: false
   type: 'bucket'
-  // for bucket tasks, `points` and `recurrence` together indicate
+  // for bucket tasks, `points` and `interval` together indicate
   // the "size" of the bucket in points-per-interval
-  recurrence: Interval
+  interval: Interval
 }
 
 /** Recurring tasks can be scheduled or deadline */
@@ -108,7 +105,7 @@ export type UnscheduledTaskSettings = BaseTaskSettings &
 // empty string, `priority` is defaulted to 0), so a blank input for a new task
 // is still a valid TaskSettings object. in EditTask, we then validate the form
 // before submission, to check for correctly-typed but empty inputs like 0 & ''.
-export type TaskSettingsInput = TaskSettings & {
+export type TaskSettingsInput<T extends TaskSettings = TaskSettings> = T & {
   tagNames: string[]
 }
 
