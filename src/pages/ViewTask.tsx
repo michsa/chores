@@ -20,7 +20,13 @@ import { useDispatch, useSelector } from '../hooks'
 import { deleteTask } from '../redux/thunks'
 import { getTaskWithTags, getTaskCompletions } from '../redux/selectors'
 import { NavigationProps } from '../types'
-import { priorityLabel, printInterval, printDate, toDate } from '../utils'
+import {
+  priorityLabel,
+  printInterval,
+  printDate,
+  toDate,
+  calcUrgency,
+} from '../utils'
 
 const ViewTask = ({
   navigation,
@@ -62,6 +68,8 @@ const ViewTask = ({
   }, [navigation, task])
 
   if (!task) return null
+
+  const urgency = calcUrgency({ ...task, completions })
   return (
     <ScrollView>
       <SpacedList style={{ margin: theme.spacing.s }}>
@@ -80,9 +88,13 @@ const ViewTask = ({
               }}
             />
           )}
-          <Text variant="primary" size="large">
+          <Text variant="primary" size="large" style={{ flex: 1 }}>
             {task.settings.name}
           </Text>
+          <Row>
+            <Icon name="alert-triangle" size="small" />
+            <Text>{urgency.toFixed(2)}</Text>
+          </Row>
         </Row>
         <Row>
           <Row as={ViewCard} style={{ flex: 2 }}>

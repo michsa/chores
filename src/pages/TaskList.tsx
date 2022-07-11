@@ -213,7 +213,7 @@ const TaskList = ({ navigation }: NavigationProps['taskList']) => {
                     />
                   )}
                   {!item.settings.deadline && !item.settings.scheduled && (
-                    <DateSection icon="clock" date={item.createdAt} />
+                    <DateSection icon="plus-circle" date={item.createdAt} />
                   )}
                   <DetailSection
                     color="placeholderText"

@@ -1,5 +1,13 @@
-import { add, sub } from 'date-fns'
-import { Interval, DateTime } from '../types'
+import { curry } from 'lodash'
+import {
+  add,
+  sub,
+  differenceInDays,
+  differenceInYears,
+  differenceInMonths,
+  differenceInWeeks,
+} from 'date-fns'
+import { Interval, DateTime, Frequency, FrequencyLabel } from '../types'
 import { frequencyLabel } from './frequency'
 import { toDate, toDateTime } from './datetime'
 import { maybePlural } from './misc'
@@ -17,3 +25,17 @@ export const subInterval = (r: Interval, date: DateTime) =>
 export const printInterval = (r: Interval, alwaysShowCount: boolean = true) =>
   (alwaysShowCount || r.count > 1 ? `${r.count} ` : '') +
   maybePlural(frequencyLabel(r.frequency)!, r.count)
+
+const frequencyDiffFnMapping: { [k in Frequency]: Function } = {
+  [Frequency.DAY]: differenceInDays,
+  [Frequency.WEEK]: differenceInWeeks,
+  [Frequency.MONTH]: differenceInMonths,
+  [Frequency.YEAR]: differenceInYears,
+}
+
+const differenceIn = (f: Frequency, a: Date, b: Date) =>
+  frequencyDiffFnMapping[f](a, b)
+
+export const differenceInIntervals = (i: Interval, start: Date, end: Date) => {
+  return differenceIn(i.frequency || 1, start, end) / (i.count || 1)
+}
