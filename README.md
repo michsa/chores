@@ -15,6 +15,8 @@ The goal is to get personal tasks done in a timely manner. We approach this from
 Tag {
   id: string
   name: string
+  color: string
+  priority: integer
 }
 ```
 
@@ -25,51 +27,54 @@ Suggestions for tags:
 - `home` - housework, both recurring tasks like chores and one-off tasks like "fix wobbly chair leg"
 - `outdoors` - tasks which take place outside. useful for filtering since completion depends on weather and time of day
 - `health` - exercise, taking vitamins, etc
-- `logistics` - paying bills, shopping for household items, etc
-- people or pets (parents, dog)
+- `shopping` - tasks that involve buying stuff
+- people or pets (`parents`, `dog`, etc)
 
-### Categories
-
-```
-Category {
-  id: string
-  name: string
-}
-```
-
-Categories are one-to-many with completions (a completion can have a single category). These allow us to bucket completions for analytics purposes. A competion category can be anything, but the primary use case is to represent the person who completed it: eg, if a housekeeper has cleaned the bathroom, we can mark the "clean bathroom" task as completed with the `housekeeper` category, so that we can filter those completions out when we view analytics for work done ourselves.
+Customizing the `priority` of a tag is a nice-to-have . This would factor into task urgency in a similar way to the priority of the task itself.
 
 ### Tasks
 
 ```
-Recurrence {
+Interval {
   frequency: enum (day, week, month, year)
-  interval: integer
+  count: integer
+}
+
+DateTime {
+  date: [int, int, int] // year, month, day
+  time?: [int, int] // hour, minute
 }
 
 Task {
   id
   name: string
-  description: string
+  notes: string
   createdAt: date
-  isRecurring: boolean
-  recurrence: Recurrence
-  deadline: timestamp
-  deadlineWarning: Recurrence
-  scheduled: timestamp
+  type: 'recurring' | 'once' | 'bucket'
+  interval: Interval
+  deadline: DateTime
+  deadlineWarning: Interval
+  scheduled: DateTime
   points: integer
   tags: Tag[]
   priority: positive or negative integer (0 is neutral)
+  completionIDs: string[]
 }
 ```
 
 Constraints:
 
 - `points` must be a positive integer
-- `recurrence` is required if `isRecurring` is true
+- `recurrence` is required if `type` is `recurring`
 - `scheduled` and `deadline` are mutually exclusive, if one is set the other must be null
-- if `isRecurring` is true then one of `scheduled` or `deadline` must be set, else both are optional
+- if `type` is `recurring` then one of `scheduled` or `deadline` must be set
+- if `type` is `once` then both are optional
+- it `type` is `bucket` then both must be null
 - `deadlineWarning` is required if `deadline` is set
+
+#### Bucket tasks
+
+A bucket is a task that isn't ever really "finished", but is just something you dump points into on a regular basis - eg, taking out the trash, or tidying up. Bucket tasks repurpose the `points` and `interval` fields to indicate the "size" of the bucket in points-per-interval (eg, 5 points every 2 weeks).
 
 #### Recurring tasks
 
@@ -81,7 +86,11 @@ Generally recurring tasks will have scheduled dates, but theoretically they coul
 
 #### Recurrence schema
 
-This will be used for date math on the current date / scheduled date. Thus if we represent it in the db as `frequency` + `interval`, we will have to convert it to a duration we can pass to a date-time library, eg `{ weeks: 2 }`. We may want to just save it as a Duration in the first place, especially if using redux.
+This will be used for date math on the current date / scheduled date. Thus if we represent it in the db as `frequency` + `count`, we will have to convert it to a duration we can pass to a date-time library, eg `{ weeks: 2 }`. We may want to just save it as a Duration in the first place, especially if using redux.
+
+#### DateTime schema
+
+For scheduling tasks, time of day is mostly irrelevant so it should be optional. Thus instead of saving a regular timestamp, we save times as objects with a required date property and an optional time property. When converting these to timestamps for date math, we use a default time (eventually configurable, set to 12pm for now) for values which don't have a time set.
 
 #### Deadlines and scheduled times
 
@@ -96,7 +105,7 @@ A deadline indicates that the task should be completed _before_ the date in ques
 ```
 Completion: {
   taskId: string
-  date: date
+  date: DateTime
   points: number
   isPartial: boolean
   category: string
@@ -110,6 +119,19 @@ When creating a completion, inputs for `points` and `date` should default to the
 #### Partial completions
 
 A completion typically but not necessarily indicates that we should mark the task as "completed", meaning we reset its scheduled time or deadline if it is recurring
+
+### Categories
+
+```
+Category {
+  id: string
+  name: string
+}
+```
+
+(Note: this is low priority)
+
+Categories are one-to-many with completions (a completion can have a single category). These allow us to bucket completions for analytics purposes. A competion category can be anything, but the primary use case is to represent the person who completed it: eg, if a housekeeper has cleaned the bathroom, we can mark the "clean bathroom" task as completed with the `housekeeper` category, so that we can filter those completions out when we view analytics for work done ourselves.
 
 ### Settings
 
