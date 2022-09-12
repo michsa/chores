@@ -16,6 +16,7 @@ import {
   ThunkAction,
 } from '@reduxjs/toolkit'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { mapValues } from 'lodash'
 
 import { reducer as tasks } from './slices/tasks'
 import { reducer as completions } from './slices/completions'
@@ -26,11 +27,34 @@ import { reducer as pins } from './slices/pins'
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  version: 1,
+  version: 3,
   migrate: createMigrate(
     {
       // @ts-ignore types for redux-persist migrations are busted https://github.com/rt2zz/redux-persist/issues/1065
-      2: (state: State) => state,
+      3: (state: State) => ({
+        ...state,
+        tasks: {
+          ...state.tasks,
+          entities: mapValues(
+            state.tasks.entities,
+            // @ts-ignore
+            ({ settings: { notes, description, ...settings }, ...entity }) => {
+              console.log('migrating task', {
+                name: settings.name,
+                notes,
+                description,
+              })
+              return {
+                ...entity,
+                settings: {
+                  notes: notes || description,
+                  ...settings,
+                },
+              }
+            }
+          ),
+        },
+      }),
     },
     { debug: true }
   ),

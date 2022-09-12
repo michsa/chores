@@ -86,7 +86,7 @@ export const calcUrgency = (task: TaskWithCompletions) => {
         cDate
       )
       const isWithinLastInterval = diff < 1
-      console.log({ cDate, diff, isWithinLastInterval })
+      // console.log({ cDate, diff, isWithinLastInterval })
       return points + (isWithinLastInterval ? c.points : 0)
     }, 0)
 
@@ -94,7 +94,7 @@ export const calcUrgency = (task: TaskWithCompletions) => {
     const percentRemaining = pointsRemaining / task.settings.points
     baseUrgency = 1 + percentRemaining
 
-    console.log({ pointsInLastInterval, baseUrgency })
+    // console.log({ pointsInLastInterval, baseUrgency })
   }
 
   if (task.settings.type === 'once') {

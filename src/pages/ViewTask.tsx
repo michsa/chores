@@ -157,10 +157,10 @@ const ViewTask = ({
           <TagList tags={task.tags} />
         </Row>
 
-        {!!task.settings.description && (
+        {!!task.settings.notes && (
           <Card>
             <Text>Notes</Text>
-            <Text variant="property">{task.settings.description}</Text>
+            <Text variant="property">{task.settings.notes}</Text>
           </Card>
         )}
 

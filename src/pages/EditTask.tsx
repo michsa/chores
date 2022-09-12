@@ -46,7 +46,7 @@ const defaultSetings: PartialTaskSettingsInput = {
   type: 'once',
   interval: defaultInterval,
   deadlineWarning: defaultInterval,
-  description: '',
+  notes: '',
   tagNames: [],
 }
 
@@ -267,8 +267,8 @@ const EditTask = ({
       <Card>
         <Text>Notes</Text>
         <MultilineTextInput
-          value={form.description}
-          onChangeText={setField('description')}
+          value={form.notes}
+          onChangeText={setField('notes')}
         />
       </Card>
     </SpacedList>

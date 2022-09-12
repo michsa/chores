@@ -10,7 +10,6 @@ type BaseTaskSettings = {
   points: number
   priority: Priority
   type: 'recurring' | 'once' | 'bucket'
-  description?: string // deprecated
   notes?: string
 
   scheduled?: DateTime
