@@ -37,5 +37,5 @@ const differenceIn = (f: Frequency, a: Date, b: Date) =>
   frequencyDiffFnMapping[f](a, b)
 
 export const differenceInIntervals = (i: Interval, start: Date, end: Date) => {
-  return differenceIn(i.frequency || 1, start, end) / (i.count || 1)
+  return differenceIn(i.frequency ?? 1, start, end) / (i.count || 1)
 }

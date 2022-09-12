@@ -6,6 +6,7 @@ import {
   printDate,
   priorityLabel,
   differenceInIntervals,
+  toDate,
 } from '../src/utils'
 import {
   TaskWithCompletions,
@@ -67,6 +68,13 @@ describe.only('intervals', () => {
 
     it('works for dates more than one interval apart', () => {
       test({ weeks: 3 }, { frequency: Frequency.WEEK, count: 2 }, -1.5)
+    })
+
+    it('works with an actual use case', () => {
+      const now = new Date()
+      const scheduled = toDate({ date: [2022, 7, 8] })
+      const interval = { frequency: Frequency.DAY, count: 3 }
+      console.log(differenceInIntervals(interval, now, scheduled))
     })
   })
 })
