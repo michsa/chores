@@ -11,7 +11,7 @@ import {
   TaskSettings,
   TaskSettingsInput,
   Frequency,
-  NavigationProps,
+  ScreenProps,
 } from '../types'
 import { priorityOptions, toDateTime } from '../utils'
 import {
@@ -87,7 +87,7 @@ const cleanup = (form: PartialTaskSettingsInput) => {
 const EditTask = ({
   navigation,
   route: { params },
-}: NavigationProps['addTask'] | NavigationProps['editTask']) => {
+}: ScreenProps['addTask'] | ScreenProps['editTask']) => {
   const theme = useTheme()
   const dispatch = useDispatch()
   const settings = useTaskIfExists(params?.id)

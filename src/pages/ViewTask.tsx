@@ -19,7 +19,7 @@ import BucketSize from '../components/BucketSize'
 import { useDispatch, useSelector } from '../hooks'
 import { deleteTask } from '../redux/thunks'
 import { getTaskWithTags, getTaskCompletions } from '../redux/selectors'
-import { NavigationProps } from '../types'
+import { ScreenProps } from '../types'
 import {
   priorityLabel,
   printInterval,
@@ -33,7 +33,7 @@ const ViewTask = ({
   route: {
     params: { id },
   },
-}: NavigationProps['viewTask']) => {
+}: ScreenProps['viewTask']) => {
   const theme = useTheme()
   const dispatch = useDispatch()
   const task = useSelector(getTaskWithTags, id)

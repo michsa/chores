@@ -1,4 +1,4 @@
-import { StackScreenProps } from '@react-navigation/stack'
+import { StackScreenProps, StackNavigationProp } from '@react-navigation/stack'
 import { TaskID } from './task'
 
 export type TaskStackParams = {
@@ -10,10 +10,14 @@ export type TaskStackParams = {
   completeTask: { id: TaskID }
 }
 
-export type NavigationProps = {
+export type ScreenProps = {
   taskList: StackScreenProps<TaskStackParams, 'taskList'>
   addTask: StackScreenProps<TaskStackParams, 'addTask'>
   editTask: StackScreenProps<TaskStackParams, 'editTask'>
   viewTask: StackScreenProps<TaskStackParams, 'viewTask'>
   completeTask: StackScreenProps<TaskStackParams, 'completeTask'>
+}
+
+export type NavigationProps = {
+  taskList: StackNavigationProp<TaskStackParams, 'taskList'>
 }

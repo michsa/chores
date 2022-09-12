@@ -20,12 +20,7 @@ import DateTimeInput from '../components/DateTimeInput'
 import { useDispatch, useSelector, useForm } from '../hooks'
 import { getTask } from '../redux/selectors'
 import { completeTask } from '../redux/thunks'
-import {
-  NavigationProps,
-  CompletionInput,
-  DateTime,
-  TaskSettings,
-} from '../types'
+import { ScreenProps, CompletionInput, DateTime, TaskSettings } from '../types'
 import {
   toDateTime,
   addInterval,
@@ -68,7 +63,7 @@ const CompleteTask = ({
   route: {
     params: { id },
   },
-}: NavigationProps['completeTask']) => {
+}: ScreenProps['completeTask']) => {
   const theme = useTheme()
   const dispatch = useDispatch()
   const task = useSelector(getTask, id)
