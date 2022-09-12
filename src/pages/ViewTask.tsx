@@ -1,7 +1,7 @@
 import React, { useLayoutEffect } from 'react'
 import { ScrollView } from 'react-native'
 import { useTheme } from '@emotion/react'
-import { sortBy, reverse } from 'lodash'
+import { sortBy, reverse, isEmpty } from 'lodash'
 
 import {
   Text,
@@ -134,7 +134,7 @@ const ViewTask = ({
               </Row>
             )}
             <SpacedList style={{ alignItems: 'flex-end' }}>
-              {!!task.settings.deadlineWarning && (
+              {!isEmpty(task.settings.deadlineWarning) && (
                 <Row>
                   <Icon size="small" name="calendar" />
                   <Text>
@@ -164,7 +164,7 @@ const ViewTask = ({
           </Card>
         )}
 
-        <Text>{JSON.stringify(task.settings, null, 2)}</Text>
+        {/* <Text>{JSON.stringify(task.settings, null, 2)}</Text> */}
 
         {completions.length && (
           <SpacedList>
