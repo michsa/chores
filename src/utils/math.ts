@@ -41,7 +41,7 @@ export const sigmoid = (
     c = 2,
     d = 0,
     k = 0.1,
-  }: { [k in 'b' | 'c' | 'd' | 'k']?: number } = {}
+  }: { [K in 'b' | 'c' | 'd' | 'k']?: number } = {}
 ) => c / (1 + Math.exp(k * x - b / 2)) + d
 
 /**
@@ -74,7 +74,7 @@ export const calcUrgency = (task: TaskWithCompletions) => {
       date,
       new Date()
     )
-    baseUrgency = sigmoid(intervalOffset, { k: 0.11 })
+    baseUrgency = sigmoid(intervalOffset, { k: 0.11, c: 2.5 }) // max priority is 2.5
   }
 
   if (task.settings.type === 'bucket') {

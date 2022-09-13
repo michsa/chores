@@ -32,6 +32,27 @@ import {
 import { Theme } from '../theme'
 import { useNavigation } from '@react-navigation/core'
 
+// copied from the urgency calc in util/math for now, so we can show info about
+// buckets in the task list
+const getBucketStats = (task: TaskWithTagsAndCompletions) => {
+  const pointsInLastInterval = task.completions.reduce((points, c) => {
+    const cDate = toDate(c.date)
+    const diff = differenceInIntervals(
+      task.settings.interval!,
+      new Date(),
+      cDate
+    )
+    const isWithinLastInterval = diff < 1
+    return points + (isWithinLastInterval ? c.points : 0)
+  }, 0)
+
+  const pointsRemaining = task.settings.points - pointsInLastInterval
+  const percentRemaining = pointsRemaining / task.settings.points
+  return `${pointsInLastInterval}/${task.settings.points} (${
+    (1 - percentRemaining) * 100
+  }%)`
+}
+
 type DetailSectionProps = {
   icon: string
   text: any
@@ -184,6 +205,14 @@ const FilteredTasks = ({ filterConfig, query }: Props) => {
                     text={shortPriorityLabel(item.settings.priority)}
                   />
                 )}
+                {!item.settings.deadline &&
+                  !item.settings.scheduled &&
+                  !(item.settings.type === 'bucket') && (
+                    <DateSection icon="clock" date={item.createdAt} />
+                  )}
+                {!!item.completions.length && (
+                  <LastCompletionSection completions={item.completions} />
+                )}
                 {!!item.settings.scheduled && (
                   <DateSection icon="calendar" date={item.settings.scheduled} />
                 )}
@@ -194,24 +223,28 @@ const FilteredTasks = ({ filterConfig, query }: Props) => {
                     date={item.settings.deadline}
                   />
                 )}
-                {!item.settings.deadline && !item.settings.scheduled && (
-                  <DateSection icon="plus-circle" date={item.createdAt} />
-                )}
-                {!!item.completions.length && (
-                  <LastCompletionSection completions={item.completions} />
-                )}
                 {item.settings.type === 'recurring' && (
                   <DetailSection
                     icon="repeat"
-                    text={`${differenceInIntervals(
+                    text={`${printInterval(
+                      item.settings.interval,
+                      'short'
+                    )} (${differenceInIntervals(
                       item.settings.interval,
                       new Date(),
                       scheduledDate(item)
-                    ).toFixed(0)} (${printInterval(
-                      item.settings.interval,
-                      'short'
-                    )})`}
+                    ).toFixed(0)})`}
                   />
+                )}
+
+                {item.settings.type === 'bucket' && (
+                  <DetailSection
+                    icon="repeat"
+                    text={printInterval(item.settings.interval, 'short')}
+                  />
+                )}
+                {item.settings.type === 'bucket' && (
+                  <DetailSection icon="star" text={getBucketStats(item)} />
                 )}
               </Row>
               <DetailSection
