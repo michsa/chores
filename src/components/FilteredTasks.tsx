@@ -48,9 +48,10 @@ const getBucketStats = (task: TaskWithTagsAndCompletions) => {
 
   const pointsRemaining = task.settings.points - pointsInLastInterval
   const percentRemaining = pointsRemaining / task.settings.points
-  return `${pointsInLastInterval}/${task.settings.points} (${
-    (1 - percentRemaining) * 100
-  }%)`
+  return `${pointsInLastInterval}/${task.settings.points} (${(
+    (1 - percentRemaining) *
+    100
+  ).toFixed(0)}%)`
 }
 
 type DetailSectionProps = {

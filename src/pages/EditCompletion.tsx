@@ -71,7 +71,7 @@ const CompleteTask = ({
   if (!task) return null
 
   const pointsRemaining = task.settings.points - (task.runningPoints ?? 0)
-  const defaultDateTime = toDateTime(new Date(), true)
+  const defaultDateTime = toDateTime(new Date(), false)
 
   const { form, setField } = useForm<PartialCompletionInput>({
     date: defaultDateTime,
@@ -213,7 +213,7 @@ const CompleteTask = ({
               <Text
                 variant="input"
                 style={{ flex: 1, borderBottomColor: theme.colors.foreground }}>
-                {defaultNextDate && printDate(defaultNextDate)}
+                {defaultNextDate && printDate(defaultNextDate, 'long')}
               </Text>
               <IconButton
                 size="small"

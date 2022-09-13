@@ -197,7 +197,9 @@ const ViewTask = ({
                     </Row>
                     <Row>
                       <Icon size="small" name="stopwatch" />
-                      <Text variant="primary">{printDate(c.date)}</Text>
+                      <Text variant="primary">
+                        {printDate(c.date, 'short')}
+                      </Text>
                     </Row>
                   </Row>
                   <IconButton
