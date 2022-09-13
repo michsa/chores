@@ -55,7 +55,7 @@ const diffLabelMapping = [
 
 const diffFormats = {
   long: ['* ago', 'in *'],
-  short: ['-*', '+*'],
+  short: ['*', '+*'],
 }
 type DiffStyle = keyof typeof diffFormats
 
@@ -65,6 +65,10 @@ const formatDiff = (diff: string, isPast: boolean, style: DiffStyle = 'long') =>
 export const formatRelativeDate = (dt: DateTime, style: DiffStyle = 'long') => {
   const date = toDate(dt)
   const now = new Date()
+
+  if (isYesterday(date)) return 'yesterday'
+  if (isToday(date)) return 'today'
+  if (isTomorrow(date)) return 'tomorrow'
 
   for (let diff of diffLabelMapping) {
     const d = diff.fn(date, now)
@@ -89,14 +93,14 @@ export const scheduledDate = (task: Task) =>
 export const printDate = (date: number | DateTime) => {
   const dt = typeof date === 'number' ? toDateTime(new Date(date)) : date
   return (
-    `${formatDate(dt)} (${formatRelativeDate(dt)})` +
+    `${formatDate(dt)} (${formatRelativeDate(dt, 'short')})` +
     (dt.time ? ', ' + formatTime(dt) : '')
   )
 }
 
 export const printRelativeDate = (date: number | DateTime) => {
   const dt = typeof date === 'number' ? toDateTime(new Date(date)) : date
-  return formatRelativeDate(dt, 'long')
+  return formatRelativeDate(dt, 'short')
 }
 
 export const clampDateTime = (

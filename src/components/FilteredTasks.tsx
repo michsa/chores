@@ -1,10 +1,12 @@
 import React from 'react'
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view'
-import { Pressable } from 'react-native'
+import { Pressable, View } from 'react-native'
 import { useTheme } from '@emotion/react'
 import { sortBy, last } from 'lodash'
 
 import { Card, Text, Icon, IconButton, Spacer, Row, SpacedList } from '.'
+import TagList from '../components/TagList'
+
 import PointsRemaining from './PointsRemaining'
 import { useSelector, useFlags, useDispatch } from '../hooks'
 import { getOrderedTasks } from '../redux/selectors'
@@ -18,10 +20,14 @@ import {
 } from '../types'
 import {
   priorityLabel,
+  shortPriorityLabel,
   printRelativeDate,
   calcUrgency,
   toDate,
   FilterConfig,
+  printInterval,
+  differenceInIntervals,
+  scheduledDate,
 } from '../utils'
 import { Theme } from '../theme'
 import { useNavigation } from '@react-navigation/core'
@@ -175,7 +181,7 @@ const FilteredTasks = ({ filterConfig, query }: Props) => {
                   <DetailSection
                     icon="flag"
                     color="accent"
-                    text={priorityLabel(item.settings.priority)}
+                    text={shortPriorityLabel(item.settings.priority)}
                   />
                 )}
                 {!!item.settings.scheduled && (
@@ -191,26 +197,64 @@ const FilteredTasks = ({ filterConfig, query }: Props) => {
                 {!item.settings.deadline && !item.settings.scheduled && (
                   <DateSection icon="plus-circle" date={item.createdAt} />
                 )}
+                {!!item.completions.length && (
+                  <LastCompletionSection completions={item.completions} />
+                )}
+                {item.settings.type === 'recurring' && (
+                  <DetailSection
+                    icon="repeat"
+                    text={`${differenceInIntervals(
+                      item.settings.interval,
+                      new Date(),
+                      scheduledDate(item)
+                    ).toFixed(0)} (${printInterval(
+                      item.settings.interval,
+                      'short'
+                    )})`}
+                  />
+                )}
+              </Row>
+              <DetailSection
+                icon="tag"
+                text={<TagList tags={item.tags} variant="small" />}
+              />
+            </SpacedList>
+            <SpacedList style={{ alignSelf: 'flex-start' }}>
+              <Row spacing="l">
+                <IconButton
+                  variant="primary"
+                  size="regular"
+                  name="edit"
+                  color="underline"
+                  onPress={() =>
+                    navigation.navigate('editTask', { id: item.id })
+                  }
+                />
+                {!isCompleted(item) && (
+                  <IconButton
+                    variant="primary"
+                    name="check-circle"
+                    color="accent"
+                    containerStyle={{
+                      alignSelf: 'flex-start',
+                    }}
+                    size="xxlarge"
+                    onPress={() =>
+                      navigation.navigate('completeTask', { id: item.id })
+                    }
+                    disabled={isCompleted(item)}
+                  />
+                )}
+              </Row>
+              <View style={{ alignSelf: 'flex-end' }}>
                 <DetailSection
                   color="placeholderText"
                   icon="alert-triangle"
                   // iconSize="xsmall"
                   text={calcUrgency(item).toFixed(2)}
                 />
-              </Row>
+              </View>
             </SpacedList>
-            {!isCompleted(item) && (
-              <IconButton
-                variant="primary"
-                name="check-circle"
-                color="accent"
-                size="xlarge"
-                onPress={() =>
-                  navigation.navigate('completeTask', { id: item.id })
-                }
-                disabled={isCompleted(item)}
-              />
-            )}
           </Row>
         </Pressable>
       )}

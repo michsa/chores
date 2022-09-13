@@ -21,4 +21,14 @@ const frequencyLabels = frequencyOptions.reduce((labels, option) => {
   return labels
 }, {} as { [k in Frequency]: FrequencyLabel })
 
-export const frequencyLabel = (f: Frequency) => frequencyLabels[f]
+const shortFrequencyLabels = {
+  [Frequency.DAY]: 'd',
+  [Frequency.WEEK]: 'w',
+  [Frequency.MONTH]: 'mo',
+  [Frequency.YEAR]: 'y',
+}
+
+export const frequencyLabel = (
+  f: Frequency,
+  style: 'long' | 'short' = 'long'
+) => (style === 'long' ? frequencyLabels[f] : shortFrequencyLabels[f])

@@ -7,7 +7,7 @@ export const BucketSize = ({ points, interval }: BucketTaskSettings) => (
   <Row as={Text} spacing="xs">
     <Text variant="primary">{points}</Text>
     <Text>/</Text>
-    <Text variant="primary">{printInterval(interval, false)}</Text>
+    <Text variant="primary">{printInterval(interval, 'long', false)}</Text>
   </Row>
 )
 export default BucketSize
