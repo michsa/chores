@@ -85,13 +85,13 @@ export const generateTaskFilter =
 // -------- example filter configs -------------
 
 export const defaultConfigs: { [k: string]: FilterConfig } = {
-  activeRecurring: {
+  recurring: {
     type: ['recurring'],
     scheduledAt: [undefined, toDateTime(new Date())], // scheduled before now
   },
-  todo: { type: ['once'], isCompleted: false },
+  todos: { type: ['once'], isCompleted: false },
   buckets: { type: ['bucket'] },
-  inactiveRecurring: {
+  upcoming: {
     type: ['recurring'],
     scheduledAt: [toDateTime(new Date()), undefined], // scheduled after now
   },

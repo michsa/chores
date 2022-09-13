@@ -14,7 +14,6 @@ import {
   DateTime,
   TaskWithTagsAndCompletions,
   Completion,
-  FilterWithCompletions,
   NavigationProps,
 } from '../types'
 import {
@@ -65,11 +64,19 @@ const LastCompletionSection = ({
   ) : null
 }
 
-const FilteredTasks = ({ filterConfig }: { filterConfig: FilterConfig }) => {
+type Props = {
+  filterConfig: FilterConfig
+  query?: string
+}
+
+const FilteredTasks = ({ filterConfig, query }: Props) => {
   const dispatch = useDispatch()
   const navigation = useNavigation<NavigationProps['taskList']>()
 
-  const tasks = useSelector(getOrderedTasks, filterConfig)
+  const tasks = useSelector(getOrderedTasks, filterConfig).filter(
+    task => !query || task.settings.name.includes(query)
+    // || task.tags.some(t => t.name.includes(query))
+  )
 
   // pinned tasks stick to the top of the task list
   const pins = useSelector(state => state.pins)
@@ -89,6 +96,7 @@ const FilteredTasks = ({ filterConfig }: { filterConfig: FilterConfig }) => {
       ref={ref}
       keyboardShouldPersistTaps="always"
       data={sortedTasks}
+      contentContainerStyle={{ paddingHorizontal: theme.spacing.xs }}
       ItemSeparatorComponent={() => <Spacer size="s" />}
       ListHeaderComponent={Spacer}
       ListFooterComponent={Spacer}
