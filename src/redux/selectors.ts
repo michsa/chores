@@ -1,11 +1,10 @@
 import { createSelector } from 'reselect'
-import { exists } from '../utils'
+import { exists, FilterConfig, generateTaskFilter } from '../utils'
 import {
   TaskWithTags,
   TaskWithTagsAndCompletions,
   CompletionWithTask,
   Filter,
-  FilterWithCompletions,
 } from '../types'
 import { selectors as tasks } from './slices/tasks'
 import { selectors as tags } from './slices/tags'
@@ -52,9 +51,9 @@ export const getOrderedTasks = createSelector(
     tasks.selectAll,
     tags.selectEntities,
     completions.selectEntities,
-    (_, filters: FilterWithCompletions[]) => filters,
+    (_, filterConfig: FilterConfig = {}) => generateTaskFilter(filterConfig),
   ],
-  (tasks, tags, completions, filters = []): TaskWithTagsAndCompletions[] =>
+  (tasks, tags, completions, taskFilter): TaskWithTagsAndCompletions[] =>
     tasks
       .map(task => ({
         ...task,
@@ -63,7 +62,7 @@ export const getOrderedTasks = createSelector(
           .map(id => completions[id])
           .filter(exists),
       }))
-      .filter(composeFilters(filters))
+      .filter(taskFilter)
 )
 
 export const getCompletionIdsForTask = createSelector(

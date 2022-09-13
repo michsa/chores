@@ -1,14 +1,17 @@
 import React, { useLayoutEffect, useState } from 'react'
 import { useTheme } from '@emotion/react'
+import { startCase } from 'lodash'
 
-import { IconButton, Row, Button } from '../components'
-import FilterControls from '../components/FilterControls'
+import { IconButton, Row, Button, SpacedList } from '../components'
 import FilteredTasks from '../components/FilteredTasks'
-import { ScreenProps, FilterWithCompletions } from '../types'
+import { Picker } from '../components'
+import { ScreenProps } from '../types'
+import { defaultConfigs } from '../utils'
 
 const TaskList = ({ navigation }: ScreenProps['taskList']) => {
-  const [filters, setFilters] = useState<FilterWithCompletions[]>([])
   const theme = useTheme()
+  const [filterConfig, setFilterConfig] =
+    useState<keyof typeof defaultConfigs>('allTasks')
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -36,10 +39,18 @@ const TaskList = ({ navigation }: ScreenProps['taskList']) => {
   const ref = React.useRef(null)
 
   return (
-    <React.Fragment>
-      <FilterControls onChangeFilters={setFilters} />
-      <FilteredTasks filters={filters} />
-    </React.Fragment>
+    <SpacedList style={{ paddingHorizontal: theme.spacing.s }}>
+      <Picker
+        selectedValue={filterConfig}
+        onValueChange={setFilterConfig}
+        containerStyle={{ flexGrow: 0 }}
+        options={Object.keys(defaultConfigs).map(key => ({
+          label: startCase(key),
+          value: key,
+        }))}
+      />
+      <FilteredTasks filterConfig={defaultConfigs[filterConfig]} />
+    </SpacedList>
   )
 }
 

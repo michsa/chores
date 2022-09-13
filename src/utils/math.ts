@@ -98,6 +98,8 @@ export const calcUrgency = (task: TaskWithCompletions) => {
   }
 
   if (task.settings.type === 'once') {
+    if (task.completions.some(c => c.isFull)) return 0
+
     const dateOffset = differenceInDays(date, new Date())
     baseUrgency = sigmoid(dateOffset, { k: 0.05 }) // 1.5 at ~21 days, 1.9 at ~60 days
   }

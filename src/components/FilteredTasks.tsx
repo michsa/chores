@@ -17,7 +17,13 @@ import {
   FilterWithCompletions,
   NavigationProps,
 } from '../types'
-import { priorityLabel, printRelativeDate, calcUrgency, toDate } from '../utils'
+import {
+  priorityLabel,
+  printRelativeDate,
+  calcUrgency,
+  toDate,
+  FilterConfig,
+} from '../utils'
 import { Theme } from '../theme'
 import { useNavigation } from '@react-navigation/core'
 
@@ -59,11 +65,11 @@ const LastCompletionSection = ({
   ) : null
 }
 
-const FilteredTasks = ({ filters }: { filters: FilterWithCompletions[] }) => {
+const FilteredTasks = ({ filterConfig }: { filterConfig: FilterConfig }) => {
   const dispatch = useDispatch()
   const navigation = useNavigation<NavigationProps['taskList']>()
 
-  const tasks = useSelector(getOrderedTasks, filters)
+  const tasks = useSelector(getOrderedTasks, filterConfig)
 
   // pinned tasks stick to the top of the task list
   const pins = useSelector(state => state.pins)
@@ -82,7 +88,6 @@ const FilteredTasks = ({ filters }: { filters: FilterWithCompletions[] }) => {
     <KeyboardAwareFlatList
       ref={ref}
       keyboardShouldPersistTaps="always"
-      style={{ paddingHorizontal: theme.spacing.s }}
       data={sortedTasks}
       ItemSeparatorComponent={() => <Spacer size="s" />}
       ListHeaderComponent={Spacer}

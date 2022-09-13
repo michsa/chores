@@ -1,6 +1,7 @@
 import { DateTime, Interval, TagID, Tag, CompletionID, Completion } from '.'
 
 export type TaskID = string
+export type TaskType = 'recurring' | 'once' | 'bucket'
 
 export type Priority = -2 | -1 | 0 | 1 | 2
 export type PriorityLabel = 'Highest' | 'High' | 'Standard' | 'Low' | 'Lowest'
@@ -9,7 +10,7 @@ type BaseTaskSettings = {
   name: string
   points: number
   priority: Priority
-  type: 'recurring' | 'once' | 'bucket'
+  type: TaskType
   notes?: string
 
   scheduled?: DateTime
