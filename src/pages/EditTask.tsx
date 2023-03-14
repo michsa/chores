@@ -87,7 +87,7 @@ const cleanup = (form: PartialTaskSettingsInput) => {
 const EditTask = ({
   navigation,
   route: { params },
-}: ScreenProps['addTask'] | ScreenProps['editTask']) => {
+}: ScreenProps['editTask']) => {
   const theme = useTheme()
   const dispatch = useDispatch()
   const settings = useTaskIfExists(params?.id)
@@ -147,12 +147,12 @@ const EditTask = ({
       </Card>
       <SpacedList as={Card}>
         <Row spacing="xl">
-          <Row style={{ flex: 1 }}>
+          <Row style={{ flex: 2 }}>
             <Icon name="star" />
             <NumberInput
               placeholder="Points"
               style={{ flex: 1 }}
-              maxValue={50}
+              maxValue={999}
               value={form.points}
               onChangeText={setField('points')}
             />

@@ -75,7 +75,7 @@ const TaskList = ({ navigation }: ScreenProps['taskList']) => {
             variant="primary"
             size="xlarge"
             name="plus"
-            onPress={() => navigation.navigate('addTask')}
+            onPress={() => navigation.navigate('editTask')}
           />
         </Row>
       ),

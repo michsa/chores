@@ -48,7 +48,7 @@ const NumberInput = ({
       blurOnSubmit
       keyboardType="numeric"
       value={strValue}
-      onChangeText={text => setValue(text.replace(/[^0-9]/g, ''))}
+      onChangeText={text => setValue(text.replace(/[^0-9^\-]/g, ''))}
       onEndEditing={() => setValue(clamp(numValue, minValue, maxValue))}
       {...props}
     />

@@ -4,15 +4,13 @@ import { TaskID } from './task'
 export type TaskStackParams = {
   metrics: undefined
   taskList: undefined
-  addTask: undefined
-  editTask: { id: TaskID }
+  editTask: { id: TaskID } | undefined
   viewTask: { id: TaskID }
   completeTask: { id: TaskID }
 }
 
 export type ScreenProps = {
   taskList: StackScreenProps<TaskStackParams, 'taskList'>
-  addTask: StackScreenProps<TaskStackParams, 'addTask'>
   editTask: StackScreenProps<TaskStackParams, 'editTask'>
   viewTask: StackScreenProps<TaskStackParams, 'viewTask'>
   completeTask: StackScreenProps<TaskStackParams, 'completeTask'>

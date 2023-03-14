@@ -59,20 +59,17 @@ const App = () => {
                 options={{ title: 'Point totals' }}
               />
               <TaskStack.Screen
-                name="editTask"
-                component={EditTask}
-                options={{ title: 'Edit Task' }}
-              />
-              <TaskStack.Screen
                 name="viewTask"
                 component={ViewTask}
                 options={{ title: 'View Task' }}
               />
               <TaskStack.Group screenOptions={{ presentation: 'modal' }}>
                 <TaskStack.Screen
-                  name="addTask"
+                  name="editTask"
                   component={EditTask}
-                  options={{ title: 'Add Task' }}
+                  options={({ route }) => ({
+                    title: `${route.params?.id ? 'Edit' : 'Add'} Task`,
+                  })}
                 />
                 <TaskStack.Screen
                   name="completeTask"
