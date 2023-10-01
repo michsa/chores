@@ -1,4 +1,4 @@
-import { mapValues, reduce } from 'lodash'
+import { reduce } from 'lodash'
 import { TagID, TaskType, DateTime, TaskWithCompletions } from '../types'
 import { toDateTime, scheduledDate, toDate } from './datetime'
 
@@ -14,7 +14,7 @@ export type FilterConfig = {
   type?: TaskType[] // types to include
 
   points?: [number?, number?] // min and max
-  pointsRemaining?: [number?, number?]
+  pointsRemaining?: [number?, number?] // min and max
   hasRunningPoints?: boolean
 
   priority?: [number?, number?] // min and max
@@ -23,7 +23,7 @@ export type FilterConfig = {
   hasDeadline?: boolean // deadline only
   scheduledAt?: [DateTime?, DateTime?]
 
-  isCompleted?: boolean
+  isCompleted?: boolean // whether the task has a full completion
   lastCompletedAt?: [DateTime?, DateTime?] // each is nullable. "after, before"
 }
 

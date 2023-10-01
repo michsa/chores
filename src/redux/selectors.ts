@@ -46,7 +46,7 @@ export const getTaskCompletions = createSelector(
     task ? task.completionIds.map(id => completions[id]).filter(exists) : []
 )
 
-export const getOrderedTasks = createSelector(
+export const getFilteredTasks = createSelector(
   [
     tasks.selectAll,
     tags.selectEntities,
