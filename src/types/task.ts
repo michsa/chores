@@ -109,15 +109,20 @@ export type TaskSettingsInput<T extends TaskSettings = TaskSettings> = T & {
   tagNames: string[]
 }
 
-export type Task = {
+export type Task<S extends BaseTaskSettings = TaskSettings> = {
   id: TaskID
-  settings: TaskSettings
+  settings: S
   createdAt: number
   tagIds: TagID[]
   completionIds: CompletionID[]
   runningPoints: number
 }
 
-export type TaskWithTags = Task & { tags: Tag[] }
-export type TaskWithCompletions = Task & { completions: Completion[] }
-export type TaskWithTagsAndCompletions = TaskWithTags & TaskWithCompletions
+export type TaskWithTags<S extends BaseTaskSettings = TaskSettings> =
+  Task<S> & { tags: Tag[] }
+export type TaskWithCompletions<S extends BaseTaskSettings = TaskSettings> =
+  Task<S> & { completions: Completion[] }
+export type TaskWithTagsAndCompletions<
+  S extends BaseTaskSettings = TaskSettings
+> = TaskWithTags<S> & TaskWithCompletions<S>
+
