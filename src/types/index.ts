@@ -1,6 +1,7 @@
 import { Task, TaskID, TaskWithCompletions } from './task'
 export * from './navigation'
 export * from './task'
+export * from './filter'
 
 /* -- COMMON TYPES -- */
 
@@ -21,7 +22,7 @@ export type Interval = {
  * used for user-defined dates. date and time are separate because time is
  * optional - when we convert this to a timestamp for date math, we use a
  * default time (hardcoded for now, but hopefully someday configurable in app
- * settings).
+ * settings). additionally, we do not ever care about sub-minute granularity.
  *
  * these values are timezone-agnostic since they should always be interpreted
  * in local time. however, it seems our implementation of Date parses strings
@@ -34,11 +35,6 @@ export type DateTime = {
   date: [number, number, number] // year, month, day
   time?: [number, number] // hour, minute
 }
-
-/* -- FILTERS -- */
-
-export type Filter<T = Task> = (t: T) => boolean
-export type FilterWithCompletions = Filter<TaskWithCompletions>
 
 /* -- TAGS -- */
 

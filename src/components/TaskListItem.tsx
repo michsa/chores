@@ -8,7 +8,7 @@ import TagList from './TagList'
 
 import PointsRemaining from './PointsRemaining'
 import { useSelector, useFlags } from '../hooks'
-import { isCompleted } from '../redux/filters'
+import { isCompleted } from '../utils/filters'
 import { DateTime, TaskWithTagsAndCompletions, Completion } from '../types'
 import {
   shortPriorityLabel,

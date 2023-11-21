@@ -1,31 +1,50 @@
-import { reduce } from 'lodash'
-import { TagID, TaskType, DateTime, TaskWithCompletions } from '../types'
-import { toDateTime, scheduledDate, toDate } from './datetime'
+import { reduce, isEmpty } from 'lodash'
+import { FilterConfig, Filter, TaskFilter, DateTime } from '../types'
+import {
+  Task,
+  TaskWithCompletions,
+  BucketTaskSettings,
+  RecurringTaskSettings,
+  OneTimeTaskSettings,
+} from '../types/task'
+import { scheduledDate, toDate } from './datetime'
 
-/**
- * Serializable configuration state for a set of task filters. To actually filter
- * tasks according to a filter config, pass the config into `generateTaskFilter`
- * to create a predicate function that operates on a single task.
- */
-export type FilterConfig = {
-  tagged?: TagID[]
-  notTagged?: TagID[]
+// ------ generic task filters ------
 
-  type?: TaskType[] // types to include
+export const composeTaskFilters =
+  <T extends Task>(filters: TaskFilter<T>[]): TaskFilter<T> =>
+  task =>
+    filters.every(filter => filter(task))
 
-  points?: [number?, number?] // min and max
-  pointsRemaining?: [number?, number?] // min and max
-  hasRunningPoints?: boolean
+// types
 
-  priority?: [number?, number?] // min and max
+export const isBucket: TaskFilter = (task): task is Task<BucketTaskSettings> =>
+  task.settings.type === 'bucket'
 
-  isScheduled?: boolean // scheduled OR deadline
-  hasDeadline?: boolean // deadline only
-  scheduledAt?: [DateTime?, DateTime?]
+export const isRecurring: TaskFilter = (
+  task
+): task is Task<RecurringTaskSettings> => task.settings.type === 'recurring'
 
-  isCompleted?: boolean // whether the task has a full completion
-  lastCompletedAt?: [DateTime?, DateTime?] // each is nullable. "after, before"
-}
+export const isOnce: TaskFilter = (task): task is Task<OneTimeTaskSettings> =>
+  task.settings.type === 'once'
+
+// status
+
+export const isInProgress: TaskFilter = task => !!task.runningPoints
+
+export const isFuture: TaskFilter = task => scheduledDate(task) > new Date()
+
+export const hasBeenCompleted: TaskFilter<TaskWithCompletions> = task =>
+  task.completions.some(c => c.isFull)
+
+export const isCompleted: TaskFilter<TaskWithCompletions> = task =>
+  isOnce(task) && hasBeenCompleted(task)
+
+export const isActive: TaskFilter<TaskWithCompletions> = task =>
+  !isFuture(task) && !isCompleted(task)
+
+export const isUpcoming: TaskFilter<TaskWithCompletions> = task =>
+  isFuture(task) && !isCompleted(task)
 
 // ------ utils ------
 
@@ -35,35 +54,34 @@ const isInRange = <T>(f: [T?, T?], x: T) =>
 const isDateInRange = (f: [DateTime?, DateTime?], x: Date) =>
   (!f[0] || x >= toDate(f[0])) && (!f[1] || x <= toDate(f[1]))
 
-// ------ filtering functions for each key in the config ------
+// ------ FilterConfig implementation ------
 
 type FilterFunction<K extends keyof FilterConfig> = (
-  f: NonNullable<FilterConfig[K]>,
-  task: TaskWithCompletions
-) => boolean
+  f: NonNullable<FilterConfig[K]>
+) => TaskFilter<TaskWithCompletions>
 
 const filterFunctions: { [K in keyof FilterConfig]: FilterFunction<K> } = {
-  tagged: (f, task) => f.every(task.tagIds.includes),
-  notTagged: (f, task) => !f.some(task.tagIds.includes),
+  tagged: f => task => f.every(task.tagIds.includes),
+  notTagged: f => task => !f.some(task.tagIds.includes),
 
-  type: (f, task) => f.includes(task.settings.type),
+  type: f => task => f.includes(task.settings.type),
 
-  points: (f, task) =>
+  points: f => task =>
     (!f[0] || task.settings.points >= f[0]) &&
     (!f[1] || task.settings.points <= f[1]),
-  pointsRemaining: (f, task) =>
+  pointsRemaining: f => task =>
     isInRange(f, task.settings.points - task.runningPoints ?? 0),
-  hasRunningPoints: (f, task) => task.runningPoints > 0 === f,
+  hasRunningPoints: f => task => task.runningPoints > 0 === f,
 
-  priority: (f, task) => isInRange(f, task.settings.priority),
+  priority: f => task => isInRange(f, task.settings.priority),
 
-  isScheduled: (f, task) =>
+  isScheduled: f => task =>
     (!!task.settings.scheduled || !!task.settings.deadline) === f,
-  hasDeadline: (f, task) => !!task.settings.deadline === f,
-  scheduledAt: (f, task) => isDateInRange(f, scheduledDate(task)),
+  hasDeadline: f => task => !!task.settings.deadline === f,
+  scheduledAt: f => task => isDateInRange(f, scheduledDate(task)),
 
-  isCompleted: (f, task) => task.completions.some(c => c.isFull) === f,
-  lastCompletedAt: (f, task) =>
+  isCompleted: f => task => isCompleted(task) === f,
+  lastCompletedAt: f => task =>
     task.completions.some(c => isDateInRange(f, toDate(c.date))),
 }
 
@@ -71,30 +89,23 @@ const filterFunctions: { [K in keyof FilterConfig]: FilterFunction<K> } = {
 const getFilterFunction = (key: keyof FilterConfig) =>
   filterFunctions[key] as FilterFunction<typeof key>
 
-export const generateTaskFilter =
+/** Processes a single FilterConfig into a TaskFilter. */
+export const processFilterConfig =
   (config: FilterConfig) => (task: TaskWithCompletions) =>
     reduce(
       config,
       (res, value, key) =>
         res &&
         (value === undefined ||
-          getFilterFunction(key as keyof FilterConfig)(value, task)),
+          getFilterFunction(key as keyof FilterConfig)(value)(task)),
       true
     )
 
-// -------- example filter configs -------------
-
-export const defaultConfigs: { [k: string]: FilterConfig } = {
-  recurring: {
-    type: ['recurring'],
-    scheduledAt: [undefined, toDateTime(new Date())], // scheduled before now
-  },
-  todos: { type: ['once'], isCompleted: false },
-  buckets: { type: ['bucket'] },
-  upcoming: {
-    type: ['recurring'],
-    scheduledAt: [toDateTime(new Date()), undefined], // scheduled after now
-  },
-  completed: { type: ['once'], isCompleted: true },
-  all: {},
-}
+/**
+ * Processes a Filter (from state) into a TaskFilter. The filter itself is
+ * optional; if it's undefined, the TaskFilter will always return true.
+ */
+export const processFilter = (filter?: Filter) => (task: TaskWithCompletions) =>
+  !filter ||
+  isEmpty(filter.configs) ||
+  filter.configs.some(config => processFilterConfig(config)(task))

@@ -14,8 +14,9 @@ import {
 } from '../components'
 import FilteredTasks from '../components/FilteredTasks'
 import { Picker } from '../components'
-import { ScreenProps } from '../types'
-import { defaultConfigs } from '../utils'
+import { useSelector } from '../hooks'
+import { getFilters } from '../redux/selectors'
+import { ScreenProps, FilterID } from '../types'
 
 const SearchBar = ({
   value,
@@ -55,10 +56,9 @@ const SearchBar = ({
 
 const TaskList = ({ navigation }: ScreenProps['taskList']) => {
   const theme = useTheme()
-  const [filterConfig, setFilterConfig] =
-    useState<keyof typeof defaultConfigs>('allTasks')
-
+  const [selectedFilter, setSelectedFilter] = useState<FilterID>('all')
   const [query, setQuery] = useState<string>('')
+  const filters = useSelector(getFilters)
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -91,11 +91,11 @@ const TaskList = ({ navigation }: ScreenProps['taskList']) => {
         <Row as={Card}>
           <Icon name="list" />
           <Picker
-            selectedValue={filterConfig}
-            onValueChange={setFilterConfig}
-            options={Object.keys(defaultConfigs).map(key => ({
-              label: startCase(key),
-              value: key,
+            selectedValue={selectedFilter}
+            onValueChange={setSelectedFilter}
+            options={filters.map(filter => ({
+              label: startCase(filter.name),
+              value: filter.id,
             }))}
           />
         </Row>
@@ -103,10 +103,7 @@ const TaskList = ({ navigation }: ScreenProps['taskList']) => {
       </SpacedList>
 
       <Divider style={{ marginBottom: 0 }} />
-      <FilteredTasks
-        filterConfig={defaultConfigs[filterConfig]}
-        query={query}
-      />
+      <FilteredTasks filterId={selectedFilter} query={query} />
     </React.Fragment>
   )
 }

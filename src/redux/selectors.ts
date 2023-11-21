@@ -1,16 +1,16 @@
 import { createSelector } from 'reselect'
-import { exists, FilterConfig, generateTaskFilter } from '../utils'
+import { exists, processFilter, composeTaskFilters } from '../utils'
 import {
   TaskWithTags,
   TaskWithTagsAndCompletions,
   CompletionWithTask,
-  Filter,
+  TaskFilter,
 } from '../types'
 import { selectors as tasks } from './slices/tasks'
 import { selectors as tags } from './slices/tags'
 import { selectors as completions } from './slices/completions'
 import { selectors as categories } from './slices/categories'
-import { composeFilters } from './filters'
+import { selectors as filters } from './slices/filters'
 
 export const getTasks = tasks.selectEntities
 export const getTask = tasks.selectById
@@ -21,12 +21,14 @@ export const getCategories = categories.selectAll
 
 export const getCompletions = completions.selectAll
 
+export const getFilters = filters.selectAll
+
 export const getCompletionsWithTasks = createSelector(
-  [getCompletions, tasks.selectEntities, (_, filters: Filter[]) => filters],
+  [getCompletions, tasks.selectEntities, (_, filters: TaskFilter[]) => filters],
   (completions, tasks, filters = []): CompletionWithTask[] =>
     completions
       .map(c => ({ ...c, task: tasks[c.taskId]! }))
-      .filter(c => composeFilters(filters)(c.task))
+      .filter(c => composeTaskFilters(filters)(c.task))
 )
 
 export const getTaskWithTags = createSelector(
@@ -48,12 +50,12 @@ export const getTaskCompletions = createSelector(
 
 export const getFilteredTasks = createSelector(
   [
+    filters.selectById,
     tasks.selectAll,
     tags.selectEntities,
     completions.selectEntities,
-    (_, filterConfig: FilterConfig = {}) => generateTaskFilter(filterConfig),
   ],
-  (tasks, tags, completions, taskFilter): TaskWithTagsAndCompletions[] =>
+  (filter, tasks, tags, completions): TaskWithTagsAndCompletions[] =>
     tasks
       .map(task => ({
         ...task,
@@ -62,7 +64,7 @@ export const getFilteredTasks = createSelector(
           .map(id => completions[id])
           .filter(exists),
       }))
-      .filter(taskFilter)
+      .filter(task => !filter || processFilter(filter)(task))
 )
 
 export const getCompletionIdsForTask = createSelector(

@@ -23,6 +23,7 @@ import { reducer as completions } from './slices/completions'
 import { reducer as tags } from './slices/tags'
 import { reducer as categories } from './slices/categories'
 import { reducer as pins } from './slices/pins'
+import { reducer as filters } from './slices/filters'
 
 const persistConfig = {
   key: 'root',
@@ -60,7 +61,7 @@ const persistConfig = {
   ),
 }
 
-const reducer = combineReducers({ tasks, completions, tags, categories, pins })
+const reducer = combineReducers({ tasks, completions, tags, categories, pins, filters })
 export type State = ReturnType<typeof reducer>
 
 const persistedReducer = persistReducer(persistConfig, reducer)

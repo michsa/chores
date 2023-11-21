@@ -10,20 +10,20 @@ import TaskListItem from './TaskListItem'
 import { useSelector, useFlags, useDispatch } from '../hooks'
 import { getFilteredTasks } from '../redux/selectors'
 import { savePins } from '../redux/thunks'
-import { TaskWithTagsAndCompletions, NavigationProps } from '../types'
-import { calcUrgency, FilterConfig } from '../utils'
+import { TaskWithTagsAndCompletions, NavigationProps, FilterID } from '../types'
+import { calcUrgency } from '../utils'
 import { useNavigation } from '@react-navigation/core'
 
 type Props = {
-  filterConfig: FilterConfig
+  filterId: FilterID
   query?: string
 }
 
-const FilteredTasks = ({ filterConfig, query }: Props) => {
+const FilteredTasks = ({ filterId, query }: Props) => {
   const dispatch = useDispatch()
   const navigation = useNavigation<NavigationProps['taskList']>()
 
-  const tasks = useSelector(getFilteredTasks, filterConfig).filter(
+  const tasks = useSelector(getFilteredTasks, filterId).filter(
     task => !query || task.settings.name.includes(query)
     // || task.tags.some(t => t.name.includes(query))
   )
