@@ -10,20 +10,20 @@ import TaskListItem from './TaskListItem'
 import { useSelector, useFlags, useDispatch } from '../hooks'
 import { getFilteredTasks } from '../redux/selectors'
 import { savePins } from '../redux/thunks'
-import { TaskWithTagsAndCompletions, NavigationProps, FilterID } from '../types'
+import { TaskWithTagsAndCompletions, NavigationProps, Filter } from '../types'
 import { calcUrgency } from '../utils'
 import { useNavigation } from '@react-navigation/core'
 
 type Props = {
-  filterId: FilterID
+  filter: Filter,
   query?: string
 }
 
-const FilteredTasks = ({ filterId, query }: Props) => {
+const FilteredTasks = ({ filter, query }: Props) => {
   const dispatch = useDispatch()
-  const navigation = useNavigation<NavigationProps['taskList']>()
+  const navigation = useNavigation<NavigationProps['root']>()
 
-  const tasks = useSelector(getFilteredTasks, filterId).filter(
+  const tasks = useSelector(getFilteredTasks, filter).filter(
     task => !query || task.settings.name.includes(query)
     // || task.tags.some(t => t.name.includes(query))
   )
@@ -55,7 +55,7 @@ const FilteredTasks = ({ filterId, query }: Props) => {
       keyExtractor={task => task.id + task.runningPoints}
       renderItem={({ item }: { item: TaskWithTagsAndCompletions }) => (
         <Pressable
-          onPress={() => navigation.navigate('viewTask', { id: item.id })}
+          onPress={() => navigation.navigate('singleTaskView', { id: item.id })}
           onLongPress={() => {
             togglePin(item.id)
             dispatch(savePins(enabled))

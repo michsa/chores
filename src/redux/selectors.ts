@@ -5,6 +5,7 @@ import {
   TaskWithTagsAndCompletions,
   CompletionWithTask,
   TaskFilter,
+  Filter
 } from '../types'
 import { selectors as tasks } from './slices/tasks'
 import { selectors as tags } from './slices/tags'
@@ -21,7 +22,7 @@ export const getCategories = categories.selectAll
 
 export const getCompletions = completions.selectAll
 
-export const getFilters = filters.selectAll
+export const getFilters = filters.selectEntities
 
 export const getCompletionsWithTasks = createSelector(
   [getCompletions, tasks.selectEntities, (_, filters: TaskFilter[]) => filters],
@@ -50,7 +51,7 @@ export const getTaskCompletions = createSelector(
 
 export const getFilteredTasks = createSelector(
   [
-    filters.selectById,
+    (_, filter: Filter) => filter,
     tasks.selectAll,
     tags.selectEntities,
     completions.selectEntities,

@@ -4,21 +4,23 @@ import { StatusBar } from 'react-native'
 import { Provider } from 'react-redux'
 import { NavigationContainer } from '@react-navigation/native'
 import { createStackNavigator } from '@react-navigation/stack'
+import { createDrawerNavigator } from '@react-navigation/drawer'
 import { PersistGate } from 'redux-persist/integration/react'
 import { ThemeProvider as EThemeProvider } from '@emotion/react'
 
-import IconButton from './src/components/IconButton'
 import { store, persistor } from './src/redux/store'
 import EditTask from './src/pages/EditTask'
-import TaskList from './src/pages/TaskList'
-import ViewTask from './src/pages/ViewTask'
+import MultiTaskView from './src/pages/MultiTaskView'
+import SingleTaskView from './src/pages/SingleTaskView'
 import Completion from './src/pages/EditCompletion'
-import Metrics from './src/pages/Metrics'
+import About from './src/pages/About'
 import { darkTheme, lightTheme } from './src/theme'
+import DrawerFilters from './src/components/DrawerFilters'
 
-import { TaskStackParams } from './src/types'
+import { RootStackParams, DrawerParams } from './src/types'
 
-const TaskStack = createStackNavigator<TaskStackParams>()
+const RootStack = createStackNavigator<RootStackParams>()
+const Drawer = createDrawerNavigator<DrawerParams>()
 
 const theme = darkTheme
 
@@ -35,7 +37,7 @@ const App = () => {
             theme={{
               dark: theme.isDark,
               colors: {
-                primary: '#0f0',
+                primary: theme.colors.accent,
                 background: theme.colors.background,
                 card: theme.colors.headerBackground,
                 text: theme.colors.primaryText,
@@ -43,41 +45,48 @@ const App = () => {
                 notification: '#f00',
               },
             }}>
-            <TaskStack.Navigator
+            <RootStack.Navigator
               screenOptions={{
                 headerStyle: { elevation: 0 },
                 headerRightContainerStyle: { marginRight: theme.spacing.m },
               }}>
-              <TaskStack.Screen
-                name="taskList"
-                component={TaskList}
-                options={{ title: 'Tasks' }}
-              />
-              <TaskStack.Screen
-                name="metrics"
-                component={Metrics}
-                options={{ title: 'Point totals' }}
-              />
-              <TaskStack.Screen
-                name="viewTask"
-                component={ViewTask}
+              <RootStack.Screen name="root" options={{ headerShown: false }}>
+                {() => (
+                  <Drawer.Navigator
+                  drawerContent={DrawerFilters}
+                    screenOptions={{
+                      headerTintColor: theme.colors.primaryText,
+                    }}>
+                    <Drawer.Screen
+                      name="multiTaskView"
+                      component={MultiTaskView}
+                      initialParams={{ filterId: '_all' }}
+                      options={{ title: 'Tasks', drawerItemStyle: { 'display': 'none' } }}
+                    />
+                    <Drawer.Screen name="about" component={About} />
+                  </Drawer.Navigator>
+                )}
+              </RootStack.Screen>
+              <RootStack.Screen
+                name="singleTaskView"
+                component={SingleTaskView}
                 options={{ title: 'View Task' }}
               />
-              <TaskStack.Group screenOptions={{ presentation: 'modal' }}>
-                <TaskStack.Screen
+              <RootStack.Group screenOptions={{ presentation: 'modal' }}>
+                <RootStack.Screen
                   name="editTask"
                   component={EditTask}
                   options={({ route }) => ({
                     title: `${route.params?.id ? 'Edit' : 'Add'} Task`,
                   })}
                 />
-                <TaskStack.Screen
+                <RootStack.Screen
                   name="completeTask"
                   component={Completion}
                   options={{ title: 'Complete Task' }}
                 />
-              </TaskStack.Group>
-            </TaskStack.Navigator>
+              </RootStack.Group>
+            </RootStack.Navigator>
           </NavigationContainer>
         </EThemeProvider>
       </PersistGate>

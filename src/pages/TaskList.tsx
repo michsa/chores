@@ -1,6 +1,5 @@
-import React, { useLayoutEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { useTheme } from '@emotion/react'
-import { startCase } from 'lodash'
 
 import {
   IconButton,
@@ -13,10 +12,8 @@ import {
   Divider,
 } from '../components'
 import FilteredTasks from '../components/FilteredTasks'
-import { Picker } from '../components'
-import { useSelector } from '../hooks'
-import { getFilters } from '../redux/selectors'
-import { ScreenProps, FilterID } from '../types'
+import { FilterContext } from './MultiTaskView'
+import { ScreenProps } from '../types'
 
 const SearchBar = ({
   value,
@@ -25,7 +22,6 @@ const SearchBar = ({
   value: string
   onChange: (value: string) => void
 }) => {
-  const theme = useTheme()
   const ref = React.useRef(null)
   return (
     <Row as={Card}>
@@ -54,56 +50,20 @@ const SearchBar = ({
   )
 }
 
-const TaskList = ({ navigation }: ScreenProps['taskList']) => {
+const TaskList = (_: ScreenProps['taskList']) => {
   const theme = useTheme()
-  const [selectedFilter, setSelectedFilter] = useState<FilterID>('all')
   const [query, setQuery] = useState<string>('')
-  const filters = useSelector(getFilters)
 
-  useLayoutEffect(() => {
-    navigation.setOptions({
-      headerRight: () => (
-        <Row spacing="l">
-          <Button
-            style={{ minHeight: theme.sizes.headerButtonHeight }}
-            color="headerForeground"
-            icon="sort-desc"
-            title="Urgency"
-            onPress={() => navigation.navigate('metrics')}
-          />
-          <IconButton
-            variant="primary"
-            size="xlarge"
-            name="plus"
-            onPress={() => navigation.navigate('editTask')}
-          />
-        </Row>
-      ),
-      title: `Tasks`,
-    })
-  }, [navigation])
-
-  const ref = React.useRef(null)
+  const filter = useContext(FilterContext)
 
   return (
     <React.Fragment>
       <SpacedList style={{ paddingHorizontal: theme.spacing.xs }}>
-        <Row as={Card}>
-          <Icon name="list" />
-          <Picker
-            selectedValue={selectedFilter}
-            onValueChange={setSelectedFilter}
-            options={filters.map(filter => ({
-              label: startCase(filter.name),
-              value: filter.id,
-            }))}
-          />
-        </Row>
         <SearchBar value={query} onChange={setQuery} />
       </SpacedList>
 
       <Divider style={{ marginBottom: 0 }} />
-      <FilteredTasks filterId={selectedFilter} query={query} />
+      <FilteredTasks filter={filter} query={query} />
     </React.Fragment>
   )
 }

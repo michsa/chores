@@ -41,8 +41,8 @@ const highlightColors = {
 
 const lightColors = {
   ...highlightColors,
-  background: palette.offWhite,
-  foreground: palette.white,
+  background: palette.white,
+  foreground: palette.offWhite,
   headerBackground: palette.white,
   headerForeground: palette.offWhite,
   text: palette.grey4,

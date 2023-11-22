@@ -33,7 +33,7 @@ const ViewTask = ({
   route: {
     params: { id },
   },
-}: ScreenProps['viewTask']) => {
+}: ScreenProps['singleTaskView']) => {
   const theme = useTheme()
   const dispatch = useDispatch()
   const task = useSelector(getTaskWithTags, id)
@@ -48,7 +48,7 @@ const ViewTask = ({
             color="danger"
             onPress={() => {
               dispatch(deleteTask(id))
-              navigation.navigate('taskList')
+              navigation.navigate('root')
             }}
           />
           <IconButton

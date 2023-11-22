@@ -108,7 +108,7 @@ const EditTask = ({
       const formToSubmit = validate(form)
       const id = dispatch(upsertTask(formToSubmit, params?.id))
       navigation.goBack()
-      navigation.navigate('viewTask', { id })
+      navigation.navigate('singleTaskView', { id })
     } catch (e: unknown) {
       console.log(typeof e)
       const error = (e as Error).toString()
