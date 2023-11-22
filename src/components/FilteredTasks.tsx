@@ -1,8 +1,7 @@
 import React from 'react'
 import { KeyboardAwareFlatList } from 'react-native-keyboard-aware-scroll-view'
-import { Pressable } from 'react-native'
 import { useTheme } from '@emotion/react'
-import { sortBy } from 'lodash'
+import { sortBy, partition } from 'lodash'
 
 import { Spacer } from '.'
 import TaskListItem from './TaskListItem'
@@ -34,6 +33,8 @@ const FilteredTasks = ({ filter, query }: Props) => {
 
   const theme = useTheme()
 
+  // const [pinnedTasks, unpinnedTasks] = partition(tasks, t => isPinned(t.id))
+  // const sortedTasks = sortBy(unpinnedTasks, t => -calcUrgency(t))
   const sortedTasks = sortBy(
     tasks,
     t => -calcUrgency(t) - (isPinned(t.id) ? 1000 : 0)
@@ -45,6 +46,7 @@ const FilteredTasks = ({ filter, query }: Props) => {
     <KeyboardAwareFlatList
       ref={ref}
       keyboardShouldPersistTaps="always"
+      // data={[...pinnedTasks, ...sortedTasks]}
       data={sortedTasks}
       contentContainerStyle={{ paddingHorizontal: theme.spacing.xs }}
       ItemSeparatorComponent={() => <Spacer size="s" />}
@@ -59,7 +61,7 @@ const FilteredTasks = ({ filter, query }: Props) => {
       // hack to force rerendering tasks in the list when they're completed
       keyExtractor={task => task.id + task.runningPoints}
       renderItem={({ item }: { item: TaskWithTagsAndCompletions }) => (
-        <Pressable
+        <TaskListItem
           onPress={() => navigation.navigate('singleTaskView', { id: item.id })}
           onLongPress={() => {
             togglePin(item.id)
@@ -67,16 +69,14 @@ const FilteredTasks = ({ filter, query }: Props) => {
             // console.log(ref.current)
             // @ts-ignore
             ref.current.scrollToPosition(0, 0, true)
-          }}>
-          <TaskListItem
-            {...{
-              item,
-              onEdit: () => navigation.navigate('editTask', { id: item.id }),
-              onComplete: () =>
-                navigation.navigate('completeTask', { id: item.id }),
-            }}
-          />
-        </Pressable>
+          }}
+          isPinned={isPinned(item.id)}
+          item={item}
+          onEdit={() => navigation.navigate('editTask', { id: item.id })}
+          onComplete={() =>
+            navigation.navigate('completeTask', { id: item.id })
+          }
+        />
       )}
     />
   )

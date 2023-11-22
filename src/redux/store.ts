@@ -61,7 +61,14 @@ const persistConfig = {
   ),
 }
 
-const reducer = combineReducers({ tasks, completions, tags, categories, pins, filters })
+const reducer = combineReducers({
+  tasks,
+  completions,
+  tags,
+  categories,
+  pins,
+  filters,
+})
 export type State = ReturnType<typeof reducer>
 
 const persistedReducer = persistReducer(persistConfig, reducer)
@@ -70,9 +77,10 @@ const store = configureStore({
   reducer: persistedReducer,
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
+      serializableCheck: false, //{
+      // ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      // },
+      immutableCheck: false,
     }),
 })
 

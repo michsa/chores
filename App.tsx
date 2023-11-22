@@ -117,7 +117,7 @@ const App = () => {
               <RootStack.Screen
                 name="singleTaskView"
                 component={SingleTaskView}
-                options={{ title: 'View Task' }}
+                options={{ title: 'View Task', detachPreviousScreen: false }}
               />
               <RootStack.Group screenOptions={{ presentation: 'modal' }}>
                 <RootStack.Screen

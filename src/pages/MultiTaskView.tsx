@@ -23,7 +23,6 @@ const MultiTaskView = ({ route, navigation }: ScreenProps['multiTaskView']) => {
   const theme = useTheme()
   const filters = useSelector(getFilters) as { [k: FilterID]: Filter }
 
-  console.log(route.params?.filterId)
   const selectedFilter = route.params?.filterId
 
   // const [selectedFilter, setSelectedFilter] = useState<FilterID>(
@@ -35,8 +34,6 @@ const MultiTaskView = ({ route, navigation }: ScreenProps['multiTaskView']) => {
       title: filters[selectedFilter]?.name ?? 'Tasks',
     })
   }, [navigation, selectedFilter])
-
-  console.log({ selectedFilter })
 
   return (
     <FilterContext.Provider value={filters[selectedFilter]}>

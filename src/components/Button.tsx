@@ -1,6 +1,7 @@
 import React from 'react'
 import { Pressable, PressableProps, Keyboard, ViewStyle } from 'react-native'
 import { useTheme } from '@emotion/react'
+import { mix } from 'polished'
 import { variants } from './utils'
 import { Icon, Text, Row } from '.'
 import { Theme } from '../theme'
@@ -30,6 +31,7 @@ export const BaseButton = ({
   const textColor = fontColor ?? readableText(theme, color)
   return (
     <Pressable
+      android_ripple={{ color: mix(0.5, theme.colors[color], theme.colors.background) }}
       style={[
         {
           minHeight: theme.sizes.buttonHeight,
