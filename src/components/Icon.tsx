@@ -7,12 +7,14 @@ import MaterialIcon from 'react-native-vector-icons/MaterialIcons'
 import { Theme } from '../theme'
 import { variants } from './utils'
 
-const octicons = ['stopwatch', 'pin']
+const octicons = ['stopwatch', 'pin', 'graph', 'grabber']
 const materialIcons = ['add-alarm']
 
 type FeatherIconProps = React.ComponentProps<typeof FeatherIcon>
 export type IconProps = Omit<FeatherIconProps, 'size'> & {
-  color?: keyof Theme['colors']
+  // ideally we'd limit `color` to theme colors, but react-navigation
+  // passes in arbitrary color strings, so we have to support them
+  color?: keyof Theme['colors'] | string
   size?: keyof Theme['iconSizes'] | number
 }
 const BaseIcon = ({
@@ -25,7 +27,8 @@ const BaseIcon = ({
   const theme = useTheme()
   const themeSize =
     typeof size === 'string' ? get(theme.iconSizes, size, 20) : size
-  const themeColor = theme.colors[color]
+  // get the theme color if there is one, else treat it as a plain color string
+  const themeColor = get(theme.colors, color, color)
   const Component = materialIcons.includes(name)
     ? MaterialIcon
     : name.startsWith('sort') || octicons.includes(name)

@@ -94,6 +94,7 @@ const iconSizes = {
   header: 24,
   xlarge: 26,
   xxlarge: 30, // for completion checkmarks
+  footerButton: 36,
 }
 
 const baseTheme = {

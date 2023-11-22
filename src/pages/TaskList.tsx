@@ -4,7 +4,6 @@ import { useTheme } from '@emotion/react'
 import {
   IconButton,
   Row,
-  Button,
   Card,
   SpacedList,
   TextInput,
@@ -50,7 +49,7 @@ const SearchBar = ({
   )
 }
 
-const TaskList = (_: ScreenProps['taskList']) => {
+const TaskList = ({ navigation }: ScreenProps['taskList']) => {
   const theme = useTheme()
   const [query, setQuery] = useState<string>('')
 
@@ -64,6 +63,23 @@ const TaskList = (_: ScreenProps['taskList']) => {
 
       <Divider style={{ marginBottom: 0 }} />
       <FilteredTasks filter={filter} query={query} />
+
+      {/* TODO: pull this out to a generic component & use it in SingleTaskView */}
+      <Row
+        style={{
+          position: 'absolute',
+          bottom: theme.spacing.s,
+          left: 0,
+          right: 0,
+          justifyContent: 'center',
+        }}>
+        <IconButton
+          onPress={() => navigation.navigate('editTask')}
+          name="plus"
+          variant="primary"
+          size="footerButton"
+        />
+      </Row>
     </React.Fragment>
   )
 }

@@ -15,7 +15,7 @@ import { calcUrgency } from '../utils'
 import { useNavigation } from '@react-navigation/core'
 
 type Props = {
-  filter: Filter,
+  filter: Filter
   query?: string
 }
 
@@ -49,7 +49,12 @@ const FilteredTasks = ({ filter, query }: Props) => {
       contentContainerStyle={{ paddingHorizontal: theme.spacing.xs }}
       ItemSeparatorComponent={() => <Spacer size="s" />}
       ListHeaderComponent={Spacer}
-      ListFooterComponent={Spacer}
+      // the parent component has a floating footer button, so we want to add
+      // empty space to the end of the list so that the last element can scroll
+      // above the button.  hacky and imprecise, but it works
+      ListFooterComponent={() => (
+        <Spacer style={{ minHeight: theme.iconSizes.footerButton * 2 }} />
+      )}
       initialNumToRender={1}
       // hack to force rerendering tasks in the list when they're completed
       keyExtractor={task => task.id + task.runningPoints}

@@ -220,9 +220,7 @@ const TaskListItem = ({ item, onEdit, onComplete }: Props) => {
               variant="primary"
               name="check-circle"
               color="accent"
-              containerStyle={{
-                alignSelf: 'flex-start',
-              }}
+              containerStyle={{ alignSelf: 'flex-start' }}
               size="xxlarge"
               onPress={onComplete}
               disabled={isCompleted(item)}

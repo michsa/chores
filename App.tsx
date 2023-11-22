@@ -15,7 +15,7 @@ import SingleTaskView from './src/pages/SingleTaskView'
 import Completion from './src/pages/EditCompletion'
 import About from './src/pages/About'
 import { darkTheme, lightTheme } from './src/theme'
-import DrawerFilters from './src/components/DrawerFilters'
+import CustomDrawer, { renderDrawerIcon } from './src/components/CustomDrawer'
 
 import { RootStackParams, DrawerParams } from './src/types'
 
@@ -53,17 +53,64 @@ const App = () => {
               <RootStack.Screen name="root" options={{ headerShown: false }}>
                 {() => (
                   <Drawer.Navigator
-                  drawerContent={DrawerFilters}
+                    // this function is needed for hot reloading to work
+                    drawerContent={props => <CustomDrawer {...props} />}
                     screenOptions={{
                       headerTintColor: theme.colors.primaryText,
+                      drawerLabelStyle: {
+                        fontSize: theme.fontSizes.small,
+                        // marginVertical: -theme.spacing.xxs
+                      },
                     }}>
                     <Drawer.Screen
                       name="multiTaskView"
                       component={MultiTaskView}
                       initialParams={{ filterId: '_all' }}
-                      options={{ title: 'Tasks', drawerItemStyle: { 'display': 'none' } }}
+                      options={{
+                        title: 'Tasks',
+                        drawerItemStyle: { display: 'none' },
+                      }}
                     />
-                    <Drawer.Screen name="about" component={About} />
+                    <Drawer.Screen
+                      name="tags"
+                      options={{
+                        title: 'Tags',
+                        drawerIcon: renderDrawerIcon('tag'),
+                      }}>
+                      {() => <React.Fragment />}
+                    </Drawer.Screen>
+                    {/* <Drawer.Screen
+                      name="users"
+                      options={{
+                        title: 'Manage people',
+                        drawerIcon: renderDrawerIcon('user'),
+                      }}>
+                      {() => <Text />}
+                    </Drawer.Screen> */}
+                    <Drawer.Screen
+                      name="settings"
+                      options={{
+                        title: 'Settings',
+                        drawerIcon: renderDrawerIcon('settings'),
+                      }}>
+                      {() => <React.Fragment />}
+                    </Drawer.Screen>
+                    {/* <Drawer.Screen
+                      name="tools"
+                      options={{
+                        title: 'Tools',
+                        drawerIcon: renderDrawerIcon('tool'),
+                      }}>
+                      {() => <Text />}
+                    </Drawer.Screen> */}
+                    <Drawer.Screen
+                      name="about"
+                      component={About}
+                      options={{
+                        title: 'About',
+                        drawerIcon: renderDrawerIcon('info'),
+                      }}
+                    />
                   </Drawer.Navigator>
                 )}
               </RootStack.Screen>

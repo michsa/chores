@@ -32,7 +32,7 @@ const MultiTaskView = ({ route, navigation }: ScreenProps['multiTaskView']) => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      title: ['Tasks', startCase(filters[selectedFilter]?.name)].join(': '),
+      title: filters[selectedFilter]?.name ?? 'Tasks',
     })
   }, [navigation, selectedFilter])
 
@@ -56,11 +56,32 @@ const MultiTaskView = ({ route, navigation }: ScreenProps['multiTaskView']) => {
 
       <Spacer />*/}
 
-      <BottomTabs.Navigator screenOptions={{ headerShown: false }}>
-        <BottomTabs.Screen name="taskList" component={TaskList} />
+      <BottomTabs.Navigator
+        screenOptions={{
+          headerShown: false,
+          tabBarLabelPosition: 'beside-icon',
+          tabBarLabelStyle: { marginLeft: theme.spacing.xl },
+          // tabBarShowLabel: false
+        }}>
+        <BottomTabs.Screen
+          name="taskList"
+          component={TaskList}
+          options={{
+            title: 'Tasks',
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="check-circle" {...{ color, size }} />
+            ),
+          }}
+        />
         <BottomTabs.Screen
           name="multiTaskMetrics"
           component={MultiTaskMetrics}
+          options={{
+            title: 'Metrics',
+            tabBarIcon: ({ color, size }) => (
+              <Icon name="graph" {...{ color, size }} />
+            ),
+          }}
         />
       </BottomTabs.Navigator>
     </FilterContext.Provider>

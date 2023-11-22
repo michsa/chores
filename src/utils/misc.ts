@@ -1,13 +1,17 @@
 import { getLuminance, mix } from 'polished'
 import { Theme } from '../theme'
-import { times } from 'lodash'
+import { times, get } from 'lodash'
 
 export const exists = <T>(x: T | undefined): x is T => !!x
 
-export const readableText = (theme: Theme, color: keyof Theme['colors']) => {
+/**
+ * Returns a theme-appropriate readable text color for the input background
+ * color (either `primaryText` or `headerBackground`).
+ */
+export const readableText = (theme: Theme, color: keyof Theme['colors'] | string) => {
   const lightText = theme.isDark ? 'primaryText' : 'headerBackground'
   const darkText = theme.isDark ? 'headerBackground' : 'primaryText'
-  return getLuminance(theme.colors[color]) > 0.5 ? darkText : lightText
+  return getLuminance(get(theme.colors, color)) > 0.5 ? darkText : lightText
 }
 
 export const gradient = (n: number, start: string, end: string) => {

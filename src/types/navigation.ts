@@ -1,8 +1,16 @@
+import {
+  CompositeScreenProps,
+  NavigationProp,
+  ParamListBase,
+  RouteProp,
+} from '@react-navigation/native'
 import { StackScreenProps, StackNavigationProp } from '@react-navigation/stack'
 import { DrawerScreenProps } from '@react-navigation/drawer'
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs"
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { TaskID } from './task'
 import { FilterID, Filter } from './filter'
+
+// ----- stack params ------
 
 export type RootStackParams = {
   root: undefined
@@ -13,6 +21,8 @@ export type RootStackParams = {
 
 export type DrawerParams = {
   multiTaskView: { filterId: FilterID }
+  tags: undefined
+  settings: undefined
   about: undefined
 }
 
@@ -26,21 +36,41 @@ export type SingleTaskViewParams = {
   singleTaskMetrics: undefined
 }
 
+// ----- screen props ------
+
 export type ScreenProps = {
   root: StackScreenProps<RootStackParams, 'root'>
 
   // multi tasks
-  multiTaskView: DrawerScreenProps<DrawerParams, 'multiTaskView'>
-  taskList: BottomTabScreenProps<MultiTaskViewParams, 'taskList'>
-  multiTaskMetrics: BottomTabScreenProps<MultiTaskViewParams, 'multiTaskMetrics'>
-  
+  multiTaskView: Compose<
+    DrawerScreenProps<DrawerParams, 'multiTaskView'>,
+    'root'
+  >
+  taskList: Compose<
+    BottomTabScreenProps<MultiTaskViewParams, 'taskList'>,
+    'multiTaskView'
+  >
+  multiTaskMetrics: Compose<
+    BottomTabScreenProps<MultiTaskViewParams, 'multiTaskMetrics'>,
+    'multiTaskView'
+  >
+
   // single tasks
-  singleTaskView: StackScreenProps<RootStackParams, 'singleTaskView'>
-  taskDetails: BottomTabScreenProps<SingleTaskViewParams, 'taskDetails'>
-  singleTaskMetrics: BottomTabScreenProps<SingleTaskViewParams, 'singleTaskMetrics'>
+  singleTaskView: Compose<
+    StackScreenProps<RootStackParams, 'singleTaskView'>,
+    'root'
+  >
+  taskDetails: Compose<
+    BottomTabScreenProps<SingleTaskViewParams, 'taskDetails'>,
+    'singleTaskView'
+  >
+  singleTaskMetrics: Compose<
+    BottomTabScreenProps<SingleTaskViewParams, 'singleTaskMetrics'>,
+    'singleTaskView'
+  >
 
   // other drawer screens
-  about: DrawerScreenProps<DrawerParams, 'about'>
+  about: Compose<DrawerScreenProps<DrawerParams, 'about'>, 'root'>
 
   // modals
   editTask: StackScreenProps<RootStackParams, 'editTask'>
@@ -50,3 +80,23 @@ export type ScreenProps = {
 export type NavigationProps = {
   root: StackNavigationProp<RootStackParams, 'root'>
 }
+
+// ------ utils -------
+
+// type we can pass to CompositeScreenProps
+type ComposableScreenProp = {
+  navigation: NavigationProp<
+    ParamListBase,
+    string,
+    string | undefined,
+    any,
+    any,
+    any
+  >
+  route: RouteProp<ParamListBase>
+}
+
+type Compose<
+  y extends ComposableScreenProp,
+  x extends keyof ScreenProps
+> = CompositeScreenProps<y, ScreenProps[x]>

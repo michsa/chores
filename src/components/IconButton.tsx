@@ -1,9 +1,9 @@
 import React from 'react'
+import { get } from 'lodash'
 import { Pressable, Keyboard, PressableProps } from 'react-native'
 import { useTheme } from '@emotion/react'
 import { Theme } from '../theme'
 import { readableText } from '../utils'
-import { ButtonProps } from './Button'
 import Icon, { IconProps } from './Icon'
 
 export type IconButtonProps = IconProps & {
@@ -24,8 +24,13 @@ export const IconButton = ({
 }: IconButtonProps) => {
   const theme = useTheme()
   const defaultBackgroundColor = (pressed: boolean) => {
-    if (variant === 'primary') return theme.colors[color]
-    return pressed ? theme.colors.highlight : 'transparent'
+    return variant === 'primary'
+      ? // if `color` is not a theme key, assume it's a plain color string.
+        // we have to support arbitrary colors because of react-navigation.
+        get(theme.colors, color, color)
+      : pressed
+      ? theme.colors.highlight
+      : 'transparent'
   }
   return (
     <Pressable
@@ -33,7 +38,10 @@ export const IconButton = ({
       removeClippedSubviews
       style={({ pressed }) => [
         {
-          borderRadius: theme.spacing.xl,
+          borderRadius:
+            typeof props.size == 'number'
+              ? props.size
+              : theme.iconSizes[props.size ?? 'regular'],
           backgroundColor: backgroundColor
             ? theme.colors[backgroundColor(pressed)]
             : defaultBackgroundColor(pressed),
